@@ -1,0 +1,744 @@
+import React, { Component } from "react";
+import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
+import DropDownPicker from 'react-native-dropdown-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import styles from "./styles";
+import { FontAwesome5 } from '@expo/vector-icons';
+import { CommonActions } from '@react-navigation/native';
+import Spinner from 'react-native-loading-spinner-overlay';
+
+import { GlobalVariables } from '../../../global';
+import * as Font from 'expo-font';
+
+
+
+export default class Electricity extends Component {
+    constructor(props) {
+        super(props);
+  
+        this.state = {
+            rating: 0,
+            customerName: "",
+            phoneNo: "",
+            selectedValue:"",
+            modalVisible: false,
+            email: "",
+            meterno:"",
+            meternoLength: 11,
+            balance:0,
+            company: "",
+            amount:0,
+            isLoading:false,
+            biller_code:"",
+            auth_token:"",
+            epayWalletChecked:true, 
+            payOnDelieveryChecked:false,
+            discoOpen: false,
+            discoValue: null,
+            discos: [{label:'AEDC - Abuja Electricity Distribution Company',value:'AEDC', icon: () => <Image source={require('../../Images/Electricity/aedc.png')} style={styles.iconStyle} />}, {label:'EEDC - Enugu Electricity Distribution Company',value:'EEDC', icon: () => <Image source={require('../../Images/Electricity/eedc.png')} style={styles.iconStyle} />}, {label:'EKEDC - Eko Electricity Distribution Company',value:'EKEDC', icon: () => <Image source={require('../../Images/Electricity/ekedc.png')} style={styles.iconStyle} />},
+                {label:'IBEDC - Ibadan Electricity Distribution Company',value:'IBEDC', icon: () => <Image source={require('../../Images/Electricity/ibedc.png')} style={styles.iconStyle} />}, {label:'IKEDC - Ikeja Electricity Distribution Company',value:'IKEDC', icon: () => <Image source={require('../../Images/Electricity/ikedc.png')} style={styles.iconStyle} />}, {label:'JEDC- Jos Electricity Distribution Company',value:'JEDC', icon: () => <Image source={require('../../Images/Electricity/jedc.png')} style={styles.iconStyle} />},
+                {label:'KAEDC - Kaduna Electricity Distribution Company',value:'KAEDC', icon: () => <Image source={require('../../Images/Electricity/kaedc.png')} style={styles.iconStyle} />}, {label:'KEDC - Kano Electricity Distribution Company',value:'KEDC', icon: () => <Image source={require('../../Images/Electricity/kedc.png')} style={styles.iconStyle} />}, {label:'PHEDC - Port Harcourt Electricity Distribution Company',value:'PHEDC', icon: () => <Image source={require('../../Images/Electricity/phedc.png')} style={styles.iconStyle} />}
+            ],
+            typeOpen: false,
+            typeValue: null,
+            meter_type: [{label:'Prepaid',value:'PREPAID'}, {label:'Postpaid',value:'POSTPAID'}],
+            transaction: false,
+            there_cards: false
+        };
+    }
+
+    async UNSAFE_componentWillMount() {
+        this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});
+        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
+
+        this.loadWalletBalance();
+        this.getUserCards();
+        await Font.loadAsync({
+            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
+            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
+            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
+            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
+            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
+            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
+            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
+            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
+            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
+            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
+            'Helvetica': require('../../Fonts/Helvetica.ttf'),
+        });
+        this.setState({ fontLoaded: true });
+    }
+
+    loadWalletBalance(){
+        fetch(GlobalVariables.apiURL+"/wallet/get-details",
+        { 
+            method: 'GET',
+            headers: new Headers({
+              'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+              'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body:  ""         
+            // <-- Post parameters
+        }) 
+        .then((response) => response.text())
+        .then((responseText) => { 
+      
+            let response_status = JSON.parse(responseText).status;
+           
+            if(response_status == true){
+                let data = JSON.parse(responseText).data;  
+                let wallet = data.wallet;
+                this.setState({balance:parseInt(wallet.balance)});
+            }else if(response_status == false){
+                Alert.alert(
+                'Session Out',
+                'Your session has timed-out. Login and try again',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => this.props.navigation.navigate('Signin'),
+                        style: 'cancel',
+                    }, 
+                    ],
+                {cancelable: false},
+                );
+            }
+        })
+        .catch((error) => {
+            // console.error(error);
+            this.setState({isLoading:false});
+            alert("Network error. Please check your connection settings");
+        });      
+    }
+
+    backPressed = () => {
+        if(this.state.transaction){
+            this.props.navigation.dispatch(
+                CommonActions.reset({
+                routes: [
+                    { name: 'Tabs' }
+                ],
+                })
+            );
+        }else{
+            this.props.navigation.goBack();
+        }
+        return true;  
+    };
+    
+    setModalVisible = (visible) => {
+        this.setState({ modalVisible: visible });
+    }
+
+    GetValueFunction = (meterno) =>{
+        var Value = meterno.length.toString();
+   
+        this.setState({meterno: meterno});
+        if (Value == 10) {
+            this.validateMeter(meterno, this.state.typeValue, this.state.discoValue);
+        }
+    }
+
+    validateMeter(meterno, type, company){
+        var Value = meterno.length.toString();
+        if (meterno == '' || Value < 10) {
+        
+        }else if(company == null){
+
+        }else if(type == null){
+
+        }else if(meterno != '' && type != null && company != null){ 
+            
+            let myHeaders = new Headers();
+            myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+
+            let requestOptions = {
+                method: 'POST',
+                headers: myHeaders
+            };
+            
+            this.setState({isLoading:true});
+            
+            fetch(GlobalVariables.apiURL+"/electricity/validate-meter?meter_no="+meterno+"&meter_type="+type+"&company="+company, requestOptions)
+            .then(response => response.text())
+            .then(responseText => 
+            {
+                // console.log(responseText);
+                let result = JSON.parse(responseText);
+                if(result.status == true){
+                    // console.log(result.data)
+                    if(result.data.status != 200){
+                        Alert.alert(
+                            'Error',
+                            result.data.message,
+                            [
+                                {
+                                    text: 'OK',
+                                    style: 'cancel',
+                                }, 
+                            ],
+                            {cancelable: false},
+                        );
+                    }
+                    this.setState({customerName:result.data.customerName, phoneNo:result.data.phoneNumber});
+                    this.setState({isLoading:false});
+                }else if(result.status != true){
+                    Alert.alert(
+                        'Error',
+                        result.message,
+                        [
+                            {
+                                text: 'OK',
+                                // onPress: () => this.props.navigation.navigate('Signin'),
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );
+                    this.setState({isLoading:false});
+                }else{
+                    Alert.alert(
+                        'Error',
+                        result.data,
+                        [
+                            {
+                                text: 'OK',
+                                // onPress: () => this.props.navigation.navigate('Signin'),
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );
+                    this.setState({isLoading:false});
+                }
+                
+            })
+            .catch((error) => {
+                this.setState({isLoading:false});
+                alert("Network error. Please check your connection settings");
+            });   
+        }
+    }
+
+    payPower(){
+        this.setState({isLoading:true});
+  
+        if( Math.floor(this.state.amount) < Math.floor(this.state.balance)){
+            let myHeaders = new Headers();
+            myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+            myHeaders.append("Content-Type", "application/json");
+  
+            let raw = JSON.stringify({
+                "company":this.state.discoValue,
+                "meter_no":this.state.meterno,
+                "amount":this.state.amount,
+                "meter_type":this.state.typeValue,
+                "channel": "wallet",
+                "callback_url": GlobalVariables.apiURL+"/verify",
+                "card_position": "primary",
+                "phone_number": this.state.phoneNo
+            });
+  
+            let requestOptions = 
+            {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+            };
+  
+            fetch(GlobalVariables.apiURL+"/electricity/pay-bill", requestOptions)
+            .then(response => response.text())
+            .then(result => 
+            {
+                this.setState({isProcessing:false});
+                //go on
+                console.log(JSON.parse(result))
+                let resultjson  = JSON.parse(result);
+                if(resultjson.status ==false){
+                    Alert.alert(
+                        "Error",
+                        resultjson.message,
+                        [
+                            {
+                                text: 'Try Again',
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );  
+                    
+                }else if(resultjson.status ==true){
+                    console.log(resultjson.data.transaction.id);
+                    this.props.navigation.navigate("SuccessPage",
+                    {
+                        transaction_id:resultjson.data.transaction.id,
+                    }); 
+                }
+            
+            })
+            .catch((error) => {
+                this.setState({isLoading:false});
+                alert("Network error. Please check your connection settings");
+            });   
+        }else{
+
+            //insufficient balance
+            this.setState({isLoading:false});
+            
+            Alert.alert(
+                'Insufficient Balance',
+                'You have insufficient balance. Kindly top up your wallet and try again',
+                [
+                    {
+                        text: 'Try Again',
+                        style: 'cancel',
+                    },     
+                ],
+                {cancelable: false},
+            );  
+        }
+    }
+
+    payPowerWithNewCard(){
+        this.setState({isLoading:true});
+        let myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+        myHeaders.append("Content-Type", "application/json");
+
+        let raw = JSON.stringify({
+            "company":this.state.discoValue,
+            "meter_no":this.state.meterno,
+            "amount":this.state.amount,
+            "meter_type":this.state.typeValue,
+            "channel": "card",
+            "callback_url": GlobalVariables.apiURL+"/verify",
+            "card_position": "new",
+            "phone_number": this.state.phoneNo
+        });
+
+        let requestOptions = 
+        {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+        };
+  
+        fetch(GlobalVariables.apiURL+"/electricity/pay-bill", requestOptions)
+        .then(response => response.text())
+        .then(result => 
+        {
+            this.setState({isLoading:false});
+            //go on
+            let resultjson  = JSON.parse(result);
+            // console.log(resultjson);
+            if(resultjson.status ==false){
+                Alert.alert(
+                    "Error",
+                    resultjson.message,
+                    [
+                        {
+                            text: 'Try Again',
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );  
+                
+            }else if(resultjson.status ==true){
+                let data = JSON.parse(result).data;
+                if (data.payment_info) {
+                    this.setState({transaction:true});
+                    let datat = data.payment_info.data;
+                    this.props.navigation.navigate("NewDebitCardPayment", 
+                    {
+                        datat: datat,
+                        verifyUrl: "/electricity/verify-bill-payment",
+                        routeName: 'Electricity'
+                    });
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            this.setState({isLoading:false});
+            alert("Network error. Please check your connection settings");
+        }); 
+    }
+
+    payPowerWithCard(){
+        this.setState({isLoading:true});
+        let company = this.state.discoValue;
+        let meter_no = this.state.meterno;
+        let amount = this.state.amount;
+        let meter_type = this.state.typeValue;
+        let phone_number = this.state.phoneNo;
+
+        this.props.navigation.navigate("DebitCardPayment",
+            {
+                transaction_type:"Electricity",
+                amount: amount,
+                phonenumber_value: phone_number,
+                meter_no: meter_no,
+                meter_type: meter_type,
+                company: company,
+                url: "/electicity/pay-bill"
+            }); 
+    }
+
+    getUserCards(){
+        this.setState({isLoading:true});
+        fetch(GlobalVariables.apiURL+"/user/get-cards",
+        { 
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body:  ""         
+            // <-- Post parameters
+        }) 
+        .then((response) => response.text())
+        .then((responseText) => {
+            let response_status = JSON.parse(responseText).status;
+             
+            if(response_status == true){
+                let data = JSON.parse(responseText).data;
+                if(data != ''){
+                    // this.setState({ cards: data })
+                    let newArray = data.map((item) => {
+                        if (item.reusable == true) {
+                            return item
+                        }
+                    })
+                    if(newArray.length != 0){
+                        this.setState({there_cards: true});
+                    }
+                    this.setState({isLoading:false});
+                }else{
+                    this.setState({there_cards: false});
+                    this.setState({isLoading:false});
+                }
+            }else if(response_status == false){
+                this.setState({there_cards: false});
+                this.setState({isLoading:false});
+            }
+        })
+        .catch((error) => {
+            alert("Network error. Please check your connection settings");
+            this.setState({isLoading:false});
+        });      
+    }
+
+    checkIfUserHasCard(){
+        if (this.state.there_cards == false) {
+            this.payPowerWithNewCard();
+        }else{
+            this.payPowerWithCard();
+        }
+    }
+
+    confirmPurchase(thetype){
+        let company = this.state.discoValue;
+        let meter_no = this.state.meterno;
+        let amount = this.state.amount;
+        let meter_type = this.state.typeValue;
+        let phoneNo = this.state.phoneNo;
+
+        if(meter_no == "" && amount == ""){
+            alert("Meter No and amount must be inserted");
+        }else if(company == null){
+            alert("Pls select a distribution company");
+        }else if(meter_type == null){
+            alert("Pls select a meter type");
+        }else if(phoneNo == ""){
+            alert("Recipient Phone Number must be inserted");
+        }else{
+            if(thetype=="wallet"){
+                Alert.alert(
+                    'Confirm Purchase',
+                    'Do you want to recharge '+amount+' on '+meter_no+' with wallet?\n',
+                    [
+                        {  
+                            text: 'Cancel',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
+                        {
+                            text: 'Yes, Pay with Wallet',
+                            onPress: () => {this.payPower()},
+                            style: 'cancel',
+                        },
+                    ],
+                    {cancelable: false},
+                );
+            }else{
+                Alert.alert(
+                    'Confirm Purchase',
+                    'Do you want to recharge '+amount+' on '+meter_no+' with card?\n',
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
+                        {
+                            text: 'Yes, Pay with Card',  
+                            onPress: () => {this.checkIfUserHasCard();},
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }
+        }
+    }
+
+    setDiscoOpen = (discoOpen) => {
+        this.setState({
+            discoOpen,
+            typeOpen:false
+        });
+    }
+
+    setDiscoValue = (callback) => {
+        this.setState(state => ({
+            discoValue: callback(state.discoValue)
+        }));
+    }
+
+    setDiscoItems = (callback) => {
+        this.setState(state => ({
+            discoItems: callback(state.discoItems)
+        }));
+    }
+
+    setTypeOpen = (typeOpen) => {
+        this.setState({
+            typeOpen,
+            discoOpen:false
+        });
+    }
+
+    setTypeValue = (callback) => {
+        this.setState(state => ({
+            typeValue: callback(state.typeValue)
+        }));
+    }
+
+    setTypeItems = (callback) => {
+        this.setState(state => ({
+            typeItems: callback(state.typeItems)
+        }));
+    }
+    
+    numberFormat = x => {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    render() {
+        const { navigation } = this.props;
+        StatusBar.setBarStyle("light-content", true);
+        if (Platform.OS === "android") {
+            StatusBar.setBackgroundColor("#445cc4", true);
+            StatusBar.setTranslucent(true);
+        }
+
+        return (
+            <View style={styles.container}>
+                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
+                <View style={styles.header}>
+                    <View style={styles.left}>
+                        <TouchableOpacity onPress={() =>this.backPressed()}>
+                            <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
+                        </TouchableOpacity>
+                    </View> 
+                    <View style={styles.headerBody}>
+                        <Text style={styles.body}>Electricity</Text>
+                        <Text style={styles.text}>Pay bills easily</Text>
+                    </View>
+                    <View style={styles.right}>
+                        <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
+                    </View> 
+                </View>
+                <View style={[styles.formLine, {marginTop:'0.01%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Select Disco</Text>
+                    </View>
+                </View>
+                <View style={{width:'90%', marginLeft:'5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:10}}>
+                    <DropDownPicker
+                        placeholder={'Select Distribution Company'}
+                        open={this.state.discoOpen}
+                        value={this.state.discoValue}
+                        style={[styles.dropdown, {flexDirection: 'row', marginTop:'1%', zIndex:10}]}
+                        items={this.state.discos}
+                        setOpen={this.setDiscoOpen}
+                        setValue={this.setDiscoValue}
+                        setItems={this.setDiscoItems}
+                        onSelectItem={(item) => {
+                            this.validateMeter(this.state.meterno, this.state.typeValue, item.value);
+                        }}
+                        listMode="SCROLLVIEW"
+                        scrollViewProps={{
+                            nestedScrollEnabled: true,
+                            // persistentScrollbar: true,
+                        }}
+                        dropDownContainerStyle={{
+                            width:'100%',
+                            marginLeft:'0%',
+                            position: 'relative',
+                            top: 0,
+                        }}           
+                    />
+                </View>
+                <View style={{justifyContent:'center'}}>
+                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'13%',marginLeft:'3.5%'}}>Meter Type</Text>
+                </View>
+                <View style={{width:'90%', marginLeft:'5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5}}>
+                    <DropDownPicker
+                        placeholder={'Select Meter Type'}
+                        open={this.state.typeOpen}
+                        value={this.state.typeValue}
+                        style={[styles.dropdown, {flexDirection: 'row', marginTop:'1%'}]}
+                        items={this.state.meter_type}
+                        setOpen={this.setTypeOpen}
+                        setValue={this.setTypeValue}
+                        setItems={this.setTypeItems}
+                        onSelectItem={(item) => {
+                            this.validateMeter(this.state.meterno, item.value, this.state.discoValue);
+                        }}
+                    />
+                </View>
+
+                <View style={[styles.formLine, {marginTop:'11%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Enter Meter Number</Text>
+                        <View roundedc style={[styles.inputitem]}>
+                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="meterno" onChangeText={meterno => this.GetValueFunction(meterno)} value={this.state.meterno}/>
+                        </View>
+                    </View>
+                </View>
+                
+                <View style={{justifyContent:'center', marginTop:'2.5%'}}>
+                    <Text style={{ fontFamily: "SFUIDisplay-Medium", fontSize:14, marginLeft:'3.5%' }}>Customer Name</Text>
+                </View>
+                <View 
+                    style={{
+                        marginTop:'0.1%',
+                        marginBottom:'0.2%',
+                        backgroundColor:'#fff',
+                        marginLeft:'3%',
+                        width: '94%'
+                    }}
+                >
+                    <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.customerName}</Text>
+                </View>
+
+                <View style={{justifyContent:'center', marginTop:'2.5%', borderWidth:0}}>
+                    <Text style={{ fontFamily: "SFUIDisplay-Medium", fontSize:14, marginLeft:'3.5%'}} placeholder="Phone number">Customer Phone Number</Text>
+                </View>
+                <View 
+                    style={{
+                        marginTop:'0.02%',
+                        marginBottom:'2%',
+                        backgroundColor:'#fff',
+                        paddingTop:5,
+                        paddingLeft:15,
+                    }}
+                >
+                    <View roundedc style={[styles.inputitem,{}]}>
+                        <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                        <TextInput placeholder="Phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" value={this.state.phoneNo} onChangeText={(phoneNo) => this.setState({phoneNo})}/>
+                    </View>
+                </View> 
+
+                <View style={{justifyContent:'center', marginTop:'0.4%'}}>
+                    <Text style={{ fontFamily: "SFUIDisplay-Medium", fontSize:14, marginLeft:'3.5%'}} >Amount</Text>
+                </View>
+                <View 
+                    style={{
+                        marginTop:'0%',
+                        marginBottom:'2%',
+                        backgroundColor:'#fff',
+                        paddingTop:5,
+                        paddingLeft:15,
+                        paddingBottom:10
+                    }}
+                >
+                    <View roundedc style={styles.inputitem}>
+                        <TextInput placeholder="Amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" value={this.state.amount.toString()} onChangeText={(amount) => this.setState({amount})}/>
+                    </View>
+                </View> 
+
+                {/* Card Option*/}
+                <View
+                    style={{
+                        backgroundColor:'#fff',
+                        marginTop:'0.3%',
+                        marginLeft: '4%',
+                        borderRadius: 30,
+                        borderWidth: 1,
+                        marginRight: '4%',
+                        borderColor: 'transparent',
+                        elevation: 2
+                    }}
+                >
+                    <View 
+                        style={{
+                            paddingLeft:1,
+                            marginTop:'0.5%',
+                            marginLeft:'3%',
+                            marginRight:'6%'
+                        }}
+                    >
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
+                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
+                                    <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
+                                </TouchableOpacity>
+
+                                <View style={{marginLeft:'1%', padding:7}}>
+                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
+                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
+                                    <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
+                                </View>
+                            </TouchableOpacity>
+                        </View> 
+                        <View style={[styles.buttonContainer,{borderTopColor:'#f5f5f5', borderTopWidth:1}]}>
+                            <TouchableOpacity style={{flexDirection:'row'}} 
+                                onPress={()=>{
+                                    this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
+                                }}
+                            > 
+                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
+                                    <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
+                                </TouchableOpacity>
+
+                                <View style={{marginLeft:'1%', padding:5}}>
+                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay with Card</Text>
+                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>Make Payment with your Debit/Credit Card </Text>
+                                    <Image source={require('../../Images/payment-terms.png')} style={{ width:270, height:50, marginLeft:-7, borderRadius:20 }}/>
+                                </View>
+                            </TouchableOpacity>
+                        </View> 
+                    </View>   
+                </View> 
+
+                {/* Card Option */}
+
+                <TouchableOpacity
+                    info
+                    style={[styles.buttonPurchase,{marginBottom:'10%'}]}
+                    onPress={() => {
+                        (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
+                    }}
+                >
+                    <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
+                        Confirm Purchase
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+}

@@ -1,0 +1,32 @@
+        fetch(GlobalVariables.apiURL+"/wallet/fund-verify?",
+        { 
+            method: 'POST',
+            headers: new Headers({
+              'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+              'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body:   "reference="+this.state.reference
+                    +"&trxref="+this.state.reference
+                
+            // <-- Post parameters
+        }) 
+        .then((response) => response.text())
+        .then((responseText) => { 
+        this.setState({isLoading:false});
+        console.log(JSON.parse(responseText))
+        let response_status = JSON.parse(responseText).status;
+        if(response_status == true){
+            // let data = JSON.parse(responseText).data;  
+            // if (data.payment_info) {
+            // this.props.navigation.navigate("Paystack",{
+            //     access_code:data.payment_info.data.access_code
+            // });
+            // }
+        //   this.setState({balance:wallet.balance});
+        }else if(response_status == false){
+            // console.log(JSON.parse(responseText))
+        }
+        })
+        .catch((error) => {
+            alert("Network error. Please check your connection settings");
+        });
