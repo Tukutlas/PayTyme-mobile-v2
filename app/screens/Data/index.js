@@ -210,7 +210,6 @@ export default class Data extends Component {
             .then((response) => response.text())
             .then((responseText) => 
             { 
-                console.log(responseText)
                 let response  = JSON.parse(responseText);
                 let bundlesplan = response.data;
                 let newArray = bundlesplan.map((item) => {
