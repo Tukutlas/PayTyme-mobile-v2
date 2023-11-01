@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.transparent,
     height: Metrics.HEIGHT * 0.08,
     borderBottomWidth: 0,
-    marginTop: Metrics.HEIGHT * 0.07,
+    marginTop: Metrics.HEIGHT * 0.06,
     elevation: 0,
     flexDirection: 'row',
     flexWrap: 'wrap'
@@ -57,29 +57,60 @@ const styles = StyleSheet.create({
     backgroundColor:'#fff'
   },
 
-  formLine:{
+  formLine: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor:'#fff',
-    width: '100%',
-    // paddingTop:0
-    // paddingTop: Metrics.HEIGHT * 0.00001,
+    backgroundColor: '#fff',
+    width: '97%',
+    paddingTop: 0,
   },
 
-  formCenter:{
-    paddingLeft: Metrics.WIDTH * 0.0421,
-    width: Metrics.WIDTH * 1.05
+  formCenter: {
+    marginLeft: '4%', // Adjust the padding according to your requirement
+    width: '95%',
   },
 
   inputitem: {
-    borderRightColor:'transparent',
-    borderWidth:0,
-    elevation:0,
-    borderRadius:1,
-    width: '90%',
-    backgroundColor:'#F6F6F6',
-    marginTop:'0.2%',
-    height: 30
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    height: 40,
+    marginTop: '1%',
+    backgroundColor: '#F6F6F6',
+  },
+
+  labeltext: {
+    color: '#222222',
+    marginTop: '1%',
+    fontSize: 14,
+    fontFamily: 'Roboto-Medium',
+  },
+
+  textBox: {
+    fontSize: 13,
+    flex: 1,
+    height: 35,
+    paddingVertical: 0,
+    paddingHorizontal: 10, // Adjust the padding according to your requirement
+    borderRadius: 2,
+    backgroundColor: '#F6F6F6',
+  },
+
+  phoneIcon: {
+    marginHorizontal: 10, // Adjust the margin according to your requirement
+  },
+
+  verifyButton: {
+    backgroundColor: '#0C0C54',
+    padding: 5,
+    borderRadius: 25,
+    marginLeft: 10,
+  },
+  verifyButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
   },
 
   buttonPurchase: {
@@ -91,7 +122,7 @@ const styles = StyleSheet.create({
     paddingRight: 40,
     paddingTop: 15,
     paddingBottom: 15,
-    marginTop: 20,
+    marginTop: '4%',
     borderRadius: 4,
     width: Metrics.WIDTH * 0.91
   },
@@ -113,29 +144,15 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50
   },
+  iconStyle2:{
+    width: 35,
+    height: 20
+  },
   labeltext:{
     color:'#222222',
     marginTop:'1%',
     fontSize:14,
     fontFamily: "Roboto-Medium",
-  },
-
-  textBox: {
-    fontSize: 13,
-    alignSelf: 'stretch',
-    height: 25,
-    borderWidth: 0,
-    paddingVertical: 0,
-    borderRadius: 2,
-    backgroundColor:'#F6F6F6',
-  },
-
-  phoneIcon:{
-      position: 'absolute',
-      marginLeft: 6,
-      height: 20,
-      width: 35,
-      padding: 2
   },
 
   buttonImage: {

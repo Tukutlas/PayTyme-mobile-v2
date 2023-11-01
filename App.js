@@ -22,7 +22,7 @@ import Data from './app/screens/Data';
 // import TvSubscription from './app/screens/TvSubscription';
 // import Education from './app/screens/Education';
 import Betting from './app/screens/Betting';
-// import Electricity from './app/screens/Electricity';
+import Electricity from './app/screens/Electricity';
 import Paystack from './app/screens/Paystack';
 import DebitCardPayment from './app/screens/DebitCardPayment';
 import NewDebitCardPayment from './app/screens/DebitCardPayment/New';
@@ -89,7 +89,7 @@ const RootStack = () => {
                 {/* <Stack.Screen name="TvSubscription" component={TvSubscription}/> */}
                 {/* <Stack.Screen name="Education" component={Education} /> */}
                 <Stack.Screen name="Betting" component={Betting} />
-                {/* <Stack.Screen name="Electricity" component={Electricity} /> */}
+                <Stack.Screen name="Electricity" component={Electricity} />
                 <Stack.Screen name="SuccessPage" component={SuccessPage} />
                 <Stack.Screen name="SingleTransaction" component={SingleTransaction} />
                 <Stack.Screen name="WalletTopUp" component={WalletTopUp} />

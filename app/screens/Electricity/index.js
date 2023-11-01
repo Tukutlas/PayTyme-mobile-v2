@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
+import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, ScrollView } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
@@ -35,15 +35,25 @@ export default class Electricity extends Component {
             payOnDelieveryChecked:false,
             discoOpen: false,
             discoValue: null,
-            discos: [{label:'AEDC - Abuja Electricity Distribution Company',value:'AEDC', icon: () => <Image source={require('../../Images/Electricity/aedc.png')} style={styles.iconStyle} />}, {label:'EEDC - Enugu Electricity Distribution Company',value:'EEDC', icon: () => <Image source={require('../../Images/Electricity/eedc.png')} style={styles.iconStyle} />}, {label:'EKEDC - Eko Electricity Distribution Company',value:'EKEDC', icon: () => <Image source={require('../../Images/Electricity/ekedc.png')} style={styles.iconStyle} />},
+            discos: [{label:'AEDC - Abuja Electricity Distribution Company',value:'AEDC', icon: () => <Image source={require('../../Images/Electricity/aedc.png')} style={styles.iconStyle} />},{label:'BEDC - Benin Electricity Distribution Company',value:'BEDC', icon: () => <Image source={require('../../Images/Electricity/bedc.png')} style={styles.iconStyle2} />}, {label:'EEDC - Enugu Electricity Distribution Company',value:'EEDC', icon: () => <Image source={require('../../Images/Electricity/eedc.png')} style={styles.iconStyle} />}, {label:'EKEDC - Eko Electricity Distribution Company',value:'EKEDC', icon: () => <Image source={require('../../Images/Electricity/ekedc.png')} style={styles.iconStyle} />},
                 {label:'IBEDC - Ibadan Electricity Distribution Company',value:'IBEDC', icon: () => <Image source={require('../../Images/Electricity/ibedc.png')} style={styles.iconStyle} />}, {label:'IKEDC - Ikeja Electricity Distribution Company',value:'IKEDC', icon: () => <Image source={require('../../Images/Electricity/ikedc.png')} style={styles.iconStyle} />}, {label:'JEDC- Jos Electricity Distribution Company',value:'JEDC', icon: () => <Image source={require('../../Images/Electricity/jedc.png')} style={styles.iconStyle} />},
                 {label:'KAEDC - Kaduna Electricity Distribution Company',value:'KAEDC', icon: () => <Image source={require('../../Images/Electricity/kaedc.png')} style={styles.iconStyle} />}, {label:'KEDC - Kano Electricity Distribution Company',value:'KEDC', icon: () => <Image source={require('../../Images/Electricity/kedc.png')} style={styles.iconStyle} />}, {label:'PHEDC - Port Harcourt Electricity Distribution Company',value:'PHEDC', icon: () => <Image source={require('../../Images/Electricity/phedc.png')} style={styles.iconStyle} />}
             ],
             typeOpen: false,
             typeValue: null,
-            meter_type: [{label:'Prepaid',value:'PREPAID'}, {label:'Postpaid',value:'POSTPAID'}],
+            meter_type: [{label:'Prepaid',value:'prepaid'}, {label:'Postpaid',value:'postpaid'}],
             transaction: false,
-            there_cards: false
+            there_cards: false,
+            serviceProvider: '',
+            isValidated: false,
+            meterError: false,
+            meterErrorMessage: '',
+            meterTypeError: false,
+            discoError: false,
+            amountError: false,
+            amountErrorMessage: '',
+            phoneError: false,
+            phoneNoErrorMessage: ''
         };
     }
 
@@ -70,7 +80,7 @@ export default class Electricity extends Component {
     }
 
     loadWalletBalance(){
-        fetch(GlobalVariables.apiURL+"/wallet/get-details",
+        fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
             method: 'GET',
             headers: new Headers({
@@ -82,12 +92,10 @@ export default class Electricity extends Component {
         }) 
         .then((response) => response.text())
         .then((responseText) => { 
-      
             let response_status = JSON.parse(responseText).status;
            
             if(response_status == true){
-                let data = JSON.parse(responseText).data;  
-                let wallet = data.wallet;
+                let wallet = JSON.parse(responseText).data;  
                 this.setState({balance:parseInt(wallet.balance)});
             }else if(response_status == false){
                 Alert.alert(
@@ -115,9 +123,9 @@ export default class Electricity extends Component {
         if(this.state.transaction){
             this.props.navigation.dispatch(
                 CommonActions.reset({
-                routes: [
-                    { name: 'Tabs' }
-                ],
+                    routes: [
+                        { name: 'Tabs' }
+                    ],
                 })
             );
         }else{
@@ -131,56 +139,52 @@ export default class Electricity extends Component {
     }
 
     GetValueFunction = (meterno) =>{
-        var Value = meterno.length.toString();
+        var value = meterno.length.toString();
+        // console.log(value)
    
         this.setState({meterno: meterno});
-        if (Value == 10) {
-            this.validateMeter(meterno, this.state.typeValue, this.state.discoValue);
-        }
+        // if (Value == 10) {
+            // this.validateMeter(meterno, this.state.typeValue, this.state.discoValue);
+        // }
+    }
+
+    handleVerify(){
+        meter_no = this.state.meterno;
+        type = this.state.typeValue;
+        company = this.state.discoValue
+        this.validateMeter(meter_no, type, company)
     }
 
     validateMeter(meterno, type, company){
-        var Value = meterno.length.toString();
-        if (meterno == '' || Value < 10) {
-        
-        }else if(company == null){
-
+        var value = meterno.length.toString();
+        if(company == null){
+            this.setState({discoError: true})
         }else if(type == null){
-
+            this.setState({meterTypeError: true})
+        }else if (meterno == '') {
+            this.setState({meterError: true, meterErrorMessage: "Please kindly input the Meter Number"})
+        }else if(value < 10){
+            this.setState({meterError: true, meterErrorMessage: "Kindly check the Meter Number"})
         }else if(meterno != '' && type != null && company != null){ 
             
             let myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
 
             let requestOptions = {
-                method: 'POST',
+                method: 'GET',
                 headers: myHeaders
             };
             
             this.setState({isLoading:true});
             
-            fetch(GlobalVariables.apiURL+"/electricity/validate-meter?meter_no="+meterno+"&meter_type="+type+"&company="+company, requestOptions)
+            fetch(GlobalVariables.apiURL+"/electricity/validate-meter-no?meter_no="+meterno+"&meter_type="+type+"&company="+company, requestOptions)
             .then(response => response.text())
             .then(responseText => 
             {
-                // console.log(responseText);
+                console.log(responseText)
                 let result = JSON.parse(responseText);
                 if(result.status == true){
-                    // console.log(result.data)
-                    if(result.data.status != 200){
-                        Alert.alert(
-                            'Error',
-                            result.data.message,
-                            [
-                                {
-                                    text: 'OK',
-                                    style: 'cancel',
-                                }, 
-                            ],
-                            {cancelable: false},
-                        );
-                    }
-                    this.setState({customerName:result.data.customerName, phoneNo:result.data.phoneNumber});
+                    this.setState({customerName:result.data.customer_name, serviceProvider:result.provider, isValidated:true});
                     this.setState({isLoading:false});
                 }else if(result.status != true){
                     Alert.alert(
@@ -211,7 +215,6 @@ export default class Electricity extends Component {
                     );
                     this.setState({isLoading:false});
                 }
-                
             })
             .catch((error) => {
                 this.setState({isLoading:false});
@@ -223,22 +226,21 @@ export default class Electricity extends Component {
     payPower(){
         this.setState({isLoading:true});
   
-        if( Math.floor(this.state.amount) < Math.floor(this.state.balance)){
+        if(Math.floor(this.state.amount) < Math.floor(this.state.balance)){
             let myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
             myHeaders.append("Content-Type", "application/json");
   
             let raw = JSON.stringify({
-                "company":this.state.discoValue,
-                "meter_no":this.state.meterno,
-                "amount":this.state.amount,
-                "meter_type":this.state.typeValue,
+                "company": this.state.discoValue,
+                "meter_no": this.state.meterno,
+                "amount": this.state.amount,
+                "meter_type": this.state.typeValue,
                 "channel": "wallet",
-                "callback_url": GlobalVariables.apiURL+"/verify",
-                "card_position": "primary",
+                "provider": this.state.serviceProvider,
                 "phone_number": this.state.phoneNo
             });
-  
+            
             let requestOptions = 
             {
                 method: 'POST',
@@ -246,14 +248,12 @@ export default class Electricity extends Component {
                 body: raw,
             };
   
-            fetch(GlobalVariables.apiURL+"/electricity/pay-bill", requestOptions)
+            fetch(GlobalVariables.apiURL+"/electricity/pay", requestOptions)
             .then(response => response.text())
-            .then(result => 
+            .then(responseText => 
             {
-                this.setState({isProcessing:false});
-                //go on
-                console.log(JSON.parse(result))
-                let resultjson  = JSON.parse(result);
+                this.setState({isLoading:false});
+                let resultjson  = JSON.parse(responseText);
                 if(resultjson.status ==false){
                     Alert.alert(
                         "Error",
@@ -267,11 +267,11 @@ export default class Electricity extends Component {
                         {cancelable: false},
                     );  
                     
-                }else if(resultjson.status ==true){
-                    console.log(resultjson.data.transaction.id);
+                }else if(resultjson.status == true){
+                    // console.log(resultjson.data.transaction.id);
                     this.props.navigation.navigate("SuccessPage",
                     {
-                        transaction_id:resultjson.data.transaction.id,
+                        transaction_id:resultjson.data.transaction.transaction_id,
                     }); 
                 }
             
@@ -387,7 +387,7 @@ export default class Electricity extends Component {
 
     getUserCards(){
         this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/get-cards",
+        fetch(GlobalVariables.apiURL+"/user/cards",
         { 
             method: 'GET',
             headers: new Headers({
@@ -443,15 +443,26 @@ export default class Electricity extends Component {
         let amount = this.state.amount;
         let meter_type = this.state.typeValue;
         let phoneNo = this.state.phoneNo;
+        let isValidated = this.state.isValidated
 
-        if(meter_no == "" && amount == ""){
-            alert("Meter No and amount must be inserted");
-        }else if(company == null){
-            alert("Pls select a distribution company");
+        if(company == null){
+            this.setState({discoError: true})
         }else if(meter_type == null){
-            alert("Pls select a meter type");
+            this.setState({meterTypeError: true})
+        }else if (meter_no == '') {
+            this.setState({meterError: true, meterErrorMessage: "Please kindly input the Meter Number"});
+        }else if(meter_no.length.toString() < 10){
+            this.setState({meterError: true, meterErrorMessage: "Kindly check the Meter Number"});
+        }else if(isValidated == false){
+            this.setState({meterError: true, meterErrorMessage: "Meter number must be verified before purchasing electricity token"});
         }else if(phoneNo == ""){
-            alert("Recipient Phone Number must be inserted");
+            this.setState({phoneError: true, phoneNoErrorMessage: "Recipient Phone Number must be inserted"});
+        }else if(phoneNo.length < 11){
+            this.setState({phoneError: true, phoneNoErrorMessage: "Kindly check the Phone Number"});
+        }else if(amount == ""){
+            this.setState({amountError: true, amountErrorMessage: "Please kindly input the amount"});
+        }else if(amount < 0){
+            this.setState({amountError: true, amountErrorMessage: "Please kindly input a correct amount"});
         }else{
             if(thetype=="wallet"){
                 Alert.alert(
@@ -530,6 +541,18 @@ export default class Electricity extends Component {
             typeItems: callback(state.typeItems)
         }));
     }
+
+    setMeterNo = (meterno) => {
+        this.setState({meterno: meterno, meterError:false});
+    }
+
+    setPhoneNo = (phoneno) => {
+        this.setState({phoneNo: phoneno, phoneError:false});
+    }
+
+    setAmount= (amount) => {
+        this.setState({amount: amount, amountError:false});
+    }
     
     numberFormat = x => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -544,7 +567,7 @@ export default class Electricity extends Component {
         }
 
         return (
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                 <View style={styles.header}>
                     <View style={styles.left}>
@@ -560,128 +583,112 @@ export default class Electricity extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formLine, {marginTop:'0.01%'}]}>
+                <View style={[styles.formLine]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Select Disco</Text>
                     </View>
                 </View>
-                <View style={{width:'90%', marginLeft:'5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:10}}>
+                <View style={{width:'90%', marginLeft:'5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
                     <DropDownPicker
                         placeholder={'Select Distribution Company'}
                         open={this.state.discoOpen}
                         value={this.state.discoValue}
-                        style={[styles.dropdown, {flexDirection: 'row', marginTop:'1%', zIndex:10}]}
+                        // style={[styles.dropdown, {flexDirection: 'row', marginTop:'1%'}]}
                         items={this.state.discos}
                         setOpen={this.setDiscoOpen}
                         setValue={this.setDiscoValue}
                         setItems={this.setDiscoItems}
                         onSelectItem={(item) => {
-                            this.validateMeter(this.state.meterno, this.state.typeValue, item.value);
+                            this.setState({discoError: false})
                         }}
                         listMode="SCROLLVIEW"
                         scrollViewProps={{
                             nestedScrollEnabled: true,
-                            // persistentScrollbar: true,
+                            persistentScrollbar: true,
                         }}
                         dropDownContainerStyle={{
                             width:'100%',
                             marginLeft:'0%',
                             position: 'relative',
-                            top: 0,
+                            top: 0
                         }}           
                     />
                 </View>
-                <View style={{justifyContent:'center'}}>
-                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'13%',marginLeft:'3.5%'}}>Meter Type</Text>
+                {this.state.discoError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select a distribution company</Text>}
+                <View style={{justifyContent:'center', marginTop: '1.2%'}}>
+                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1.2%',marginLeft:'3.5%'}}>Meter Type</Text>
                 </View>
-                <View style={{width:'90%', marginLeft:'5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5}}>
+                <View style={{width:'90%', marginLeft:'5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
                     <DropDownPicker
                         placeholder={'Select Meter Type'}
                         open={this.state.typeOpen}
                         value={this.state.typeValue}
-                        style={[styles.dropdown, {flexDirection: 'row', marginTop:'1%'}]}
                         items={this.state.meter_type}
                         setOpen={this.setTypeOpen}
                         setValue={this.setTypeValue}
                         setItems={this.setTypeItems}
                         onSelectItem={(item) => {
-                            this.validateMeter(this.state.meterno, item.value, this.state.discoValue);
+                            this.setState({meterTypeError: false})
                         }}
                     />
                 </View>
-
-                <View style={[styles.formLine, {marginTop:'11%'}]}>
+                {this.state.meterTypeError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select the meter type</Text>}
+                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Meter Number</Text>
                         <View roundedc style={[styles.inputitem]}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
-                            <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="meterno" onChangeText={meterno => this.GetValueFunction(meterno)} value={this.state.meterno}/>
+                            <FontAwesome5 name={'tachometer-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/>
+                            <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
+                                <Text style={styles.verifyButtonText}>Verify</Text>
+                            </TouchableOpacity>
+                        </View>
+                        {this.state.meterError && <Text style={{ color: 'red' }}>{this.state.meterErrorMessage}</Text>}
+                    </View>
+                </View>
+
+                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Customer Name</Text>
+                        <View roundedc style={[styles.inputitem, {height:30}]}>
+                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.customerName}</Text>
                         </View>
                     </View>
                 </View>
-                
-                <View style={{justifyContent:'center', marginTop:'2.5%'}}>
-                    <Text style={{ fontFamily: "SFUIDisplay-Medium", fontSize:14, marginLeft:'3.5%' }}>Customer Name</Text>
-                </View>
-                <View 
-                    style={{
-                        marginTop:'0.1%',
-                        marginBottom:'0.2%',
-                        backgroundColor:'#fff',
-                        marginLeft:'3%',
-                        width: '94%'
-                    }}
-                >
-                    <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.customerName}</Text>
-                </View>
 
-                <View style={{justifyContent:'center', marginTop:'2.5%', borderWidth:0}}>
-                    <Text style={{ fontFamily: "SFUIDisplay-Medium", fontSize:14, marginLeft:'3.5%'}} placeholder="Phone number">Customer Phone Number</Text>
-                </View>
-                <View 
-                    style={{
-                        marginTop:'0.02%',
-                        marginBottom:'2%',
-                        backgroundColor:'#fff',
-                        paddingTop:5,
-                        paddingLeft:15,
-                    }}
-                >
-                    <View roundedc style={[styles.inputitem,{}]}>
-                        <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
-                        <TextInput placeholder="Phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" value={this.state.phoneNo} onChangeText={(phoneNo) => this.setState({phoneNo})}/>
+                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Customer Phone Number</Text>
+                        <View roundedc style={[styles.inputitem]}>
+                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <TextInput placeholder="Type in your Phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
+                        </View>
+                        {this.state.phoneError && <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.phoneNoErrorMessage}</Text>}
                     </View>
-                </View> 
-
-                <View style={{justifyContent:'center', marginTop:'0.4%'}}>
-                    <Text style={{ fontFamily: "SFUIDisplay-Medium", fontSize:14, marginLeft:'3.5%'}} >Amount</Text>
                 </View>
-                <View 
-                    style={{
-                        marginTop:'0%',
-                        marginBottom:'2%',
-                        backgroundColor:'#fff',
-                        paddingTop:5,
-                        paddingLeft:15,
-                        paddingBottom:10
-                    }}
-                >
-                    <View roundedc style={styles.inputitem}>
-                        <TextInput placeholder="Amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" value={this.state.amount.toString()} onChangeText={(amount) => this.setState({amount})}/>
-                    </View>
-                </View> 
 
+                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Amount</Text>
+                        <View roundedc style={styles.inputitem}>
+                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <TextInput placeholder="Type in airtime amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
+                        </View>
+                        {this.state.amountError && <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.amountErrorMessage}</Text>}
+                    </View>
+                </View>
                 {/* Card Option*/}
                 <View
                     style={{
                         backgroundColor:'#fff',
-                        marginTop:'0.3%',
+                        marginTop:'3%',
                         marginLeft: '4%',
                         borderRadius: 30,
                         borderWidth: 1,
                         marginRight: '4%',
                         borderColor: 'transparent',
-                        elevation: 2
+                        elevation: 10
                     }}
                 >
                     <View 
@@ -738,7 +745,7 @@ export default class Electricity extends Component {
                         Confirm Purchase
                     </Text>
                 </TouchableOpacity>
-            </View>
+            </ScrollView>
         );
     }
 }
