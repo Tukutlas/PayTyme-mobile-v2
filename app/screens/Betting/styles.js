@@ -9,10 +9,9 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: Colors.transparent,
-    height: Metrics.HEIGHT * 0.135,
+    height: Metrics.HEIGHT * 0.09,
     borderBottomWidth: 0,
-    paddingTop: Metrics.HEIGHT * 0.0354,
-    marginTop: Metrics.HEIGHT * 0.0254,
+    marginTop: Metrics.HEIGHT * 0.0614,
     elevation: 0,
     flexDirection: 'row',
     flexWrap: 'wrap'
@@ -58,29 +57,51 @@ const styles = StyleSheet.create({
     backgroundColor:'#fff'
   },
 
-  formLine:{
+  formLine: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor:'#fff',
-    width: '100%',
-    // paddingTop:0
-    paddingTop: Metrics.HEIGHT * 0.00001,
+    backgroundColor: '#fff',
+    width: '97%',
+    paddingTop: 0,
   },
 
-  formCenter:{
-    paddingLeft: Metrics.WIDTH * 0.0421,
-    width: Metrics.WIDTH * 1.05
+  formCenter: {
+    paddingLeft: 10, // Adjust the padding according to your requirement
+    width: '100%',
   },
 
   inputitem: {
-    borderRightColor:'transparent',
-    borderWidth:0,
-    elevation:0,
-    borderRadius:1,
-    width: '90%',
-    backgroundColor:'#F6F6F6',
-    marginTop:'0.5%',
-    height: 27
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    height: 40,
+    marginTop: '1%',
+    backgroundColor: '#F6F6F6',
+  },
+
+  labeltext: {
+    color: '#222222',
+    marginTop: '1%',
+    fontSize: 14,
+    fontFamily: 'Roboto-Medium',
+  },
+
+  phoneIcon: {
+    marginHorizontal: 10, // Adjust the margin according to your requirement
+  },
+
+  betIcon: {
+    height:40, 
+    width:40, 
+    borderRadius:30
+  },
+
+  betIcon2: {
+    height:40, 
+    width:50, 
+    borderRadius:30
   },
 
   buttonPurchase: {
@@ -107,29 +128,20 @@ const styles = StyleSheet.create({
     paddingLeft:'2%',
   },
 
-  labeltext:{
-    color:'#222222',
-    marginTop:'1%',
-    fontSize:14,
-    fontFamily: "Roboto-Medium",
+  labeltext: {
+    color: '#222222',
+    marginTop: '1%',
+    fontSize: 14,
+    fontFamily: 'Roboto-Medium',
   },
-
   textBox: {
-    fontSize: 15,
-    alignSelf: 'stretch',
-    height: 25,
-    borderWidth: 0,
+    fontSize: 13,
+    flex: 1,
+    height: 35,
     paddingVertical: 0,
+    paddingHorizontal: 10, // Adjust the padding according to your requirement
     borderRadius: 2,
-    backgroundColor:'#F6F6F6',
-  },
-
-  phoneIcon:{
-      position: 'absolute',
-      marginLeft: 6,
-      height: 20,
-      width: 35,
-      padding: 2
+    backgroundColor: '#F6F6F6',
   },
 
   buttonImage: {
@@ -142,8 +154,6 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     padding:1,
     width:'100%',
-    // marginTop: 50
-    paddingTop: Metrics.HEIGHT * 0.015,
   },
 
   flexx:{
@@ -152,10 +162,7 @@ const styles = StyleSheet.create({
     alignItems:'center',
     marginTop: '7%',
     margin:'4%',
-    // elevation:8,
-    flex:3,
-    // borderRadius:10,
-    // backgroundColor:'#E0EBEC'
+    flex:3
   },
 
   flexa:{
@@ -173,14 +180,12 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     padding:1,
     width:'90%',
-    marginTop: 15,
-    // marginLeft: -20
-    // marginRight: Metrics.WIDTH * 0.2
+    marginTop: 15
   },
 
   circle: {
-    height: 20,
-    width: 20,
+    height: 15,
+    width: 15,
     borderRadius: 10,  
     borderWidth: 1,
     borderColor: '#ACACAC',

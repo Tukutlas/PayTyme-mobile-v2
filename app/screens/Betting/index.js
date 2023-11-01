@@ -89,7 +89,7 @@ export default class Airtime extends Component {
     }
 
     loadWalletBalance(){  
-        fetch(GlobalVariables.apiURL+"/wallet/get-details",
+        fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
               method: 'GET',
               headers: new Headers({
@@ -101,12 +101,10 @@ export default class Airtime extends Component {
           }) 
           .then((response) => response.text())
           .then((responseText) => { 
-        
               let response_status = JSON.parse(responseText).status;
              
               if(response_status == true){
-                  let data = JSON.parse(responseText).data;  
-                  let wallet = data.wallet;
+                  let wallet = JSON.parse(responseText).data;  
                   this.setState({balance:parseInt(wallet.balance)});
               }else if(response_status == false){
                   Alert.alert(
@@ -131,7 +129,7 @@ export default class Airtime extends Component {
 
     getUserCards(){
         this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/get-cards",
+        fetch(GlobalVariables.apiURL+"/user/cards",
         { 
             method: 'GET',
             headers: new Headers({
@@ -215,7 +213,7 @@ export default class Airtime extends Component {
             //send api for betting wallet funding
             let subtext = "";
             amount = ":  N"+this.state.amount;
-            subtext="to this ";
+            subtext=" to this ";
             
             if(thetype=="wallet"){
                 Alert.alert(
@@ -238,7 +236,7 @@ export default class Airtime extends Component {
             }else{
                 Alert.alert(
                     'Confirm Purchase',
-                    'Do you want to recharge '+amount+'('+betplatform+') '+subtext+' on '+account_id+' ?\n',
+                    'Do you want to recharge '+amount+' ('+betplatform+') '+subtext+' on '+account_id+' ?\n',
                     [
                         {
                             text: 'Cancel',
@@ -304,8 +302,7 @@ export default class Airtime extends Component {
             this.setState({isLoading:true});
             let endpoint ="";  
             //send api for airtime purchase
-            endpoint = "/betting/fund-account";
-            let verify = "/verify";
+            endpoint = "/betting/fund";
             // alert(amount);
 
             fetch(GlobalVariables.apiURL+endpoint,
@@ -319,8 +316,6 @@ export default class Airtime extends Component {
                     +"&amount="+amount
                     +"&type="+betplatform
                     +"&channel=wallet"
-                    +"&callback_url="+GlobalVariables.apiURL+verify
-                    +"&card_position=primary"
                 // <-- Post parameters
             }) 
             .then((response) => response.text())
@@ -331,7 +326,7 @@ export default class Airtime extends Component {
                 if(response.status == true) { 
                     this.props.navigation.navigate("SuccessPage",
                     {
-                        transaction_id:response.data.transaction.id,
+                        transaction_id:response.data.transaction.transaction_id,
                     }); 
                 }else if(response.status == false){
                     this.setState({isLoading:false});
@@ -580,16 +575,16 @@ export default class Airtime extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formLine, {marginTop: '-5%'}]}>
+                <View style={[styles.formLine]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Account ID</Text>
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
                             <TextInput placeholder="Enter account id" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id})}  />
                         </View>
                     </View>
                 </View>
-                <View style={[styles.formLine]}>
+                <View style={[styles.formLine, {marginTop:'1%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Select from the Betting Collection</Text>
                     </View>
@@ -597,7 +592,7 @@ export default class Airtime extends Component {
                 <View style={styles.grid}>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>NairaBet</Text>
-                        <Image source={require('../../Images/Betting/nairabet.jpg')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/nairabet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:true});
@@ -620,7 +615,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>BetNaija</Text>
-                        <Image source={require('../../Images/Betting/bet9ja.png')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/bet9ja.png')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -641,8 +636,8 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>SupaBet</Text>
-                        <Image source={require('../../Images/Betting/supabet.jpg')} style={{height:50, width:50, borderRadius:20}} />
+                        <Text style={{width:50.5}}>SupaBets</Text>
+                        <Image source={require('../../Images/Betting/supabet.jpg')} style={[styles.betIcon2]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -664,7 +659,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>CloudBet</Text>
-                        <Image source={require('../../Images/Betting/cloudbet.jpg')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/cloudbet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -686,7 +681,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>BangBet</Text>
-                        <Image source={require('../../Images/Betting/bangbet.png')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/bangbet.png')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -707,10 +702,10 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={[styles.grid, {marginTop:'3%'}]}>
+                <View style={[styles.grid, {marginTop:'2%'}]}>
                     <View style={[styles.flexx]}>
                         <Text style={{width:45}}>BetLion</Text>
-                        <Image source={require('../../Images/Betting/betlion.png')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/betlion.png')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -732,7 +727,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:35}}>1xbet</Text>
-                        <Image source={require('../../Images/Betting/1xbet.png')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/1xbet.png')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -754,7 +749,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>MerryBet</Text>
-                        <Image source={require('../../Images/Betting/merrybet.jpg')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/merrybet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -776,7 +771,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>BetWay</Text>
-                        <Image source={require('../../Images/Betting/betway.png')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/betway.png')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -798,7 +793,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>BetLand</Text>
-                        <Image source={require('../../Images/Betting/betland.jpeg')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/betland.jpeg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -819,7 +814,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={[styles.grid, {marginTop:'3%'}]}>
+                <View style={[styles.grid, {marginTop:'2%'}]}>
                     <View style={[styles.flexx]}>
                     </View>
                     <View style={[styles.flexx]}>
@@ -827,7 +822,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>BetKing</Text>
-                        <Image source={require('../../Images/Betting/betking.jpg')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/betking.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -849,7 +844,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:80}}>LiveScoreBet</Text>
-                        <Image source={require('../../Images/Betting/livescorebet.jpg')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/livescorebet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -871,7 +866,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={[styles.flexx]}>
                         <Text style={{width:50}}>NaijaBet</Text>
-                        <Image source={require('../../Images/Betting/naijabet.jpg')} style={{height:50, width:50, borderRadius:30}} />
+                        <Image source={require('../../Images/Betting/naijabet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
                                 this.setState({nairabet:false});
@@ -892,13 +887,13 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={[styles.formLine,{marginTop:'3%'}]}>
+                <View style={[styles.formLine,{marginTop:'0%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Amount</Text>
                     </View>
                     <View style={styles.formCenter}>
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
                             <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})}/>
                         </View>
                     </View>
@@ -907,13 +902,13 @@ export default class Airtime extends Component {
                 <View
                     style={{
                         backgroundColor:'#fff',
-                        marginTop:'1.5%',
+                        marginTop:'4%',
                         marginLeft: '4%',
                         borderRadius: 30,
                         borderWidth: 1,
                         marginRight: '4%',
                         borderColor: 'transparent',
-                        elevation: 2
+                        elevation: 20
                     }}>
                     <View 
                         style={{
