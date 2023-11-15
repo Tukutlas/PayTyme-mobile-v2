@@ -54,12 +54,19 @@ export default class TvSubscription extends Component {
             dstvBouquetDisable: true,
             providerOpen: false,
             providerValue: null,
-            
-            providers: [{label:'DSTV',value:'DSTV'}, {label:'GOTV',value:'GOTV'}, {label:'STARTIMES',value:'STARTIMES'}],
+            providers: [{label:'DSTV',value:'DSTV', icon: () => <Image source={require('../../Images/Tv/dstv-logo.png')} style={styles.iconStyle} />}, {label:'GOTV',value:'GOTV', icon: () => <Image source={require('../../Images/Tv/gotv-logo.png')} style={styles.iconStyle} />}, {label:'STARTIMES',value:'STARTIMES', icon: () => <Image source={require('../../Images/Tv/startime-logo.jpg')} style={styles.iconStyle} />}, {label:'SHOWMAX',value:'SHOWMAX', icon: () => <Image source={require('../../Images/Tv/showmax-logo1.png')} style={styles.iconStyle2} />}],
             isLoading:false,
             TextInputDisableHolder: false,
             transaction: false,
-            there_cards: false
+            there_cards: false,
+            service_provider: '',
+            verifyNumber: false,
+            providerError: false,
+            providerErrorMessage: '',
+            cardError: false,
+            cardErrorMessage: '',
+            bouquetError: false,
+            bouquetErrorMessage: ''
         };
     }
 
@@ -71,6 +78,7 @@ export default class TvSubscription extends Component {
                 ).user.access_token
             }
         );
+        // this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.loadWalletBalance();
         this.getUserCards();
@@ -119,7 +127,7 @@ export default class TvSubscription extends Component {
     }
 
     loadWalletBalance(){   
-        fetch(GlobalVariables.apiURL+"/wallet/get-details",
+        fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
             method: 'GET',
             headers: new Headers({
@@ -135,8 +143,7 @@ export default class TvSubscription extends Component {
       
             let response_status = JSON.parse(responseText).status;
             if(response_status == true){
-                let data = JSON.parse(responseText).data;  
-                let wallet = data.wallet;
+                let wallet = JSON.parse(responseText).data;  
                 this.setState({balance:parseInt(wallet.balance)});
             }else if(response_status == false){
                 // Alert.alert(
@@ -161,7 +168,7 @@ export default class TvSubscription extends Component {
 
     getUserCards(){
         this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/get-cards",
+        fetch(GlobalVariables.apiURL+"/user/cards",
         { 
             method: 'GET',
             headers: new Headers({
@@ -174,17 +181,16 @@ export default class TvSubscription extends Component {
         .then((response) => response.text())
         .then((responseText) => {
             let response_status = JSON.parse(responseText).status;
-             
             if(response_status == true){
                 let data = JSON.parse(responseText).data;
                 if(data != ''){
                     // this.setState({ cards: data })
-                    let newArray = data.map((item) => {
+                    let bouquets = data.map((item) => {
                         if (item.reusable == true) {
                             return item
                         }
                     })
-                    if(newArray.length != 0){
+                    if(bouquets.length != 0){
                         this.setState({there_cards: true});
                     }
                     this.setState({isLoading:false});
@@ -203,14 +209,21 @@ export default class TvSubscription extends Component {
         });      
     }
 
-    getCustomerdetails(cabletype,cardnumber){
+    handleVerify(){
+        cardnumber = this.state.cardnumber;
+        type = this.state.providerValue;
+        provider = this.state.service_provider;
+        this.getCustomerdetails(type, cardnumber, provider);
+    }
+
+    getCustomerdetails(cabletype,cardnumber, provider){
         if (cabletype == '' && cardnumber == '') {
             
         }else if(cardnumber == ''){
 
         }else{
             var requestOptions = {
-                method: "POST",
+                method: "GET",
                 headers: new Headers({
                   'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                   'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
@@ -218,26 +231,29 @@ export default class TvSubscription extends Component {
             };
             this.setState({isLoading:true});
       
-            fetch(GlobalVariables.apiURL+"/tv/validate-smart-card?smart_card_no="+cardnumber+"&type="+cabletype, requestOptions)
+            fetch(GlobalVariables.apiURL+"/tv/validate-card?smart_card_no="+cardnumber+"&type="+cabletype+"&provider="+provider, requestOptions)
             .then(response => response.text())
             .then(result => {
                 let status = JSON.parse(result).status;
                 if (status == true) {
                     let data = JSON.parse(result).data;
                     if(data){
-                        this.setState({cable_tv_type:data.type})
-                        this.setState({customerName:data.customerName})
+                        this.setState({cable_tv_type:data.tv_type})
+                        this.setState({customerName:data.customer_name})
+                        this.setState({cardError: false, verifyNumber:true});
                         this.setState({isLoading:false});
-                        
                     } else{
-                        alert('Pls check your cards details');
+                        this.setState({cardError: true});
+                        this.setState({cardErrorMessage: 'Please check your card details'})
                     }
                 } else {
                     let message = JSON.parse(result).message;
-                    alert(message);
+                    this.setState({cardError: true});
+                    this.setState({cardErrorMessage: message});
                 }
             }).catch((error) => {
                 this.setState({isLoading:false});
+                // console.log(error);
                 alert("Network error. Please check your connection settings");
             });   
         }
@@ -252,11 +268,30 @@ export default class TvSubscription extends Component {
     }
 
     confirmPurchase(thetype){
-        let bouquet = this.state.providerValue;
+        let provider = this.state.providerValue;
         let cardnumber = this.state.cardnumber;
+        let verifyNumber = this.state.verifyNumber;
+        let bouquet = this.state.bouquetValue;
 
-        if(cardnumber == ""  && bouquet == null){
-            alert("Smart card number and Bouquet Plan must be inserted");
+        if(provider == null){
+            this.setState({providerError: true});
+            this.setState({providerErrorMessage: 'TV provider must be selected'});
+        }
+
+        if(cardnumber == ""){
+            this.setState({cardError: true});
+            this.setState({cardErrorMessage: 'Smart card number must be inserted'});
+        }
+
+        if (bouquet == null) {
+            this.setState({bouquetError: true});
+            this.setState({bouquetErrorMessage: 'Bouquet Plan must be selected'})
+        }
+        
+        if(!verifyNumber){
+            this.setState({cardError: true});
+            this.setState({cardErrorMessage: 'Please validate your card'})
+            return;
         }else{
             let amount = this.numberFormat(this.state.amount);
 
@@ -305,6 +340,10 @@ export default class TvSubscription extends Component {
         }
     }
 
+    setCardNo (cardnumber){
+        this.setState({cardnumber: cardnumber, verifyNumber: false});
+    }
+
     GetValueFunction = (cardnumber) =>{
         var value = cardnumber.length.toString();
    
@@ -318,88 +357,167 @@ export default class TvSubscription extends Component {
 
     payTV(){
         if(this.state.amount <= this.state.balance){
-            this.setState({isLoading:true});  
             var myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
             myHeaders.append("Content-Type", "application/json");
 
-            let hasaddon = 0;
-            if(this.state.addon == 0 || this.state.addon==""){
-                hasaddon = 0;
-            }else{
-                hasaddon = 1;
+            let verifyNumber = this.state.verifyNumber;
+            if(!verifyNumber){
+                this.setState({cardError: true});
+                this.setState({cardErrorMessage: 'Please validate your card'})
+                return;
             }
 
-            let verify = "/verify";
-            
-            var raw = JSON.stringify({
-                "smart_card_no": this.state.cardnumber,
-                "type": this.state.cableoption,
-                "amount": this.state.packageAmount,
-                "package_name": this.state.packageName,
-                "product_code": this.state.productCode,
-                "period": this.state.period,
-                "has_addon": hasaddon,
-                "channel": "wallet",
-                "card_position": "primary",
-                "callback_url": GlobalVariables.apiURL+verify,
-                "addon_product_code": this.state.addonProductCode,
-                "addon_amount": this.state.addonAmount,
-                "addon_product_name": this.state.addonProductName
-            });
-
-            var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: raw,
-            };
-            
-            fetch(GlobalVariables.apiURL+"/tv/bouquet/payment", requestOptions)
-            .then(response => response.text())
-            .then(result => {
-               //go on
-                let resultjson  = JSON.parse(result);
-
-                if(resultjson.status ==true){
-                    this.setState({isLoading:false});
-                    this.props.navigation.navigate("SuccessPage",
-                    {
-                        transaction_id:resultjson.data.transaction.id,
-                    }); 
-                    this.setState({isProcessing:false}); 
+            let service_provider = this.state.service_provider;
+            if (service_provider == 'shago') {
+                let hasaddon = 0;
+                if(this.state.addon == 0 || this.state.addon==""){
+                    hasaddon = 0;
                 }else{
-                    this.setState({isLoading:false})
-                    Alert.alert(
-                        resultjson.message,
-                        [
-                            {
-                                text: 'Ok',
-                                style: 'cancel',
-                            }, 
-                        ],
-                        {cancelable: false},
-                    ); 
+                    hasaddon = 1;
                 }
-            })
-            .catch((error) => {
-                this.setState({isLoading:false});
-                alert("Network error. Please check your connection settings");
-            });   
+            
+                var raw = JSON.stringify({
+                    "smart_card_no": this.state.cardnumber,
+                    "type": this.state.cableoption,
+                    "amount": this.state.packageAmount,
+                    "package_name": this.state.packageName,
+                    "product_code": this.state.productCode,
+                    "period": this.state.period,
+                    "has_addon": hasaddon,
+                    "channel": "wallet",
+                    "provider": service_provider
+                    // "addon_product_code": this.state.addonProductCode,
+                    // "addon_amount": this.state.addonAmount,
+                    // "addon_product_name": this.state.addonProductName
+                });
+
+    //         "smart_card_no": "1212121212",
+    // "type": "showmax",
+    // "amount": "1200",
+    // "package_name": "Showmax Mobile",
+    // "product_code": "mobile_only",
+    // "period": 1,
+    // "channel": "wallet",
+    // "provider": "shago",
+    // "gateway": "paystack",
+    // "card_id": "610f4fae-237b-4cec-b762-52b7adc63990",
+    // "phone_number": "09064893038"
+
+                var requestOptions = {
+                    method: 'POST',
+                    headers: myHeaders,
+                    body: raw,
+                };
+
+                this.setState({isLoading:true});  
+                fetch(GlobalVariables.apiURL+"/tv/purchase", requestOptions)
+                .then(response => response.text())
+                .then(result => {
+                //go on
+                    let resultjson  = JSON.parse(result);
+
+                    if(resultjson.status == true){
+                        this.setState({isLoading:false});
+                        this.props.navigation.navigate("SuccessPage",
+                        {
+                            transaction_id:resultjson.data.transaction.transaction_id
+                        }); 
+                        this.setState({isLoading:false}); 
+                    }else{
+                        this.setState({isLoading:false})
+                        Alert.alert(
+                            resultjson.message,
+                            [
+                                {
+                                    text: 'Ok',
+                                    style: 'cancel',
+                                }, 
+                            ],
+                            {cancelable: false},
+                        ); 
+                    }
+                })
+                .catch((error) => {
+                    this.setState({isLoading:false});
+                    alert("Network error. Please check your connection settings");
+                });
+            }else if(service_provider == 'vtpass'){
+                var raw = JSON.stringify({
+                    "smart_card_no": this.state.cardnumber,
+                    "type": this.state.cableoption,
+                    "amount": this.state.packageAmount,
+                    "package_name": this.state.packageName,
+                    "product_code": this.state.productCode,
+                    "channel": "wallet",
+                    "provider": service_provider
+                });
+
+    //         "smart_card_no": "1212121212",
+    // "type": "showmax",
+    // "amount": "1200",
+    // "package_name": "Showmax Mobile",
+    // "product_code": "mobile_only",
+    // "period": 1,
+    // "channel": "wallet",
+    // "provider": "shago",
+    // "gateway": "paystack",
+    // "card_id": "610f4fae-237b-4cec-b762-52b7adc63990",
+    // "phone_number": "09064893038"
+
+                var requestOptions = {
+                    method: 'POST',
+                    headers: myHeaders,
+                    body: raw,
+                };
+
+                this.setState({isLoading:true});  
+                fetch(GlobalVariables.apiURL+"/tv/purchase", requestOptions)
+                .then(response => response.text())
+                .then(result => {
+                    let resultjson  = JSON.parse(result);
+
+                    if(resultjson.status == true){
+                        this.setState({isLoading:false});
+                        this.props.navigation.navigate("SuccessPage",
+                        {
+                            transaction_id:resultjson.data.transaction.transaction_id,
+                        }); 
+                        this.setState({isLoading:false}); 
+                    }else{
+                        this.setState({isLoading:false})
+                        Alert.alert(
+                            resultjson.message,
+                            [
+                                {
+                                    text: 'Ok',
+                                    style: 'cancel',
+                                }, 
+                            ],
+                            {cancelable: false},
+                        ); 
+                    }
+                })
+                .catch((error) => {
+                    this.setState({isLoading:false});
+                    alert("Network error. Please check your connection settings");
+                });
+            }
         }else {
             //insufficient balance
             this.setState({isLoading:false});
 
             Alert.alert(
-            'Insufficient Balance',
-            'You have insufficient balance. Kindly top up your wallet and try again',
-            [
-                {
-                text: 'Try Again',
-                style: 'cancel',
-                }, 
-            
-            ],
-            {cancelable: false},
+                'Insufficient Balance',
+                'You have insufficient balance. Kindly top up your wallet and try again',
+                [
+                    {
+                        text: 'Try Again',
+                        style: 'cancel',
+                    }, 
+                
+                ],
+                {cancelable: false},
             );  
         }
     }
@@ -510,45 +628,86 @@ export default class TvSubscription extends Component {
     getCableBouquetOptions(tv_type){
         this.setState({isLoading:true});
         let requestOptions = {
-            method: 'POST',
+            method: 'GET',
             headers: new Headers({
                 'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                 'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
             }),
         };
 
-        fetch(GlobalVariables.apiURL+"/tv/bouquets?type="+tv_type, requestOptions)
+        fetch(GlobalVariables.apiURL+"/tv/bouquets?tv_type="+tv_type, requestOptions)
         .then(response => response.text())
-        .then(result => {    
-            if(tv_type=='STARTIMES'){
-                let data_parsed = JSON.parse(result).data.STARTIMES;
-                let newArray = data_parsed.map((item) => {
-                    return {label: item.name+" ₦"+this.numberFormat(item.price)+" "+item.duration, value: item.name+"#"+item.price+"#"+item.duration+"#"+item.code}
-                })
-
-                this.setState({bouquetdata: newArray, cableoption:tv_type, bouquetDisable:false, dstv:false});
-
-            }
-            if(tv_type=='GOTV'){
-                let data_parsed = JSON.parse(result).data.GOTV;
-                let newArray = data_parsed.map((item) => {
-                    return {label: item.name+' '+item.month+" Month(s) - ₦"+this.numberFormat(item.price), value: item.name+"#"+item.price+"#"+item.period+"#"+item.code}
-                })
-
-                this.setState({bouquetdata: newArray, cableoption:tv_type, bouquetDisable:false, dstv:false});
-            }
-            if(tv_type=='DSTV'){
-                let data_parsed = JSON.parse(result).data.DSTV;
-                let newArray = data_parsed.map((item) => {
-                    return {label: item.name+' '+item.month+" Month(s) - ₦"+this.numberFormat(item.price), value: item.name+"#"+item.price+"#"+item.period+"#"+item.code}
-                })
-
-                this.setState({bouquetdata: newArray, cableoption:tv_type, bouquetDisable:false, dstv:true});
+        .then(result => {
+            response = JSON.parse(result);
+            // console.log(response);
+            // return;
+            if(response.service_provider == 'vtpass'){
+                if(tv_type=='STARTIMES'){
+                    let data_parsed = JSON.parse(result).data;
+                    let bouquets = data_parsed.map((item) => {
+                        return {label: item.name, value: item.name+"#"+item.amount+"#"+item.duration+"#"+item.code}
+                    })
+                    this.setState({service_provider: response.service_provider, bouquetdata: bouquets, cableoption:tv_type, bouquetDisable:false, dstv:false});
+                }
+                if(tv_type=='GOTV'){
+                    let data_parsed = JSON.parse(result).data;
+                    let bouquets = data_parsed.map((item) => {
+                        return {label: item.name+" ₦"+this.numberFormat(item.amount), value: item.name+"#"+item.amount+"#"+item.period+"#"+item.code}
+                    })
+                    this.setState({service_provider: response.service_provider, bouquetdata: bouquets, cableoption:tv_type, bouquetDisable:false, dstv:false});
+                }
+                if(tv_type=='DSTV'){
+                    let data_parsed = JSON.parse(result).data;
+                    let bouquets = data_parsed.map((item) => {
+                        return {label: item.name, value: item.name+"#"+item.amount+"#"+item.period+"#"+item.code}
+                    })
+    
+                    this.setState({service_provider: response.service_provider, bouquetdata: bouquets, cableoption:tv_type, bouquetDisable:false, dstv:false});
+                }
+                if(tv_type == 'SHOWMAX'){
+                    let data_parsed = JSON.parse(result).data;
+                    let bouquets = data_parsed.map((item) => {
+                        return {label: item.name, value: item.name+"#"+item.amount+"#"+item.duration+"#"+item.code}
+                    })
+    
+                    this.setState({service_provider: response.service_provider, bouquetdata: bouquets, cableoption:tv_type, bouquetDisable:false, dstv:false});
+    
+                }
+            }else if(response.service_provider == 'shago'){
+                if(tv_type=='STARTIMES'){
+                    let data_parsed = JSON.parse(result).data;
+                    let bouquets = data_parsed.map((item) => {
+                        return {label: item.name+" ₦"+this.numberFormat(item.amount)+" "+item.duration, value: item.name+"#"+item.amount+"#"+item.duration+"#"+item.code}
+                    })
+                    this.setState({service_provider: response.service_provider, bouquetdata: bouquets, cableoption:tv_type, bouquetDisable:false, dstv:false});
+                }
+                if(tv_type=='GOTV'){
+                    let data_parsed = JSON.parse(result).data;
+                    let bouquets = data_parsed.map((item) => {
+                        return {label: item.name+' '+item.duration+" Month(s) - ₦"+this.numberFormat(item.amount), value: item.name+"#"+item.amount+"#"+item.period+"#"+item.code}
+                    })
+                    this.setState({service_provider: response.service_provider, bouquetdata: bouquets, cableoption:tv_type, bouquetDisable:false, dstv:false});
+                }
+                if(tv_type=='DSTV'){
+                    let data_parsed = JSON.parse(result).data;
+                    let bouquets = data_parsed.map((item) => {
+                        return {label: item.name+' '+item.duration+" Month(s) - ₦"+this.numberFormat(item.amount), value: item.name+"#"+item.amount+"#"+item.period+"#"+item.code}
+                    })
+                    this.setState({service_provider: response.service_provider, bouquetdata: bouquets, cableoption:tv_type, bouquetDisable:false, dstv:false});
+                }
+                if(tv_type == 'SHOWMAX'){
+                    let data_parsed = JSON.parse(result).data;
+                    let bouquets = data_parsed.map((item) => {
+                        return {label: item.name+" ₦"+this.numberFormat(item.amount)+" "+item.period+" Month(s)", value: item.name+"#"+item.amount+"#"+item.period+"#"+item.code}
+                    })
+                    this.setState({service_provider: response.service_provider, bouquetdata: bouquets, cableoption:tv_type, bouquetDisable:false, dstv:false});
+                }
             }
             this.setState({isLoading:false});
         })
         .catch((error) => {
             this.setState({isLoading:false});
+            console.log(error)
             alert("Network error. Please check your connection settings");
         });   
     }
@@ -580,11 +739,11 @@ export default class TvSubscription extends Component {
         .then(result => {
             result = JSON.parse(result);
             if (result.status == true) {
-                let newArray = result.data.map((item) => {
+                let bouquets = result.data.map((item) => {
                     return {label: item.name+' '+item.month+" Month(s) - ₦"+this.numberFormat(item.price), value: item.name+"#"+item.price+"#"+item.period+"#"+item.code}
                 })
 
-                this.setState({addondata: newArray, dstvBouquetDisable:false});
+                this.setState({addondata: bouquets, dstvBouquetDisable:false});
             } else {
                 alert(result.message);
             }
@@ -638,6 +797,8 @@ export default class TvSubscription extends Component {
         this.setState(state => ({
             providerValue: callback(state.providerValue)
         }));
+
+        this.setState({providerError: false});
     }
 
     setProviderItems = (callback) => {
@@ -658,6 +819,7 @@ export default class TvSubscription extends Component {
         this.setState(state => ({
           bouquetValue: callback(state.bouquetValue)
         }));
+        this.setState({bouquetError: false})
     }
 
     setBouquetItems = (callback) => {
@@ -711,18 +873,21 @@ export default class TvSubscription extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formLine, {marginTop:'0%'}]}>
+                {/* <View style={[styles.formLine, {marginTop:'0%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Select Cable Tv Service Provider</Text>
                     </View>
+                </View> */}
+                <View style={{justifyContent:'center'}}>
+                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Select Cable TV Service Provider</Text>
                 </View>
                 
-                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', zIndex:1000}}>
+                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor: '#F6F6F6', zIndex:1000}}>
                     <DropDownPicker
                         placeholder={'Select Cable Tv Provider'}
                         open={this.state.providerOpen}
                         value={this.state.providerValue}
-                        style={[styles.dropdown, {flexDirection: 'row', marginTop:'2%'}]}
+                        style={[styles.dropdown]}
                         items={this.state.providers}
                         setOpen={this.setProviderOpen}
                         setValue={this.setProviderValue}
@@ -730,20 +895,20 @@ export default class TvSubscription extends Component {
                         searchable={false}
                         onSelectItem={(item) => {
                             this.getCableBouquetOptions(item.value);
-                            this.getCustomerdetails(item.value, this.state.cardnumber);
                         }}
-                    />
+                    />    
                 </View>
+                {this.state.providerError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.providerErrorMessage}</Text>}
 
                 <View style={{justifyContent:'center'}}>
-                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'10%',marginLeft:'3.5%'}}>Bouquet Plan</Text>
+                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Select Bouquet Plan</Text>
                 </View>
                 <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
                     <DropDownPicker
-                        placeholder={'Select Bouquet Plan'}
+                        placeholder={'Select your subscription plan'}
                         open={this.state.bouquetOpen}
                         value={this.state.bouquetValue}
-                        style={[styles.dropdown, {flexDirection: 'row', marginTop:'2%'}]}
+                        style={[styles.dropdown]}
                         items={this.state.bouquetdata}
                         setOpen={this.setBouquetOpen}
                         setValue={this.setBouquetValue}
@@ -760,6 +925,8 @@ export default class TvSubscription extends Component {
                         }}
                     />
                 </View>
+                {this.state.bouquetError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.bouquetErrorMessage}</Text>}
+
                 {
                     this.state.dstv ?
                     <View style={{justifyContent:'center'}}>
@@ -774,7 +941,7 @@ export default class TvSubscription extends Component {
                             placeholder={'Select DSTV Addon Bouquet'}
                             open={this.state.dstvBouquetOpen}
                             value={this.state.dstvBouquetValue}
-                            style={[styles.dropdown, {flexDirection: 'row', marginTop:'2%'}]}
+                            style={[styles.dropdown]}
                             items={this.state.addondata}
                             setOpen={this.setDstvBouquetOpen}
                             setValue={this.setDstvBouquetValue}
@@ -790,46 +957,42 @@ export default class TvSubscription extends Component {
                     : <View></View>
                 }
 
-                <View style={[styles.formLine, {marginTop:'12%'}]}>
+                <View style={[styles.formLine, {marginTop:'1%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Card Number</Text>
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
-                            <TextInput placeholder="Type your smart card number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={cardnumber => this.GetValueFunction(cardnumber)} value={this.state.cardnumber}/>
+                            <FontAwesome5 name={'credit-card'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            {/* <TextInput placeholder="Type your smart card number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={cardnumber => this.GetValueFunction(cardnumber)} value={this.state.cardnumber}/> */}
+                            <TextInput placeholder="Type your smart card number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={(cardnumber) => this.setCardNo(cardnumber)}/>
+                            <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
+                                <Text style={styles.verifyButtonText}>Verify</Text>
+                            </TouchableOpacity>
                         </View>
+                        {this.state.cardError && <Text style={{ color: 'red' }}>{this.state.cardErrorMessage}</Text>}
                     </View>
                 </View>
                 
-                <View style={{justifyContent:'center', marginTop:'5%'}}>
-                    <Text style={{ fontFamily: "Roboto-Medium", fontSize:14, marginLeft:'3.5%' }}>Customer Name</Text>
+                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Customer Name</Text>
+                        <View roundedc style={[styles.inputitem, {height:40}]}>
+                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6'}}>{this.state.customerName}</Text>
+                        </View>
+                    </View>
                 </View>
-                <View 
-                    style={{
-                        marginTop:'0.4%',
-                        marginBottom:'2%',
-                        backgroundColor:'#fff',
-                        paddingTop:10,
-                        paddingLeft:15,
-                        paddingBottom:10,
-                        elevation:1,
-                        marginLeft: '2.5%',
-                        width: '95%'
-                    }}
-                >
-                    <Text style={{fontSize:13, color:'black'}}>{this.state.customerName}</Text>
-                </View> 
 
                 {/* Card Option*/}
                 <View
                     style={{
                         backgroundColor:'#fff',
-                        marginTop:'0.5%',
+                        marginTop:'5%',
                         marginLeft: '4%',
                         borderRadius: 30,
                         borderWidth: 1,
                         marginRight: '4%',
                         borderColor: 'transparent',
-                        elevation: 2
+                        elevation: 10
                     }}
                 >
                     <View 
@@ -876,8 +1039,7 @@ export default class TvSubscription extends Component {
                 {/* Card Option */}
 
                 <TouchableOpacity
-                    info
-                    style={[styles.buttonPurchase,{marginBottom:'10%'}]}
+                    info style={[styles.buttonPurchase,{marginBottom:'10%'}]}
                     onPress={() => {
                         (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
                     }}

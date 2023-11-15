@@ -19,7 +19,8 @@ import WalletTransfer from './app/screens/WalletTransfer';
 import WalletTopUp from './app/screens/WalletTopUp/index2';
 import Airtime from './app/screens/Airtime';
 import Data from './app/screens/Data';
-// import TvSubscription from './app/screens/TvSubscription';
+import TvSubscription from './app/screens/TvSubscription';
+import Insurance from './app/screens/Insurance/insurance';
 // import Education from './app/screens/Education';
 import Betting from './app/screens/Betting';
 import Electricity from './app/screens/Electricity';
@@ -86,13 +87,14 @@ const RootStack = () => {
                 <Stack.Screen name="AboutUs" component={AboutUs} />
                 <Stack.Screen name="Airtime" component={Airtime} />
                 <Stack.Screen name="Data" component={Data} />
-                {/* <Stack.Screen name="TvSubscription" component={TvSubscription}/> */}
+                <Stack.Screen name="TvSubscription" component={TvSubscription}/>
                 {/* <Stack.Screen name="Education" component={Education} /> */}
                 <Stack.Screen name="Betting" component={Betting} />
                 <Stack.Screen name="Electricity" component={Electricity} />
+                <Stack.Screen name="WalletTopUp" component={WalletTopUp} />
+                <Stack.Screen name="Insurance" component={Insurance} />
                 <Stack.Screen name="SuccessPage" component={SuccessPage} />
                 <Stack.Screen name="SingleTransaction" component={SingleTransaction} />
-                <Stack.Screen name="WalletTopUp" component={WalletTopUp} />
                 <Stack.Screen name="Paystack" component={Paystack} />
                 {/* <Stack.Screen name="PaymentConfirmation" component={PaymentConfirmation} /> */}
                 <Stack.Screen name="BankTransfer" component={BankTransfer} />

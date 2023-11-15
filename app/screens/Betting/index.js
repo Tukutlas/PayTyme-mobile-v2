@@ -579,7 +579,7 @@ export default class Airtime extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Account ID</Text>
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Enter account id" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id})}  />
                         </View>
                     </View>
@@ -893,7 +893,7 @@ export default class Airtime extends Component {
                     </View>
                     <View style={styles.formCenter}>
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})}/>
                         </View>
                     </View>

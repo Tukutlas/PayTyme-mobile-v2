@@ -520,7 +520,7 @@ export default class Airtime extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Phone Number</Text>
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setState({phonenumber_value})} value={this.state.phonenumber_value}  />
                         </View>
                     </View>
@@ -591,7 +591,7 @@ export default class Airtime extends Component {
                     <View style={styles.formCenter}>
                         {/* <Text style={styles.labeltext}>Enter Phone Number</Text> */}
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in airtime amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
                         </View>
                     </View>

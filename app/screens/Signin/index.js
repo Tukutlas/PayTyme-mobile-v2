@@ -16,6 +16,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { FontAwesome5 } from "@expo/vector-icons";
 export default class Signin extends Component {
     constructor(props) {
         super(props)
@@ -458,15 +459,17 @@ export default class Signin extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Email-Address</Text>
                         <View roundedc style={styles.inputitem}>
-                            <TextInput placeholder="Enter your email-address" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="email" onChangeText={(email) => this.setState({ email })} value={this.state.email} />
+                            <FontAwesome5 name={'envelope'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput placeholder="Enter your email-address" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="email" onChangeText={(email) => this.setState({ email })}/>
                         </View>
                     </View>
                 </View>
-                <View style={[styles.formline, { paddingTop: 10 }]}>
+                <View style={[styles.formLine, { paddingTop: 10 }]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Password</Text>
-                        <View roundedc style={styles.textBoxContainer}>
-                            <TextInput placeholder="Enter Password" secureTextEntry={this.state.hidePassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })} value={this.state.password} />
+                        <View roundedc style={styles.inputitem}>
+                            <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput placeholder="Enter your password" secureTextEntry={this.state.hidePassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })}/>
                             <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
                                 <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                             </TouchableOpacity>
@@ -497,7 +500,7 @@ export default class Signin extends Component {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                { this.state.compatible
+                {this.state.compatible
                     ?
                     (
                         this.state.biometricEnabled ? 

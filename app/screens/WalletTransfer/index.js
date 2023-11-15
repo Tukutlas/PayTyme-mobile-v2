@@ -449,7 +449,7 @@ export default class WalletTransfer extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter amount</Text>
                         <View roundedc style={styles.inputitem}>
-                            {/* <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/> */}
+                            {/* <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/> */}
                             <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref='amount' onChangeText={(amount) => this.setState({amount})}/>
                         </View>
                     </View>
@@ -458,7 +458,7 @@ export default class WalletTransfer extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter receiver's ID</Text>
                         <View roundedc style={styles.inputitem}>
-                            {/* <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/> */}
+                            {/* <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/> */}
                             <TextInput placeholder="Type in the wallet ID you are transferring to" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id})} value={this.state.account_id}/>
                         </View>
                     </View>

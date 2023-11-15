@@ -83,8 +83,13 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    height: 10,
-    padding: 10,
+    minHeight: 40,
+    backgroundColor: "#f6f6f6",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    width: '97%',
+    marginLeft: '1.5%'
   },
 
   iconStyle:{
@@ -139,7 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor:'#F6F6F6',
   },
 
-  phoneIcon:{
+  inputIcon:{
       position: 'absolute',
       marginLeft: 6,
       height: 20,

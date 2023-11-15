@@ -84,11 +84,6 @@ const styles = StyleSheet.create({
     height: 45
   },
 
-  dropdown: {
-    height: 10,
-    padding: 10,
-  },
-
   buttonPurchase: {
     borderWidth: 1,
     borderColor: "#8493d5",
@@ -155,7 +150,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 
-  phoneIcon:{
+  inputIcon:{
       position: 'absolute',
       marginLeft: 6,
       height: 20,

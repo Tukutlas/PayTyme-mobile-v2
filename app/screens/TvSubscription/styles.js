@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
         height: '8%',
         borderBottomWidth: 0,
         // paddingTop: Metrics.HEIGHT * 0.0354,
-        marginTop: '13%',
+        marginTop: '15%',
         elevation: 0,
         flexDirection: 'row',
         flexWrap: 'wrap'
@@ -20,8 +20,8 @@ const styles = StyleSheet.create({
 
     left: {
         alignSelf: "flex-start",
-        marginLeft: Metrics.WIDTH * 0.02,
-        marginTop: Metrics.HEIGHT * 0.01,
+        marginLeft: '3%',
+        marginTop: '1.6%',
     },
 
     headerBody: {
@@ -62,27 +62,27 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         backgroundColor: '#fff',
         width: '100%',
-        // paddingTop:0
+        paddingTop: 0,
     },
 
     formCenter: {
-        paddingLeft: Metrics.WIDTH * 0.0421,
-        width: Metrics.WIDTH * 1.05
+        marginLeft: '4%', // Adjust the padding according to your requirement
+        width: '92%',
     },
 
     inputitem: {
-        borderRightColor: 'transparent',
-        borderWidth: 0,
-        elevation: 0,
-        borderRadius: 1,
-        width: '90%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        height: 40,
+        marginTop: '1%',
         backgroundColor: '#F6F6F6',
-        marginTop: '0.5%',
-        height: 30
     },
 
     buttonPurchase: {
-        borderWidth: 1,
+        borderWidth: 0,
         borderColor: "#8493d5",
         backgroundColor: "#0C0C54",
         alignSelf: "center",
@@ -91,8 +91,9 @@ const styles = StyleSheet.create({
         paddingTop: 15,
         paddingBottom: 15,
         marginTop: 20,
-        borderRadius: 4,
-        width: Metrics.WIDTH * 0.91
+        height: '56px',
+        borderRadius: 15,
+        width: '241px'
     },
 
     purchaseButton: {
@@ -104,36 +105,36 @@ const styles = StyleSheet.create({
     input: {
         paddingLeft: '2%',
     },
+
     dropdown: {
-        // margin: 15,
-        height: 20,
+        minHeight: 40,
+        backgroundColor: "#f6f6f6",
+        borderRadius: 5,
         borderWidth: 1,
-        padding: 10,
+        borderColor: '#ccc',
+        width: '97%',
+        marginLeft: '1.5%'
     },
 
     labeltext: {
         color: '#222222',
         marginTop: '1%',
         fontSize: 14,
-        fontFamily: "Roboto-Medium",
+        fontFamily: 'Roboto-Medium',
     },
 
     textBox: {
         fontSize: 13,
-        alignSelf: 'stretch',
-        height: 25,
-        borderWidth: 0,
+        flex: 1,
+        height: 35,
         paddingVertical: 0,
+        paddingHorizontal: 10, // Adjust the padding according to your requirement
         borderRadius: 2,
         backgroundColor: '#F6F6F6',
     },
 
-    phoneIcon: {
-        position: 'absolute',
-        marginLeft: 6,
-        height: 20,
-        width: 35,
-        padding: 2
+    inputIcon: {
+        marginHorizontal: 10, // Adjust the margin according to your requirement
     },
 
     buttonImage: {
@@ -188,14 +189,14 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ACACAC',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
 
     checkedCircle: {
         width: 14,
         height: 14,
         borderRadius: 7,
-        backgroundColor: '#445cc4',
+        backgroundColor: '#445cc4'
     },
 
     buttonpaymentmethod: {
@@ -203,6 +204,26 @@ const styles = StyleSheet.create({
         borderColor: '#f5f5f5'
     },
 
+    iconStyle:{
+        width: 45,
+        height: 25
+    },
+
+    iconStyle2:{
+        width: 50,
+        height: 10
+    },
+
+    verifyButton: {
+        backgroundColor: '#0C0C54',
+        padding: 5,
+        borderRadius: 25,
+        marginLeft: 10
+    },
+    verifyButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
 });
 
 export default styles;

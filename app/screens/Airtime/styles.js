@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
   },
 
-  phoneIcon: {
+  inputIcon: {
     marginHorizontal: 10, // Adjust the margin according to your requirement
   },
 

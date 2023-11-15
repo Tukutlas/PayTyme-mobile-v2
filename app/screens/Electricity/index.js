@@ -10,8 +10,6 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
 
-
-
 export default class Electricity extends Component {
     constructor(props) {
         super(props);
@@ -274,7 +272,6 @@ export default class Electricity extends Component {
                         transaction_id:resultjson.data.transaction.transaction_id,
                     }); 
                 }
-            
             })
             .catch((error) => {
                 this.setState({isLoading:false});
@@ -588,12 +585,12 @@ export default class Electricity extends Component {
                         <Text style={styles.labeltext}>Select Disco</Text>
                     </View>
                 </View>
-                <View style={{width:'90%', marginLeft:'5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
+                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
                     <DropDownPicker
                         placeholder={'Select Distribution Company'}
                         open={this.state.discoOpen}
                         value={this.state.discoValue}
-                        // style={[styles.dropdown, {flexDirection: 'row', marginTop:'1%'}]}
+                        style={[styles.dropdown]}
                         items={this.state.discos}
                         setOpen={this.setDiscoOpen}
                         setValue={this.setDiscoValue}
@@ -618,12 +615,13 @@ export default class Electricity extends Component {
                 <View style={{justifyContent:'center', marginTop: '1.2%'}}>
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1.2%',marginLeft:'3.5%'}}>Meter Type</Text>
                 </View>
-                <View style={{width:'90%', marginLeft:'5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
+                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
                     <DropDownPicker
                         placeholder={'Select Meter Type'}
                         open={this.state.typeOpen}
                         value={this.state.typeValue}
                         items={this.state.meter_type}
+                        style={[styles.dropdown]}
                         setOpen={this.setTypeOpen}
                         setValue={this.setTypeValue}
                         setItems={this.setTypeItems}
@@ -637,7 +635,7 @@ export default class Electricity extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Meter Number</Text>
                         <View roundedc style={[styles.inputitem]}>
-                            <FontAwesome5 name={'tachometer-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'tachometer-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/>
                             <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
                                 <Text style={styles.verifyButtonText}>Verify</Text>
@@ -651,7 +649,7 @@ export default class Electricity extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Customer Name</Text>
                         <View roundedc style={[styles.inputitem, {height:30}]}>
-                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.customerName}</Text>
                         </View>
                     </View>
@@ -661,7 +659,7 @@ export default class Electricity extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Customer Phone Number</Text>
                         <View roundedc style={[styles.inputitem]}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in your Phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
                         </View>
                         {this.state.phoneError && <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.phoneNoErrorMessage}</Text>}
@@ -672,7 +670,7 @@ export default class Electricity extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Amount</Text>
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.phoneIcon}/>
+                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in airtime amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
                         </View>
                         {this.state.amountError && <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.amountErrorMessage}</Text>}

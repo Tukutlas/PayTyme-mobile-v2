@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
   },
 
-  phoneIcon: {
+  inputIcon: {
     marginHorizontal: 10, // Adjust the margin according to your requirement
   },
 
@@ -137,8 +137,13 @@ const styles = StyleSheet.create({
     paddingLeft:'2%',
   },
   dropdown: {
-    height: 10,
-    padding: 10,
+    minHeight: 40,
+    backgroundColor: "#f6f6f6",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    width: '97%',
+    marginLeft: '1.5%'
   },
   iconStyle:{
     width: 50,

@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor:'#F6F6F6',
   },
 
-  phoneIcon:{
+  inputIcon:{
       position: 'absolute',
       marginLeft: 6,
       height: 20,

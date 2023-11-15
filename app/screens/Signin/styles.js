@@ -55,13 +55,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff'
     },
 
-    formline: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        backgroundColor: '#fff',
-        width: '100%'
-    },
-
     formleft: {
         paddingLeft: Metrics.WIDTH * 0.0421,
         width: 176
@@ -73,26 +66,49 @@ const styles = StyleSheet.create({
         width: 176
     },
 
+    formLine: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        backgroundColor: '#fff',
+        width: '100%',
+        paddingTop: 0,
+    },
+    
     formCenter: {
-        paddingLeft: Metrics.WIDTH * 0.0421,
-        width: Metrics.WIDTH * 1.05
+        marginLeft: '4%', // Adjust the padding according to your requirement
+        width: '92%',
     },
-
+    
     inputitem: {
-        borderRightColor: 'transparent',
-        borderWidth: 0,
-        elevation: 0,
-        borderRadius: 1,
-        width: '90%',
-        backgroundColor: '#F6F6F6',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        height: 40,
         marginTop: '1%',
-        height: 35
+        backgroundColor: '#F6F6F6',
     },
-
+    
     labeltext: {
         color: '#222222',
+        marginTop: '1%',
         fontSize: 14,
-        fontFamily: "Roboto-Medium",
+        fontFamily: 'Roboto-Medium',
+    },
+    
+    textBox: {
+        fontSize: 13,
+        flex: 1,
+        height: 35,
+        paddingVertical: 0,
+        paddingHorizontal: 10, // Adjust the padding according to your requirement
+        borderRadius: 2,
+        backgroundColor: '#F6F6F6',
+    },
+    
+    inputIcon: {
+        marginHorizontal: 10, // Adjust the margin according to your requirement
     },
 
     touchableButton: {
@@ -108,17 +124,6 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         justifyContent: 'center',
         marginRight: Metrics.WIDTH * 0.10,
-    },
-
-    textBox: {
-        fontSize: 13,
-        alignSelf: 'stretch',
-        height: 35,
-        borderWidth: 0,
-        paddingVertical: 0,
-        borderRadius: 2,
-        backgroundColor: '#F6F6F6',
-        fontFamily: "Roboto-Regular",
     },
 
     buttonImage: {

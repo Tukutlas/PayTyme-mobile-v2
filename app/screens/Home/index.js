@@ -237,7 +237,7 @@ export default class Home extends Component {
                         <FontAwesome5 name={'wallet'} color={'#34A853'} size={35} />
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Fund Wallet</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }}>
+                    <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Insurance") }}>
                         <FontAwesome5 name={'car'} color={'#F03434'} size={35} />
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Insurance</Text>
                     </TouchableOpacity>
