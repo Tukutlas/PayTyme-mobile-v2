@@ -179,7 +179,6 @@ export default class Electricity extends Component {
             .then(response => response.text())
             .then(responseText => 
             {
-                console.log(responseText)
                 let result = JSON.parse(responseText);
                 if(result.status == true){
                     this.setState({customerName:result.data.customer_name, serviceProvider:result.provider, isValidated:true});
@@ -252,7 +251,7 @@ export default class Electricity extends Component {
             {
                 this.setState({isLoading:false});
                 let resultjson  = JSON.parse(responseText);
-                if(resultjson.status ==false){
+                if(resultjson.status == false){
                     Alert.alert(
                         "Error",
                         resultjson.message,
@@ -369,6 +368,7 @@ export default class Electricity extends Component {
         let amount = this.state.amount;
         let meter_type = this.state.typeValue;
         let phone_number = this.state.phoneNo;
+        let serviceProvider = this.state.serviceProvider;
 
         this.props.navigation.navigate("DebitCardPayment",
             {
@@ -378,7 +378,7 @@ export default class Electricity extends Component {
                 meter_no: meter_no,
                 meter_type: meter_type,
                 company: company,
-                url: "/electicity/pay-bill"
+                serviceProvider: serviceProvider
             }); 
     }
 

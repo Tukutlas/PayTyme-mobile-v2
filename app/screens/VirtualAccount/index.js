@@ -8,7 +8,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import * as Font from 'expo-font';
 import * as Clipboard from 'expo-clipboard';
 
-export default class BankTransfer extends Component {
+export default class VirtualAccount extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -70,7 +70,7 @@ export default class BankTransfer extends Component {
                         </TouchableOpacity>
                     </View> 
                     <View style={styles.headerBody}>
-                        <Text style={styles.body}>Bank Transfer</Text>
+                        <Text style={styles.body}>Bank Transfer via Virtual Account</Text>
                     </View>
                     <View style={styles.right}>
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
@@ -80,7 +80,7 @@ export default class BankTransfer extends Component {
                 <View style={[styles.headerText]}>
                     <Text style={styles.text}>
                         Use the details below to fund your wallet from any bank app or through internet banking. 
-                        Kindly be advised that the least amount to be funded is ₦200.
+                        {/* Kindly be advised that the least amount to be funded is ₦200. */}
                     </Text>
                 </View>
                 <View 

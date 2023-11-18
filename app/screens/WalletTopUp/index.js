@@ -227,7 +227,8 @@ export default class WalletTopUp extends Component {
             this.setState({channel_error:true});
         }else if(this.state.paymentChannelValue == 'debit_card'){
             this.setState({channel_error:false});
-            this.checkIfUserHasCard();
+            // this.checkIfUserHasCard();
+            this.props.navigation.navigate('DebitCardPayment');
         }else if(this.state.paymentChannelValue == 'bank_transfer'){
             //Go To Bank Transfer Page
             this.props.navigation.navigate('BankTransfer');

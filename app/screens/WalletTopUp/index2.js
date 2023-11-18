@@ -21,8 +21,9 @@ const WalletTopUp = ({ navigation }) => {
     const [cards, setCards] = useState([]);
     const [authToken, setAuthToken] = useState("");
     const [paymentChannels, setPaymentChannels] = useState([
-        { label: "", value: "paystack", icon: () => <Image source={require('../../Images/Payment-Gateway/paystack.png')} style={styles.iconStyle} />},
-        { label: "", value: "flutterwave", icon: () => <Image source={require('../../Images/Payment-Gateway/flutterwave.png')} style={styles.iconStyle} />},
+        // { label: "", value: "paystack", icon: () => <Image source={require('../../Images/Payment-Gateway/paystack.png')} style={styles.iconStyle} />},
+        // { label: "", value: "flutterwave", icon: () => <Image source={require('../../Images/Payment-Gateway/flutterwave.png')} style={styles.iconStyle} />},
+        { label: "Card", value: "card", icon: () =>  <FontAwesome5 name={'credit-card'} color={'#fof'} size={20}/>},
         { label: "Virtual Account", value: "virtual_account" , icon: () => <Image source={require('../../Images/Bank/default-image.png')} style={styles.iconStyle2} />},
         { label: "Bank Transfer", value: "bank_transfer" , icon: () => <Image source={require('../../Images/Bank/default-image.png')} style={styles.iconStyle2} />},
         
@@ -180,13 +181,21 @@ const WalletTopUp = ({ navigation }) => {
             setAmountError(true);
         } else if (!paymentChannelValue) {
             setChannelError(true);
-        } else if (paymentChannelValue === "paystack") {
-            setChannelError(false);
-            checkIfUserHasCard();
-        } else if (paymentChannelValue === "flutterwave") {
-            setChannelError(false);
-            checkIfUserHasCard();
-        } else if (paymentChannelValue === "virtual_account") {
+        } else if(paymentChannelValue === 'card'){
+            navigation.navigate("DebitCardPayment",{
+                transaction_type:"WalletTopUp",
+                amount: amount,
+                url: "/wallet/fund"
+            }); 
+        }
+        // else if (paymentChannelValue === "paystack") {
+        //     setChannelError(false);
+        //     checkIfUserHasCard();
+        // } else if (paymentChannelValue === "flutterwave") {
+        //     setChannelError(false);
+        //     checkIfUserHasCard();
+        // } 
+        else if (paymentChannelValue === "virtual_account") {
             setChannelError(false);
             // checkIfUserHasCard();
         } else if (paymentChannelValue === "bank_transfer") {
@@ -216,11 +225,15 @@ const WalletTopUp = ({ navigation }) => {
     useEffect(() => {
         // This effect will run every time paymentChannelValue changes
         // console.log(paymentChannelValue);
-        if(paymentChannelValue == 'paystack' || paymentChannelValue == 'flutterwave'){
-            FilterCards(paymentChannelValue)
-        }else {
-            setDisplayCards(false)
-        }
+        // if(paymentChannelValue == 'paystack' || paymentChannelValue == 'flutterwave'){
+        //     FilterCards(paymentChannelValue)
+        // }
+        // if(paymentChannelValue == 'card'){
+        //     // FilterCards(paymentChannelValue)
+        //     navigation.navigate("DebitCardPayment");
+        // }else {
+        //     setDisplayCards(false)
+        // }
     }, [paymentChannelValue]); // Dependency array ensures the effect runs when paymentChannelValue changes
 
 
@@ -271,6 +284,7 @@ const WalletTopUp = ({ navigation }) => {
                     setOpen={setOpen}
                     setValue={setChannelValue}
                     setItems={setPaymentChannels}
+                    style={[styles.dropdown]}
                     placeholder="Select the payment option you want to fund with"
                     // renderListItem={({ onPress, item }) => (
                     //     <TouchableOpacity onPress={ () => setPaymentChannelValue(item.value)} style={{ flexDirection: 'row' }}>
@@ -278,6 +292,10 @@ const WalletTopUp = ({ navigation }) => {
                     //       <View style={{ flex: 2, alignItems: 'flex-end', marginRight: "50px"}}>{item.icon()}</View>
                     //     </TouchableOpacity>
                     //   )}
+                    dropDownContainerStyle={{
+                        width:'97%',
+                        marginLeft:'1.5%'
+                    }} 
                 />
             </View>
             {channelError && <Text style={{ marginTop: '7%', marginLeft: '3%', color: 'red' }}>Please select a payment channel</Text>}

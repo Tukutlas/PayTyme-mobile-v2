@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     width: '97%',
     marginLeft: '1.5%'
-},
+  },
 
   buttonImage: {
     resizeMode: 'contain',

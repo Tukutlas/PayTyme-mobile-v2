@@ -4,6 +4,7 @@ import {WebView} from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 //import the global varibales
 import { GlobalVariables } from '../../../global';
+import queryString from 'query-string';
  
 export default class Paystack extends Component {
     constructor(props) {
@@ -37,95 +38,134 @@ export default class Paystack extends Component {
         return true;  
     };
 
-    onNavigationStateChange(){       
-        this._onNavigationStateChange.bind(this)
-    }
+    // onNavigationStateChange(){       
+    //     this._onNavigationStateChange.bind(this)
+    // }
     
-    _onNavigationStateChange(webViewState)
-    {
-        let url = webViewState.url;
-        // let string = url.split("?");
-        // console.log(string[0]);
-        var regex = /[?&]([^=#]+)=([^&#]*)/g,
-        params = {},
-        match;
-        while (match = regex.exec(url)) {
-          params[match[1]] = match[2];
-        }
-        if(params.reference){
-            fetch(GlobalVariables.apiURL+"/wallet/fund-verify?",
-            { 
-                method: 'POST',
-                headers: new Headers({
-                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                    'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-                }),
-                body:  "reference="+this.props.route.params.datat.reference
-                    +"&trxref="+params.trxref
-              // <-- Post parameters
-            }) 
-            .then((response) => response.text())
-            .then((responseText) => {
-                let response = JSON.parse(responseText);
-                if(response.status == true){
-                    this.props.navigation.navigate("SuccessPage",
-                    {
-                        transaction_id:response.data.transaction.id,
+    _onNavigationStateChange = async (webViewState) => {
+        const url = webViewState.url;
+        console.log(url);
+        const string = url.split("?");
+        console.log(string[0]);
+      
+        if (string[0] === "https://api.paytyme.com.ng/verify") {
+    //         const params = queryString.parse(url);
+    //   console.log(params)
+            const queryStringIndex = url.indexOf('?');
+            const queryString = url.substring(queryStringIndex + 1);
+
+            // Parse the query string
+            const params = queryString.split('&').reduce((acc, pair) => {
+                const [key, value] = pair.split('=');
+                acc[key] = decodeURIComponent(value);
+                return acc;
+            }, {});
+            if (params.reference) {
+                try {
+                    const response = await fetch(`${GlobalVariables.apiURL}/transactions/verify?save_card=${this.props.route.params.saveCard}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Authorization': `Bearer ${this.state.auth_token}`,
+                        },
+                        body: `tx_ref=${params.trxref}`
                     });
-                }else if(response.status == false){
-                    let response_message = JSON.parse(responseText).message;
-                    Alert.alert(
-                        'oops',
-                        response_message,
-                        [
+      
+                    const responseData = await response.json();
+      
+                    if (responseData.status) {
+                        this.props.navigation.navigate("SuccessPage", {
+                            transaction_id: responseData.data.transaction.transaction_id,
+                        });
+                    } else {
+                        const responseMessage = responseData.message;
+                        Alert.alert('Oops', responseMessage, [
                             {
                                 text: 'Ok',
                                 onPress: () => {
                                     this.props.navigation.dispatch(
                                         StackActions.reset({
-                                            index: 0, key: null, actions: [NavigationActions.navigate({ routeName: 'Tabs' })]
+                                            index: 0,
+                                            key: null,
+                                            actions: [
+                                                NavigationActions.navigate({ routeName: 'Tabs' })
+                                            ]
                                         })
                                     );
                                 },
                                 style: 'cancel',
-                            }, 
-                        ],
-                        {cancelable: false},
-                    );
+                            },
+                        ], { cancelable: false });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    // Handle network or other errors
                 }
-            })
-            .catch((error) => {
-                // alert("Network error. Please check your connection settings");
-                // Alert.alert(
-                //     'oops',
-                //     'An error occured',
-                //     [
-                //         {
-                //             text: 'Ok',
-                //             onPress: () => {
-                //                 this.props.navigation.dispatch(
-                //                     CommonActions.reset({
-                //                     routes: [
-                //                         { name: 'Tabs' }
-                //                     ],
-                //                     })
-                //                 );
-                //             },
-                //             style: 'cancel',
-                //         }, 
-                //     ],
-                //     {cancelable: false},
-                // );
-            });
-          //if payment reference verify successful, then topup user waller
-          //and redirect to waller page
-
-          // this.props.navigation.dispatch(StackActions.reset({
-          //   index: 0, key: null, actions: [NavigationActions.navigate({ routeName: 'Wallet' })]
-          //  }));
-          
+            } else if (params.tx_ref) {
+                try {
+                    const response = await fetch(`${GlobalVariables.apiURL}/transactions/verify?save_card=${this.props.route.params.saveCard}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Authorization': `Bearer ${this.state.auth_token}`,
+                        },
+                        body: `tx_ref=${params.tx_ref}&transaction_id=${params.transaction_id}`
+                    });
+      
+                    const responseData = await response.json();
+      
+                    if (responseData.status) {
+                        this.props.navigation.navigate("SuccessPage", {
+                            transaction_id: responseData.data.transaction.transaction_id,
+                        });
+                    } else {
+                        const responseMessage = responseData.message;
+                        Alert.alert('Oops', responseMessage, [
+                            {
+                                text: 'Ok',
+                                onPress: () => {
+                                    this.props.navigation.dispatch(
+                                        StackActions.reset({
+                                            index: 0,
+                                            key: null,
+                                            actions: [
+                                                NavigationActions.navigate({ routeName: 'Tabs' })
+                                            ]
+                                        })
+                                    );
+                                },
+                                style: 'cancel',
+                            },
+                        ], { cancelable: false });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    // Handle network or other errors
+                }
+            }
+        }else if(string[0] === "https://flutterwave.com/ng"){
+            // Parse the URL params
+            const params = queryString.parse(url);
+            console.log(params)
         }
-        // else{
+    };
+      
+    render() {
+        return (
+            <WebView
+                source={{ uri: this.props.route.params.payment_link }}
+                style={{
+                    width: '100%',
+                    height: 500,
+                    marginTop: 50
+                }}
+                startInLoadingState={true}
+                onNavigationStateChange={this._onNavigationStateChange}
+            />
+        );
+      }
+    }      
+// else{
         //   //do nothing
         //     Alert.alert(
         //         'Oops',
@@ -146,32 +186,3 @@ export default class Paystack extends Component {
         //         {cancelable: false},
         //     );
         // }
-    }
-
-
-  render() {
- 
-    return (
-        <WebView     
-          source={{uri: "https://checkout.paystack.com/"+this.props.route.params.datat.access_code}}
-          style={{
-              width: '100%',
-              height: 500,
-              marginTop: 50 
-          }}
-          startInLoadingState={true}
-          onNavigationStateChange={this._onNavigationStateChange.bind(this)}
-          // onLoad={() => this.hideSpinner()}
-        /> 
-        // <View>
-        //     <Text style={{
-        //       width: '100%',
-        //       height: 500,
-        //       marginTop: 50 
-        //     }}>{this.props.route.params.datat.access_code}</Text>
-        //   </View>
-
-
-    )
-  }
-}

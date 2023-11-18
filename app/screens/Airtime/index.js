@@ -127,7 +127,6 @@ export default class Airtime extends Component {
         }) 
         .then((response) => response.text())
         .then((responseText) => { 
-            console.log(responseText)
             this.setState({isLoading:false});
         
             let response_status = JSON.parse(responseText).status;
@@ -262,7 +261,7 @@ export default class Airtime extends Component {
                         },
                         {
                             text: 'Yes, Pay with Card',  
-                            onPress: () => {this.checkIfUserHasCard();},
+                            onPress: () => {this.buyAirtimeWithCardPayment();},
                             style: 'cancel',
                         }, 
                     ],
@@ -279,11 +278,11 @@ export default class Airtime extends Component {
         let network =""; 
 
         if(this.state.mtn ==true){
-            network="MTN";
+            network="mtn";
         }else if(this.state.airtel == true){
-            network="AIRTEL";
+            network="airtel";
         }else if(this.state.glo == true){
-            network="GLO";
+            network="glo";
         }else if(this.state.etisalat == true){
             network="9mobile";
         }else{
@@ -296,96 +295,8 @@ export default class Airtime extends Component {
             amount: amount,
             phonenumber_value: phonenumber_value,
             network: network,
-            url: "/topup/recharge-airtime"
+            url: "/topup/airtime"
         });    
-    }
-
-    buyAirtimeWithNewCardPayment(){
-        let amount = this.state.amount;
-        let phonenumber_value = this.state.phonenumber_value;
-    
-        let network =""; 
-
-        if(this.state.mtn ==true){
-            network="mtn";
-        }else if(this.state.airtel == true){
-            network="airtel";
-        }else if(this.state.glo == true){
-            network="glo";
-        }else if(this.state.etisalat == true){
-            network="9mobile";
-        }else{
-            
-        }
-
-        this.setState({isLoading:true});
-        let endpoint ="";  
-        //send api for airtime purchase
-        endpoint = "/topup/airtime";
-        let verify = "/verify";
-
-        fetch(GlobalVariables.apiURL+endpoint,
-        { 
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  "phone="+phonenumber_value
-                +"&amount="+amount
-                +"&network="+network
-                +"&channel=card"
-            // <-- Post parameters
-
-            // {
-            //     "phone": "08011111111",
-            //     "network": "glo",
-            //     "amount": "3000",
-            //     "channel": "wallet",
-            //     "gateway": "flutterwave",
-            //     "card_id": "610f4fae-237b-4cec-b762-52b7adc63990"
-        }) 
-        .then((response) => response.text())
-        .then((responseText) =>    
-        {
-            this.setState({isLoading:true});
-            let response = JSON.parse(responseText);
-            if(response.status == true){
-                let data = JSON.parse(responseText).data;
-                if (data.payment_info) {
-                    this.setState({transaction:true});
-                    let datat = data.payment_info.data;
-                    this.props.navigation.navigate("NewDebitCardPayment", 
-                    {
-                        datat: datat,
-                        verifyUrl: "/topup/airtime/verify-recharge",
-                        routeName: 'Airtime'
-                    });
-                }
-            }else if(response.status == false){
-                this.setState({isLoading:false});
-                let message = JSON.parse(responseText).message;
-                alert(message);
-            }
-        })
-        .catch((error) => {
-            this.setState({isLoading:false});
-            Alert.alert(
-                'Oops. Network Error',
-                'Could not connect to server. Check your network and try again',
-                [
-                    {
-                        text: 'Try Again',
-                        onPress: () => {
-                        
-                        },
-                        style: 'cancel'
-                    }, 
-                ],
-                {cancelable: false},
-            );
-        });
-        //end send API for airtime purchase  
     }
   
     buyAirtime(){
@@ -419,7 +330,7 @@ export default class Airtime extends Component {
                     'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                     'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
                 }),
-                body:  "phone="+phonenumber_value
+                body: "phone="+phonenumber_value
                     +"&amount="+amount
                     +"&network="+network
                     +"&channel=wallet"
@@ -495,8 +406,8 @@ export default class Airtime extends Component {
         const { navigation } = this.props;
         StatusBar.setBarStyle("light-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#445cc4", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#445cc4", true);
+            StatusBar.setTranslucent(true);
         }
     
         return (
@@ -592,7 +503,7 @@ export default class Airtime extends Component {
                         {/* <Text style={styles.labeltext}>Enter Phone Number</Text> */}
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in airtime amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
+                            <TextInput placeholder="Type in airtime amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} value={this.state.amount.toString()}/>
                         </View>
                     </View>
                 </View>

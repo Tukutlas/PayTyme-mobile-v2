@@ -372,6 +372,7 @@ export default class Data extends Component {
         let amount = this.state.amount;
         let bundlePackage = this.state.bundlepackage;
         let network =""; 
+        let serviceProvider = this.state.serviceProvider;
 
         if(this.state.mtn ==true){
             network="mtn";
@@ -393,94 +394,8 @@ export default class Data extends Component {
             amount: amount,
             phonenumber_value: phonenumber_value,
             network: network,
-            url: "/topup/recharge-data"
+            serviceProvider: serviceProvider
         });    
-    }
-
-    buyDataWithNewCardPayment(){
-        let phonenumber_value = this.state.phonenumber_value;
-        let bundlePlan = this.state.bundleplan; 
-        let amount = this.state.amount;
-        let bundlePackage = this.state.bundlepackage;
-        let network =""; 
-
-        if(this.state.mtn ==true){
-            network="mtn";
-        }else if(this.state.airtel == true){
-            network="airtel";
-        }else if(this.state.glo == true){
-            network="glo";
-        }else if(this.state.etisalat == true){
-            network="9mobile";
-        }else{
-            
-        }
-
-        this.setState({isLoading:true});
-        let endpoint ="";  
-        //send api for Data purchase
-        endpoint = "/topup/recharge-data";
-        let verify = "/verify";
-
-        fetch(GlobalVariables.apiURL+endpoint,
-        { 
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  "phone="+phonenumber_value
-                +"&amount="+amount
-                +"&bundle="+bundlePlan
-                +"&package="+bundlePackage
-                +"&network="+network
-                +"&channel=card"
-                +"&callback_url="+GlobalVariables.apiURL+verify
-                +"&card_position=new"
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) =>    
-        {
-            this.setState({isLoading:true});
-            let response = JSON.parse(responseText);
-            if(response.status == true){
-                let data = JSON.parse(responseText).data;
-                if (data.payment_info) {
-                    this.setState({transaction:true});
-                    let datat = data.payment_info.data;
-                    this.props.navigation.navigate("NewDebitCardPayment", 
-                    {
-                        datat: datat,
-                        verifyUrl: "/topup/data/verify-recharge",
-                        routeName: 'Data'
-                    });
-                }
-            }else if(response.status == false){
-                this.setState({isLoading:false});
-                let message = JSON.parse(responseText).message;
-                alert(message);
-            }
-        })
-        .catch((error) => {
-            this.setState({isLoading:false});
-            // console.log(error);
-            Alert.alert(
-                'Oops. Network Error',
-                'Could not connect to server. Check your network and try again',
-                [
-                    {
-                        text: 'Try Again',
-                        onPress: () => {
-                        
-                        },
-                        style: 'cancel'
-                    }, 
-                ],
-                {cancelable: false},
-            );
-        });
-        //end send API for Data purchase 
     }
   
     buyData(){

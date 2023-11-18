@@ -71,8 +71,8 @@ export default class SuccessPage extends Component {
             StatusBar.setTranslucent(true);
         }
         return (
-            <View style={{backgroundColor: '#FFF'}}>
-                <View style={styles.left}>
+            <View style={styles.container}>
+                <View style={[styles.left, {marginTop: "8%"}]}>
                     <Image style={[styles.profileImage, {borderRadius:30, borderColor:'#120A47'}]} source={require('../../../assets/logo.png')}/> 
                 </View> 
                 <View>

@@ -3,9 +3,9 @@ import { Fonts, Metrics, Colors } from "../../Themes/";
 
 module.exports = StyleSheet.create({
     container: {
-        flex: 1,
+        // flex: 1,
         backgroundColor: "#ffff",
-       // width:290
+        height: "100%"
     },
 
     header:{

@@ -25,7 +25,7 @@ import Insurance from './app/screens/Insurance/insurance';
 import Betting from './app/screens/Betting';
 import Electricity from './app/screens/Electricity';
 import Paystack from './app/screens/Paystack';
-import DebitCardPayment from './app/screens/DebitCardPayment';
+import DebitCardPayment from './app/screens/DebitCardPayment/debitCardPayment';
 import NewDebitCardPayment from './app/screens/DebitCardPayment/New';
 // import PaymentConfirmation from './app/screens/PaymentConfirmation';
 import ForgotPassword from './app/screens/ForgotPassword';

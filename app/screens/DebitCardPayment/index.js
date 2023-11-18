@@ -3,6 +3,7 @@ import { Text, Image, TouchableOpacity, BackHandler, Alert, View} from 'react-na
 import Spinner from 'react-native-loading-spinner-overlay';
 import { FontAwesome5 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DropDownPicker from 'react-native-dropdown-picker';
 // Screen Styles
 import styles from './styles';
 //import the global varibales
@@ -167,26 +168,21 @@ export default class DebitCardPayment extends Component {
                     'Oops. Transaction Error',
                     'You have insufficient funds. Top up your wallet to make this transaction',
                     [
-                    {
-                    text: 'Try Again', 
-                    onPress: () => {
-                        
-                        this.props.navigation.dispatch(StackActions.reset({
-                        index: 0, key: null, actions: [NavigationActions.navigate({ routeName: 'DrawerSocial' })]
-                        }));
-
-                        //this.props.navigation.navigate("CardTopUp");
-                    },
-                    style: 'cancel',
-                    }, 
-                    
-                    
+                        {
+                            text: 'Try Again', 
+                            onPress: () => {
+                                this.props.navigation.dispatch(StackActions.reset({
+                                    index: 0, key: null, actions: [NavigationActions.navigate({ routeName: 'DrawerSocial' })]
+                                }));
+                                //this.props.navigation.navigate("CardTopUp");
+                            },
+                            style: 'cancel',
+                        }, 
                     ],
                     {cancelable: false},
                 );
             }else{
                 this.setState({isLoading:false});
-
                 Alert.alert(
                     'Oops. Transaction Error',
                     response.message,
@@ -707,7 +703,7 @@ export default class DebitCardPayment extends Component {
 
     getUserCards(){
         this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/get-cards",
+        fetch(GlobalVariables.apiURL+"/user/cards",
         { 
             method: 'GET',
             headers: new Headers({
@@ -724,16 +720,15 @@ export default class DebitCardPayment extends Component {
             if(response_status == true){
                 let data = JSON.parse(responseText).data;
                 if(data != ''){
-                    // this.setState({ cards: data })
+                    this.setState({ cards: data })
                     let newArray = data.map((item) => {
                         if (item.reusable == true) {
                             return item
                         }
                     })
                     if(newArray.length != 0){
-                        this.setState({cards: newArray, there_cards: true});
+                        this.setState({there_cards: true});
                     }
-                    // this.cards();
                     this.setState({isLoading:false});
                 }else{
                     this.setState({there_cards: false});
@@ -1071,6 +1066,29 @@ export default class DebitCardPayment extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
+
+                <View style={{justifyContent:'center'}}>
+                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Select Payment Gateway</Text>
+                </View>
+                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
+                    <DropDownPicker
+                        placeholder={'Select your payment gateway'}
+                        open={this.state.gatewayOpen}
+                        value={this.state.gatewayValue}
+                        style={[styles.dropdown]}
+                        items={this.state.gatewaydata}
+                        setOpen={this.setGatewayOpen}
+                        setValue={this.setGatewayValue}
+                        setItems={this.setGatewayItems}
+                        listMode="MODAL"  
+                        searchable={false}
+                        onSelectItem={(item) => {
+                            this.sortCards(item.value);
+                        }}
+                    />
+                </View>
+                {this.state.bouquetError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.bouquetErrorMessage}</Text>}
+
 
                 {(!this.state.there_cards)
                     ? 
