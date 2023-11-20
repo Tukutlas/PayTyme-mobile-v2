@@ -261,9 +261,7 @@ export default class Data extends Component {
  
         if (data.length > 0) {
             const contact = data;
-            //console.log(contact[0].Image.uri);
             this.setState({contact:contact});
-            // console.log("Phone Contact"+JSON.stringify(contact));
         }
 
 
@@ -444,7 +442,6 @@ export default class Data extends Component {
             .then((response) => response.text())
             .then((responseText) =>    
             {
-                console.log(responseText)
                 let response = JSON.parse(responseText);
                 if(response.status == true) {
                     this.props.navigation.navigate("SuccessPage",

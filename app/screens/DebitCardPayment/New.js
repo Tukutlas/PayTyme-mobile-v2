@@ -32,7 +32,6 @@ export default class NewDebitCardPayment extends Component {
         try{  
             this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token, });
         }catch (error) {
-            console.log(error);
         }
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);              
     }
@@ -107,7 +106,6 @@ export default class NewDebitCardPayment extends Component {
                         }
                     })
                     .catch((error) => {
-                        console.log(error)
                         Alert.alert(
                             'Error',
                             'An error occured',
