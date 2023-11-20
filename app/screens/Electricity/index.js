@@ -111,7 +111,6 @@ export default class Electricity extends Component {
             }
         })
         .catch((error) => {
-            // console.error(error);
             this.setState({isLoading:false});
             alert("Network error. Please check your connection settings");
         });      
@@ -138,7 +137,6 @@ export default class Electricity extends Component {
 
     GetValueFunction = (meterno) =>{
         var value = meterno.length.toString();
-        // console.log(value)
    
         this.setState({meterno: meterno});
         // if (Value == 10) {
@@ -164,7 +162,6 @@ export default class Electricity extends Component {
         }else if(value < 10){
             this.setState({meterError: true, meterErrorMessage: "Kindly check the Meter Number"})
         }else if(meterno != '' && type != null && company != null){ 
-            
             let myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
 
@@ -265,11 +262,28 @@ export default class Electricity extends Component {
                     );  
                     
                 }else if(resultjson.status == true){
-                    // console.log(resultjson.data.transaction.id);
-                    this.props.navigation.navigate("SuccessPage",
-                    {
-                        transaction_id:resultjson.data.transaction.transaction_id,
-                    }); 
+                    let transaction = resultjson.data.transaction;
+                    let status = transaction.status;
+                    if(status == 'successful'){
+                        this.props.navigation.navigate("SuccessPage",
+                        {
+                            transaction_id:resultjson.data.transaction.id,
+                        }); 
+                    }else{
+                        this.setState({isLoading:false});
+                        Alert.alert(
+                            "Error",
+                            resultjson.message,
+                            [
+                                {
+                                    text: 'Try Again',
+                                    style: 'cancel',
+                                }, 
+                            ],
+                            {cancelable: false},
+                        );
+                    }
+                    
                 }
             })
             .catch((error) => {
@@ -293,72 +307,6 @@ export default class Electricity extends Component {
                 {cancelable: false},
             );  
         }
-    }
-
-    payPowerWithNewCard(){
-        this.setState({isLoading:true});
-        let myHeaders = new Headers();
-        myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
-        myHeaders.append("Content-Type", "application/json");
-
-        let raw = JSON.stringify({
-            "company":this.state.discoValue,
-            "meter_no":this.state.meterno,
-            "amount":this.state.amount,
-            "meter_type":this.state.typeValue,
-            "channel": "card",
-            "callback_url": GlobalVariables.apiURL+"/verify",
-            "card_position": "new",
-            "phone_number": this.state.phoneNo
-        });
-
-        let requestOptions = 
-        {
-            method: 'POST',
-            headers: myHeaders,
-            body: raw,
-        };
-  
-        fetch(GlobalVariables.apiURL+"/electricity/pay-bill", requestOptions)
-        .then(response => response.text())
-        .then(result => 
-        {
-            this.setState({isLoading:false});
-            //go on
-            let resultjson  = JSON.parse(result);
-            // console.log(resultjson);
-            if(resultjson.status ==false){
-                Alert.alert(
-                    "Error",
-                    resultjson.message,
-                    [
-                        {
-                            text: 'Try Again',
-                            style: 'cancel',
-                        }, 
-                    ],
-                    {cancelable: false},
-                );  
-                
-            }else if(resultjson.status ==true){
-                let data = JSON.parse(result).data;
-                if (data.payment_info) {
-                    this.setState({transaction:true});
-                    let datat = data.payment_info.data;
-                    this.props.navigation.navigate("NewDebitCardPayment", 
-                    {
-                        datat: datat,
-                        verifyUrl: "/electricity/verify-bill-payment",
-                        routeName: 'Electricity'
-                    });
-                }
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            this.setState({isLoading:false});
-            alert("Network error. Please check your connection settings");
-        }); 
     }
 
     payPowerWithCard(){
@@ -660,9 +608,9 @@ export default class Electricity extends Component {
                         <Text style={styles.labeltext}>Customer Phone Number</Text>
                         <View roundedc style={[styles.inputitem]}>
                             <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in your Phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
+                            <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
                         </View>
-                        {this.state.phoneError && <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.phoneNoErrorMessage}</Text>}
+                        {this.state.phoneError && <Text style={{fontSize:13, color:'red', backgroundColor:'#F6F6F6', height:20}}>{this.state.phoneNoErrorMessage}</Text>}
                     </View>
                 </View>
 
@@ -671,9 +619,9 @@ export default class Electricity extends Component {
                         <Text style={styles.labeltext}>Amount</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in airtime amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
+                            <TextInput placeholder="Type in the token amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
                         </View>
-                        {this.state.amountError && <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.amountErrorMessage}</Text>}
+                        {this.state.amountError && <Text style={{fontSize:13, color:'red', backgroundColor:'#F6F6F6', height:20}}>{this.state.amountErrorMessage}</Text>}
                     </View>
                 </View>
                 {/* Card Option*/}

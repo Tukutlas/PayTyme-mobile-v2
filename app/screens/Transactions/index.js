@@ -59,51 +59,46 @@ export default class Transactions extends Component {
     }
       
     loadWalletBalance(){
-        // this.setState({isLoading:true});   
-        fetch(GlobalVariables.apiURL+"/wallet/get-details",
+        fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
             method: 'GET',
             headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+              'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+              'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
             }),
             body:  ""         
             // <-- Post parameters
         }) 
         .then((response) => response.text())
         .then((responseText) => { 
-            this.setState({isLoading:false});
             let response_status = JSON.parse(responseText).status;
+           
             if(response_status == true){
-                let data = JSON.parse(responseText).data;  
-                let wallet = data.wallet;
-                // alert(wallet.balance) 
-                this.setState({balance:wallet.balance});
-                this.setState({wallet_id:wallet.wallet_id});
+                let wallet = JSON.parse(responseText).data;  
+                this.setState({balance:parseInt(wallet.balance)});
             }else if(response_status == false){
                 Alert.alert(
-                    'Session Out',
-                    'Your session has timed-out. Login and try again',
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => this.props.navigation.navigate('Signin'),
-                            style: 'cancel',
-                        }, 
+                'Session Out',
+                'Your session has timed-out. Login and try again',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => this.props.navigation.navigate('Signin'),
+                        style: 'cancel',
+                    }, 
                     ],
-                    {cancelable: false},
+                {cancelable: false},
                 );
             }
         })
         .catch((error) => {
+            this.setState({isLoading:false});
             alert("Network error. Please check your connection settings");
-        });
-        
+        });      
     }
-
     getTransactionHistory(){
         this.setState({isLoading:true});   
-        fetch(GlobalVariables.apiURL+"/wallet/get-transaction-history?perpage=15",
+        fetch(GlobalVariables.apiURL+"/transactions?perpage=20",
         { 
             method: 'GET',
             headers: new Headers({
@@ -186,15 +181,15 @@ export default class Transactions extends Component {
             transaction_list.push(
                 <View style={{marginTop: '2%', marginRight: '5%', borderWidth: 1, borderRadius: 10}} key={transaction.id}>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={{fontSize:15, color:'#120A47', marginLeft:'6%', width:'60%', marginTop:'1%'}}>{transaction.title}</Text>
+                        <Text style={{fontSize:12, color:'#120A47', marginLeft:'3%', width:'69%', marginTop:'1%'}}>{transaction.description}</Text>
                         {
                             status == 'successful' ?
-                            <View style={{marginLeft:'5%', height:'80%', width:'25%', backgroundColor:'#4C3DB1', alignItems: "center", marginTop: '0.7%', borderRadius: 7}}>
-                                <Text style={{fontSize:15, color:'#fff', paddingBottom: '7%'}}>{transaction.status}</Text>
+                            <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
+                                <Text style={{fontSize:13, color:'#fff', paddingBottom: '7%', color:'#0c0c54'}}>{transaction.status}</Text>
                             </View>
                             :
-                            <View style={{marginLeft:'5%', height:'80%', width:'25%', backgroundColor:'#F03434', alignItems: "center", marginTop: '0.7%', borderRadius: 7}}>
-                                <Text style={{fontSize:15, color:'#fff', paddingBottom: '7%'}}>{transaction.status}</Text>
+                            <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
+                                <Text style={{fontSize:13, color:'#fff', paddingBottom: '7%', color:'#f03434'}}>{transaction.status}</Text>
                             </View>
                         }
                     </View>
@@ -209,9 +204,9 @@ export default class Transactions extends Component {
                     >
                     </View>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={{fontSize:15, color:'#120A47', marginLeft:'6%', width:'60%'}}>{transaction.created_at}</Text>
-                        <TouchableOpacity style={{marginLeft:'5%', height:'80%', width:'25%', alignItems: "center", marginTop: '0.7%', borderRadius: 7}} onPress={()=>{ this.viewTransactionDetails(transaction.id)}}>
-                            <Text style={{fontSize:15, paddingBottom: '7%', color:'#F03434'}}>View</Text>
+                        <Text style={{fontSize:13, color:'#120A47', marginLeft:'4%', width:'60%', justifyContent:"center", marginTop: '1%'}}>{transaction.created_at}</Text>
+                        <TouchableOpacity style={{marginLeft:'7%', width:'25%', alignItems: "center", marginTop: '1%', borderRadius: 7, backgroundColor: "#0c0c54", marginBottom: "2%"}} onPress={()=>{ this.viewTransactionDetails(transaction.id)}}>
+                            <Text style={{fontSize:13, paddingBottom: '2%', color:'#ffff'}}>View</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

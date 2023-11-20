@@ -245,7 +245,7 @@ export default class Airtime extends Component {
                         },
                         {
                             text: 'Yes, Pay with Card',  
-                            onPress: () => {this.checkIfUserHasCard();},
+                            onPress: () => {this.transferWithCardPayment();},
                             style: 'cancel',
                         }, 
                     ],
@@ -326,7 +326,7 @@ export default class Airtime extends Component {
                 if(response.status == true) { 
                     this.props.navigation.navigate("SuccessPage",
                     {
-                        transaction_id:response.data.transaction.transaction_id,
+                        transaction_id:response.data.transaction.id,
                     }); 
                 }else if(response.status == false){
                     this.setState({isLoading:false});
@@ -423,8 +423,7 @@ export default class Airtime extends Component {
             transaction_type:"betting",
             amount: amount,
             betplatform: betplatform,
-            account_id: account_id,
-            url: "/betting/fund-account"
+            account_id: account_id
         });   
     }
 

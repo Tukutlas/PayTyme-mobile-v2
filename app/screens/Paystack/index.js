@@ -75,7 +75,7 @@ export default class Paystack extends Component {
       
                     if (responseData.status) {
                         this.props.navigation.navigate("SuccessPage", {
-                            transaction_id: responseData.data.transaction.transaction_id,
+                            transaction_id: responseData.data.transaction.id,
                         });
                     } else {
                         const responseMessage = responseData.message;

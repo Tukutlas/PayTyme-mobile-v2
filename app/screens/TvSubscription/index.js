@@ -330,7 +330,7 @@ export default class TvSubscription extends Component {
                         },
                         {
                             text: 'Yes, Pay with Card',  
-                            onPress: () => {this.checkIfUserHasCard();},
+                            onPress: () => {this.payTVWithCard();},
                             style: 'cancel',
                         }, 
                     ],
@@ -421,7 +421,7 @@ export default class TvSubscription extends Component {
                         this.setState({isLoading:false});
                         this.props.navigation.navigate("SuccessPage",
                         {
-                            transaction_id:resultjson.data.transaction.transaction_id
+                            transaction_id:resultjson.data.transaction.id
                         }); 
                         this.setState({isLoading:false}); 
                     }else{
@@ -481,7 +481,7 @@ export default class TvSubscription extends Component {
                         this.setState({isLoading:false});
                         this.props.navigation.navigate("SuccessPage",
                         {
-                            transaction_id:resultjson.data.transaction.transaction_id,
+                            transaction_id:resultjson.data.transaction.id,
                         }); 
                         this.setState({isLoading:false}); 
                     }else{
@@ -621,7 +621,6 @@ export default class TvSubscription extends Component {
             addon_product_code: this.state.addonProductCode,
             addon_amount: this.state.addonAmount,
             addon_product_name: this.state.addonProductName,
-            url: "/tv/bouquet/payment"
         });
     }
 

@@ -123,7 +123,7 @@ export default class DebitCardPayment extends Component {
         } else if (transaction_type == 'betting') {
             let betplatform = this.props.route.params.betplatform;
             let account_id = this.props.route.params.account_id;
-            let card = this.state.card;
+            let card = this.state.card_id;
             let amount = this.props.route.params.amount;
             this.transferToBettingAccount(amount, betplatform, account_id, card);
         } else if (transaction_type == 'Education') {
@@ -199,7 +199,7 @@ export default class DebitCardPayment extends Component {
                 } else {
                     this.props.navigation.navigate("SuccessPage",
                         {
-                            transaction_id: response.data.transaction.transaction_id,
+                            transaction_id: response.data.transaction.id,
                         });
                 }
             } else if (response.message == "Insufficient funds") {
@@ -304,7 +304,7 @@ export default class DebitCardPayment extends Component {
                     } else {
                         this.props.navigation.navigate("SuccessPage",
                             {
-                                transaction_id: response.data.transaction.transaction_id,
+                                transaction_id: response.data.transaction.id,
                             });
                     }
                 } else if (response.status == false) {
@@ -368,8 +368,7 @@ export default class DebitCardPayment extends Component {
         this.setState({ isLoading: true });
         let endpoint = "";
         //send api for airtime purchase
-        endpoint = "/betting/fund-account";
-        let verify = "/verify";
+        endpoint = "/betting/fund?with_card="+ (card == '' ? "0" : "1");
 
         fetch(GlobalVariables.apiURL + endpoint,
             {
@@ -382,8 +381,8 @@ export default class DebitCardPayment extends Component {
                     + "&amount=" + amount
                     + "&type=" + betplatform
                     + "&channel=card"
-                    + "&callback_url=" + GlobalVariables.apiURL + verify
-                    + "&card_position=" + card
+                    + "&payment_gateway="+ this.state.gatewayValue
+                    + "&card_id=" + card
                 // <-- Post parameters
             })
             .then((response) => response.text())
@@ -392,19 +391,13 @@ export default class DebitCardPayment extends Component {
                 let response = JSON.parse(responseText);
                 if (response.status == true) {
                     let data = JSON.parse(responseText).data;
-                    // console.log(response.data);
-                    if (data.payment_info) {
-                        let datat = data.payment_info.data;
-                        this.props.navigation.navigate("NewDebitCardPayment",
-                            {
-                                datat: datat,
-                                verifyUrl: "/betting/verify-transfer",
-                                routeName: 'Betting'
-                            });
+                    if (data.payment_link) {
+                        let payment_link = data.payment_link;
+                        this.props.navigation.navigate("Paystack", { payment_link, saveCard });
                     } else {
                         this.props.navigation.navigate("SuccessPage",
                             {
-                                transaction_id: response.data.transaction.transaction_id,
+                                transaction_id: response.data.transaction.id,
                             });
                     }
                 } else if (response.status == false) {
@@ -505,7 +498,7 @@ export default class DebitCardPayment extends Component {
                         } else {
                             this.props.navigation.navigate("SuccessPage",
                                 {
-                                    transaction_id: response.data.transaction.transaction_id,
+                                    transaction_id: response.data.transaction.id,
                                 });
                         }
                     } else if (response.status == false) {
@@ -604,7 +597,7 @@ export default class DebitCardPayment extends Component {
                         } else {
                             this.props.navigation.navigate("SuccessPage",
                                 {
-                                    transaction_id: response.data.transaction.transaction_id,
+                                    transaction_id: response.data.transaction.id,
                                 });
                         }
                     } else if (response.status == false) {
@@ -715,7 +708,7 @@ export default class DebitCardPayment extends Component {
                     } else {
                         this.props.navigation.navigate("SuccessPage",
                             {
-                                transaction_id: resultjson.data.transaction.transaction_id,
+                                transaction_id: resultjson.data.transaction.id,
                             });
                     }
                     this.setState({ isLoading: false });
@@ -868,7 +861,7 @@ export default class DebitCardPayment extends Component {
                 } else {
                     this.props.navigation.navigate("SuccessPage",
                     {
-                        transaction_id: response.data.transaction.transaction_id,
+                        transaction_id: response.data.transaction.id,
                     });
                 }
             } else if (response.status == false) {
@@ -947,7 +940,7 @@ export default class DebitCardPayment extends Component {
                     } else {
                         this.props.navigation.navigate("SuccessPage",
                             {
-                                transaction_id: response.data.transaction.transaction_id,
+                                transaction_id: response.data.transaction.id,
                             });
                     }
                 } else if (response.status == false) {
@@ -1059,12 +1052,33 @@ export default class DebitCardPayment extends Component {
                         let payment_link = data.payment_link;
                         this.props.navigation.navigate("Paystack", { payment_link, saveCard });
                     } else {
-                        this.props.navigation.navigate("SuccessPage",
+                        let transaction = data.transaction;
+                        let status = transaction.status;
+
+                        if(status == 'successful'){
+                            this.props.navigation.navigate("SuccessPage",
                             {
-                                transaction_id: resultjson.data.transaction.transaction_id,
-                            });
+                                transaction_id:resultjson.data.transaction.id,
+                            }); 
+                        }else{
+                            this.setState({isLoading:false});
+                            Alert.alert(
+                                "Error",
+                                resultjson.message,
+                                [
+                                    {
+                                        text: 'Try Again',
+                                        style: 'cancel',
+                                    }, 
+                                ],
+                                {cancelable: false},
+                            );
+                        }
                     }
+
+                    
                 }
+            
             })
             .catch((error) => {
                 console.log(error)

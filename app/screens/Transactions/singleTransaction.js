@@ -38,7 +38,6 @@ export default class SingleTransaction extends Component {
         this.setState({auth_token:JSON.parse( 
             await AsyncStorage.getItem('login_response')).user.access_token
         });
-        this.loadWalletBalance();
 
         this.getTransaction();
         await Font.loadAsync({
@@ -57,49 +56,6 @@ export default class SingleTransaction extends Component {
         this.setState({ fontLoaded: true });
     }
 
-    loadWalletBalance(){
-        // this.setState({isLoading:true});   
-        fetch(GlobalVariables.apiURL+"/wallet/get-details",
-        { 
-            method: 'GET',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  ""         
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => { 
-            this.setState({isLoading:false});
-            let response_status = JSON.parse(responseText).status;
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;  
-                let wallet = data.wallet;
-                // alert(wallet.balance) 
-                this.setState({balance:wallet.balance});
-                this.setState({wallet_id:wallet.wallet_id});
-            }else if(response_status == false){
-                Alert.alert(
-                    'Session Out',
-                    'Your session has timed-out. Login and try again',
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => this.props.navigation.navigate('Signin'),
-                            style: 'cancel',
-                        }, 
-                    ],
-                    {cancelable: false},
-                );
-            }
-        })
-        .catch((error) => {
-            alert("Network error. Please check your connection settings");
-        });
-        
-    }
-
     backPressed = () => {
         this.props.navigation.goBack();
         return true;  
@@ -111,7 +67,7 @@ export default class SingleTransaction extends Component {
 
     getTransaction(){
         this.setState({isLoading:true});   
-        fetch(GlobalVariables.apiURL+"/wallet/get-transaction-details/"+this.props.route.params.transaction_id,
+        fetch(GlobalVariables.apiURL+"/transactions/"+this.props.route.params.transaction_id,
         { 
             method: 'GET',
             headers: new Headers({
@@ -123,26 +79,29 @@ export default class SingleTransaction extends Component {
         }) 
         .then((response) => response.text())
         .then((responseText) => { 
-            
             let response_status = JSON.parse(responseText).status;
+            console.log(responseText)
             if(response_status == true){
                 let data = JSON.parse(responseText).data;
                 let transaction = data.transaction_info;
-                if(transaction.type == 'AIRTIME'){
+                if(transaction.type == 'Airtime' || transaction.type == 'Airtime Recharge'){
                     this.setState({
+                        transaction_type: transaction.type,
                         amount: this.numberFormat(transaction.amount), 
                         recipient: data.airtime_info.phone_number, 
                         network: data.airtime_info.network
                     });
-                }else if(transaction.type == 'DATA'){
+                }else if(transaction.type == 'Data'){
                     this.setState({
+                        transaction_type: transaction.type,
                         amount: this.numberFormat(transaction.amount), 
                         recipient: data.data_info.phone_number, 
                         network: data.data_info.network,
                         other_details: data.data_info.bundle
                     });
-                }else if(transaction.type == 'BETTING'){
+                }else if(transaction.type == 'Betting'){
                     this.setState({
+                        transaction_type: transaction.type,
                         amount: this.numberFormat(transaction.amount), 
                         bet_wallet_id: data.betting_info.customer_id, 
                         betting_platform: data.betting_info.type
@@ -163,25 +122,29 @@ export default class SingleTransaction extends Component {
                         amount: this.numberFormat(transaction.amount), 
                         profile_code: data.jamb_info.profile_code, 
                     });
-                }else if(transaction.type == 'ELECTRICITY'){
+                }else if(transaction.type == 'Electricity Bill'){
                     this.setState({
+                        transaction_type: transaction.type,
                         amount: this.numberFormat(transaction.amount), 
                         metre_no: data.electricity_info.meter_no, 
                         disco: data.electricity_info.company
                     });
                 }else if(transaction.type == 'TRANSFER'){
                     this.setState({
+                        transaction_type: transaction.type,
                         amount: this.numberFormat(transaction.amount), 
                         wallet_id: data.wallet_id
                     });
-                }else if(transaction.type == 'FUND_WALLET'){
+                }else if(transaction.type == 'fund_wallet'){
                     this.setState({
+                        transaction_type: 'Fund Wallet',
                         amount: this.numberFormat(transaction.amount)
                     });
                 }
+
                 this.setState({
-                    transaction_type: transaction.type, 
-                    transactionDate:transaction.created_at, 
+                    status: transaction.status,
+                    transactionDate: transaction.created_at, 
                     payment_channel: transaction.payment_channel,
                 });
                 this.setState({isLoading:false});
@@ -253,7 +216,7 @@ export default class SingleTransaction extends Component {
                         <Text style={{fontSize:15,  color:'#120A47', marginLeft:'12%'}}>{this.state.transaction_type}</Text>
                     </View>
                     {
-                        this.state.transaction_type=='AIRTIME' || this.state.transaction_type=='DATA' ?
+                        this.state.transaction_type=='Airtime' || this.state.transaction_type=='Data' || this.state.transaction_type=='Airtime Recharge' ?
                         <>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
                                 <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Network Provider:</Text>
@@ -267,7 +230,7 @@ export default class SingleTransaction extends Component {
                         : ''
                     }
                     {
-                        this.state.transaction_type == 'BETTING' ? 
+                        this.state.transaction_type == 'Betting' ? 
                         <>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
                                 <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Bet wallet ID:</Text>
@@ -293,7 +256,7 @@ export default class SingleTransaction extends Component {
                         </>: ''
                     }
                     {
-                        this.state.transaction_type=='ELECTRICITY'?
+                        this.state.transaction_type=='Electricity Bill'?
                         <>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
                                 <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Distribution Company:</Text>
@@ -335,12 +298,16 @@ export default class SingleTransaction extends Component {
                         <Text style={{fontSize:15,  color:'#120A47', marginLeft:'27%'}}>₦{this.state.amount}</Text>
                     </View>
                     <View style={{flexDirection:'row', marginTop: '4%'}}>
-                        <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Other Details:</Text>
-                        <Text style={{fontSize:15,  color:'#120A47', marginLeft:'18%'}}>{this.state.other_details}</Text>
-                    </View>
-                    <View style={{flexDirection:'row', marginTop: '4%'}}>
                         <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Payment Channel:</Text>
                         <Text style={{fontSize:15,  color:'#120A47', marginLeft:'12%'}}>{this.state.payment_channel}</Text>
+                    </View>
+                    <View style={{flexDirection:'row', marginTop: '4%'}}>
+                        <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Status:</Text>
+                        <Text style={{fontSize:15,  color:'#120A47', marginLeft:'30%'}}>{this.state.status}</Text>
+                    </View>
+                    <View style={{flexDirection:'row', marginTop: '4%'}}>
+                        <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Other Details:</Text>
+                        <Text style={{fontSize:15,  color:'#120A47', marginLeft:'18%'}}>{this.state.other_details}</Text>
                     </View>
                 </View>
                 {

@@ -579,10 +579,9 @@ export default class Insurance extends Component {
                     );  
                     
                 }else if(resultjson.status == true){
-                    // console.log(resultjson.data.transaction.id);
                     this.props.navigation.navigate("SuccessPage",
                     {
-                        transaction_id:resultjson.data.transaction.transaction_id,
+                        transaction_id:resultjson.data.transaction.id,
                     }); 
                 }
             })
