@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "PayTyme-mobile-v2",
-    "slug": "PayTyme-mobile-v2",
+    "name": "PayTyme",
+    "slug": "PayTyme",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,16 +15,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.victorel.paytymemobileapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.victorel.paytymemobileapp",
+      "versionCode": 6
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "024cfd22-e17c-45ce-b7dc-f648f7bc098d"
+      }
     }
   }
 }

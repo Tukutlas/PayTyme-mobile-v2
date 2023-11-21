@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { Image, View, StatusBar, Platform, TouchableOpacity, BackHandler, Text, TextInput } from "react-native";
 // import DropDownPicker from 'react-native-dropdown-picker';
-import RNPickerSelect from 'react-native-picker-select';
-// import {Picker} from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Screen Styles
 import styles from "./styles";  
@@ -304,23 +302,6 @@ export default class WalletTopUp extends Component {
                     </View>
                 </View>
                 <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:30, zIndex:1000}}>
-                    <RNPickerSelect
-                        placeholder={'Select Payment Channel'}
-                        open={this.state.paymentChannelOpen}
-                        value={this.state.paymentChannelValue}
-                        // style={[styles.dropdown, {flexDirection: 'row', marginTop:'2%'}]}
-                        items={this.state.paymentChannels}
-                        setOpen={this.setChannelOpen}
-                        setValue={this.setChannelValue}
-                        setItems={this.setChannelItems}
-                        searchable={false}
-                        onSelectItem={(item) => {
-                            this.setState({channel_error:false});
-                            // this.getCableBouquetOptions(item.value);
-                            // this.getCustomerdetails(item.value, this.state.cardnumber);
-                        }}
-                    >
-                    </RNPickerSelect>
                     
                 </View>
                 {
