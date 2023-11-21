@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Image, View, StatusBar, Platform, TouchableOpacity, BackHandler, Text, TextInput } from "react-native";
-import RNPickerSelect from "react-native-picker-select";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -197,7 +196,7 @@ const WalletTopUp = ({ navigation }) => {
         // } 
         else if (paymentChannelValue === "virtual_account") {
             setChannelError(false);
-            // checkIfUserHasCard();
+            alert('Virtual Account is coming soon');
         } else if (paymentChannelValue === "bank_transfer") {
             // Navigate to BankTransfer screen
             navigation.navigate('BankTransfer');
@@ -222,21 +221,6 @@ const WalletTopUp = ({ navigation }) => {
         }
     }
 
-    useEffect(() => {
-        // This effect will run every time paymentChannelValue changes
-        // console.log(paymentChannelValue);
-        // if(paymentChannelValue == 'paystack' || paymentChannelValue == 'flutterwave'){
-        //     FilterCards(paymentChannelValue)
-        // }
-        // if(paymentChannelValue == 'card'){
-        //     // FilterCards(paymentChannelValue)
-        //     navigation.navigate("DebitCardPayment");
-        // }else {
-        //     setDisplayCards(false)
-        // }
-    }, [paymentChannelValue]); // Dependency array ensures the effect runs when paymentChannelValue changes
-
-
     return (
         <View style={{ backgroundColor: "#ffff", flex: 1 }}>
             <Spinner visible={isLoading} textContent={''} color={'blue'} />
@@ -255,10 +239,11 @@ const WalletTopUp = ({ navigation }) => {
                     <Image style={styles.logo} source={require('../../../assets/logo.png')} />
                 </View>
             </View>
-            <View style={styles.formline}>
+            <View style={styles.formLine}>
                 <View style={styles.formCenter}>
                     <Text style={styles.labeltext}>Enter amount</Text>
                     <View style={[styles.inputitem, { borderColor: amountError ? 'red' : '#A9A9A9' }]}>
+                    <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                         <TextInput
                             placeholder="Type in amount"
                             style={styles.textBox}

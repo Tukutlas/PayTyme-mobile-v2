@@ -162,6 +162,28 @@ export default class DebitCardPayment extends Component {
             let card = this.state.card;
             let amount = this.props.route.params.amount;
             this.transferToWallet(amount, account_id, card);
+        }else if(transaction_type == 'Insurance'){
+            let amount = this.props.route.params.amount;
+            let card = this.state.card_id;
+            let vehicle_type = this.props.route.params.packageName;
+            let year = this.props.route.params.year;
+            let color = this.props.route.params.color;
+            let ownerName = this.props.route.params.ownerName;
+            let email = this.props.route.params.email;
+            let phoneNo = this.props.route.params.phoneNo;
+            let plateNumber = this.props.route.params.plateNumber;
+            let engineNumber = this.props.route.params.engineNumber;
+            let chassisNumber = this.props.route.params.chassisNumber;
+            let brand = this.props.route.params.brand;
+            let model = this.props.route.params.model;
+            let address = this.props.route.params.address;
+            let code = this.props.route.params.code;
+            let serviceProvider = this.props.route.params.serviceProvider;
+
+            // vehicle_type: vehicle_type,
+            
+            
+            this.payInsurance(code, phoneNo, email, amount, ownerName, engineNumber, chassisNumber, plateNumber, brand, model, color, year, address, card, serviceProvider, saveCard);
         }
     }
 
@@ -1085,6 +1107,97 @@ export default class DebitCardPayment extends Component {
                 this.setState({ isLoading: false });
                 alert("Network error. Please check your connection settings");
             });
+    }
+
+    payInsurance(code, phoneNo, email, amount, ownerName, engineNumber, chassisNumber, plateNumber, brand, model, color, year, address, card, serviceProvider, saveCard){
+        // console.log(code, phoneNo, email, amount, ownerName, engineNumber, chassisNumber, plateNumber, brand, model, color, year, address, card, serviceProvider, saveCard)
+        this.setState({isLoading: true});
+        let myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+        myHeaders.append("Content-Type", "application/json");
+
+        let raw = JSON.stringify({
+            "code": code,
+            "phone": phoneNo,
+            "email": email,
+            "amount": amount,
+            "insured_name": ownerName,
+            "engine_number": engineNumber,
+            "chasis_number": chassisNumber,
+            "plate_number": plateNumber,
+            "provider": serviceProvider,
+            "channel": 'card',
+            "vehicle_make": brand,
+            "vehicle_model": model,
+            "vehicle_color": color,
+            "year_of_make": year,
+            "contact_address": address,
+            "card_id": card,
+            "payment_gateway": this.state.gatewayValue
+        });
+
+        let requestOptions = 
+        {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+        };
+
+        fetch(GlobalVariables.apiURL+"/insurance/purchase?with_card="+ (card == '' ? "0" : "1"), requestOptions)
+        .then(response => response.text())
+        .then(responseText => 
+        {
+            this.setState({isLoading:false});
+            let resultjson  = JSON.parse(responseText);
+            if(resultjson.status ==false){
+                Alert.alert(
+                    "Error",
+                    resultjson.message,
+                    [
+                        {
+                            text: 'Try Again',
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );  
+                
+            }else if(resultjson.status == true){
+                let data = JSON.parse(responseText).data;
+                if (data.payment_link) {
+                    let payment_link = data.payment_link;
+                    this.props.navigation.navigate("Paystack", { payment_link, saveCard });
+                } else {
+                    let transaction = data.transaction;
+                    let status = transaction.status;
+
+                    if(status == 'successful'){
+                        this.props.navigation.navigate("SuccessPage",
+                        {
+                            transaction_id:resultjson.data.transaction.id,
+                        }); 
+                    }else{
+                        this.setState({isLoading:false});
+                        Alert.alert(
+                            "Error",
+                            resultjson.message,
+                            [
+                                {
+                                    text: 'Try Again',
+                                    style: 'cancel',
+                                }, 
+                            ],
+                            {cancelable: false},
+                        );
+                    }
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+            this.setState({isLoading:false});
+            alert("Network error. Please check your connection settings");
+        });
     }
 
     backPressed = () => {

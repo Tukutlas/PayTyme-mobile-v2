@@ -83,7 +83,7 @@ export default class Insurance extends Component {
 
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.loadWalletBalance();
-        this.getUserCards();
+
         this.getInsurancePackages();
         //check random balances
         await Font.loadAsync({
@@ -161,49 +161,6 @@ export default class Insurance extends Component {
         });       
     }
 
-    getUserCards(){
-        this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/cards",
-        { 
-            method: 'GET',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  ""         
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => {
-            let response_status = JSON.parse(responseText).status;
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;
-                if(data != ''){
-                    // this.setState({ cards: data })
-                    let bouquets = data.map((item) => {
-                        if (item.reusable == true) {
-                            return item
-                        }
-                    })
-                    if(bouquets.length != 0){
-                        this.setState({there_cards: true});
-                    }
-                    this.setState({isLoading:false});
-                }else{
-                    this.setState({there_cards: false});
-                    this.setState({isLoading:false});
-                }
-            }else if(response_status == false){
-                this.setState({there_cards: false});
-                this.setState({isLoading:false});
-            }
-        })
-        .catch((error) => {
-            alert("Network error. Please check your connection settings");
-            this.setState({isLoading:false});
-        });      
-    }
-
     getInsurancePackages() {
         this.setState({isLoading:true});
         fetch(GlobalVariables.apiURL+"/insurance/packages",
@@ -218,6 +175,7 @@ export default class Insurance extends Component {
         })
         .then((response) => response.text())
         .then((responseText) => {
+            console.log(responseText)
             let response = JSON.parse(responseText);
             let status = response.status;
             let service_provider = response.service_provider
@@ -228,11 +186,11 @@ export default class Insurance extends Component {
                         return {label: item.name, value: item.name+"#"+item.amount+"#"+item.code}
                     })
 
-                    let years = data.year_of_make.map((item) => {
+                    let years = data.years_of_make.map((item) => {
                         return {label: item, value: item}
                     })
 
-                    let colors = data.color.map((item) => {
+                    let colors = data.colors.map((item) => {
                         return {label: item, value: item}
                     })
 
@@ -249,6 +207,7 @@ export default class Insurance extends Component {
             }
         })
         .catch((error) => {
+            console.log(error)
             alert("Network error. Please check your connection settings");
             this.setState({isLoading:false});
         }); 
@@ -333,11 +292,12 @@ export default class Insurance extends Component {
 
     publishAmount(product){
         let string = product.split("#");
+        console.log(string)
 
         this.setState({
             packageName: string[0],
             amount:parseInt(string[1]),
-            packageCode: string[3],
+            packageCode: string[2],
         });
     }
 
@@ -499,7 +459,7 @@ export default class Insurance extends Component {
                         },
                         {
                             text: 'Yes, Pay with Card',  
-                            onPress: () => {this.checkIfUserHasCard();},
+                            onPress: () => {this.purchaseInsuranceWithCard();},
                             style: 'cancel',
                         }, 
                     ],
@@ -592,6 +552,47 @@ export default class Insurance extends Component {
         }
     }
     
+    purchaseInsuranceWithCard(){
+        let vehicle_type = this.state.packageName;
+        let year = this.state.year;
+        let color = this.state.color;
+        let ownerName = this.state.ownerName;
+        let email = this.state.email;
+        let phoneNo = this.state.phoneNumber;
+        let plateNumber = this.state.plateNumber;
+        let engineNumber = this.state.engineNumber;
+        let chassisNumber = this.state.chassisNumber;
+        let brand = this.state.brand;
+        let model = this.state.model;
+        let address = this.state.address;
+        let code = this.state.packageCode;
+        let amount = this.state.amount;
+        let serviceProvider = this.state.serviceProvider;
+        console.log(code, phoneNo, email, amount, ownerName, engineNumber, chassisNumber, plateNumber, brand, model, color, year, address, serviceProvider)
+        // return;
+
+        this.setState({isLoading:true});
+
+        this.props.navigation.navigate("DebitCardPayment",
+        {
+            transaction_type:"Insurance",
+            amount: amount,
+            phoneNo: phoneNo,
+            vehicle_type: vehicle_type,
+            year: year,
+            color: color,
+            ownerName: ownerName,
+            email: email,
+            plateNumber: plateNumber,
+            engineNumber: engineNumber,
+            chassisNumber: chassisNumber,
+            brand: brand,
+            model: model,
+            address: address,
+            code: code,
+            serviceProvider: serviceProvider
+        });
+    }
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("light-content", true);

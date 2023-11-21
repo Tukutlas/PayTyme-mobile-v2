@@ -49,6 +49,7 @@ export default class Transactions extends Component {
             'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
             'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
+            'Lato-Regular': require('../../Fonts/Lato-Regular.ttf')
         });
         
         if(JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null){
@@ -185,7 +186,7 @@ export default class Transactions extends Component {
                         {
                             status == 'successful' ?
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
-                                <Text style={{fontSize:13, color:'#fff', paddingBottom: '7%', color:'#0c0c54'}}>{transaction.status}</Text>
+                                <Text style={{fontSize:13, color:'#fff', paddingBottom: '7%', color:'#0c0c54', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
                             </View>
                             :
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>

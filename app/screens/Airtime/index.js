@@ -136,16 +136,16 @@ export default class Airtime extends Component {
                 this.setState({balance:parseInt(wallet.balance)});
             }else if(response_status == false){
                 Alert.alert(
-                'Session Out',
-                'Your session has timed-out. Login and try again',
-                [
-                    {
-                    text: 'OK',
-                    onPress: () => this.props.navigation.navigate('Signin'),
-                    style: 'cancel',
-                    }, 
+                    'Session Out',
+                    'Your session has timed-out. Login and try again',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => this.props.navigation.navigate('Signin'),
+                            style: 'cancel',
+                        }, 
                     ],
-                {cancelable: false},
+                    {cancelable: false},
                 );
             }
         })
@@ -437,7 +437,7 @@ export default class Airtime extends Component {
                     </View>
                 </View>
                 <View style={styles.grid}>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:1, borderColor:(this.state.mtn) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.mtn) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({mtn:true});
                             this.setState({glo:false});
@@ -447,7 +447,7 @@ export default class Airtime extends Component {
                     >
                         <Image source={require('../../Images/mtn-logo.png')} style={{height:70, width:70, borderRadius:15}} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:1, borderColor:(this.state.glo) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.glo) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({mtn:false});
                             this.setState({glo:true});
@@ -457,7 +457,7 @@ export default class Airtime extends Component {
                     >
                         <Image source={require('../../Images/glo.png')} style={{height:55, width:55, borderRadius:15}} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:1, borderColor:(this.state.airtel) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.airtel) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({mtn:false});
                             this.setState({glo:false});
@@ -467,7 +467,7 @@ export default class Airtime extends Component {
                     >
                         <Image source={require('../../Images/airtel-logo.png')} style={{height:50, width:50, borderRadius:10}} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:1, borderColor:(this.state.etisalat) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.etisalat) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({mtn:false});
                             this.setState({glo:false});

@@ -30,7 +30,10 @@ export default class SingleTransaction extends Component {
             card_no: "",
             no_of_pins: "",
             wallet_id: "",
-            profile_code: ""
+            profile_code: "",
+            plate_number: "",
+            vehicle_model: "",
+            vehicle_make: ""
         };
     }
 
@@ -129,6 +132,14 @@ export default class SingleTransaction extends Component {
                         metre_no: data.electricity_info.meter_no, 
                         disco: data.electricity_info.company
                     });
+                }else if(transaction.type == 'Insurance'){
+                    this.setState({
+                        transaction_type: transaction.type,
+                        amount: this.numberFormat(transaction.amount),
+                        vehicle_model: data.insurance_info.vehicle_model,
+                        vehicle_make: data.insurance_info.vehicle_make,
+                        plate_number: data.insurance_info.plate_number
+                    });
                 }else if(transaction.type == 'TRANSFER'){
                     this.setState({
                         transaction_type: transaction.type,
@@ -166,9 +177,9 @@ export default class SingleTransaction extends Component {
             }
         })
         .catch((error) => {
+            this.setState({isLoading:false});
             alert("Network error. Please check your connection settings");
         });
-        
     }
 
     render(){
@@ -267,6 +278,23 @@ export default class SingleTransaction extends Component {
                                 <Text style={{fontSize:15,  color:'#120A47', marginLeft:'25%'}}>{this.state.metre_no}</Text>
                             </View>
                         </>: ''
+                    }
+                    {
+                        this.state.transaction_type=='Insurance'?
+                        <>
+                            <View style={{flexDirection:'row', marginTop: '4%'}}>
+                                <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Vehicle Type:</Text>
+                                <Text style={{fontSize:15,  color:'#120A47', marginLeft:'19%'}}>{this.state.vehicle_make}</Text>
+                            </View>
+                            <View style={{flexDirection:'row', marginTop: '4%'}}>
+                                <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Vehicle Model:</Text>
+                                <Text style={{fontSize:15,  color:'#120A47', marginLeft:'17%'}}>{this.state.vehicle_model}</Text>
+                            </View>
+                            <View style={{flexDirection:'row', marginTop: '4%'}}>
+                                <Text style={{fontSize:15,  color:'#120A47', marginLeft:'6%'}}>Plate Number:</Text>
+                                <Text style={{fontSize:15,  color:'#120A47', marginLeft:'17%'}}>{this.state.plate_number}</Text>
+                            </View>
+                        </>:''
                     }
                     {
                         this.state.transaction_type=='WAEC'?
