@@ -219,7 +219,8 @@ export default class Home extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.gridb}>
-                    <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Education") }} >
+                    <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }} >
+                    {/* <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Education") }} > */}
                         <FontAwesome5 name={'graduation-cap'} color={'#4285F4'} size={35} />
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Education</Text>
                     </TouchableOpacity>

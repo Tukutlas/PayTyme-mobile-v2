@@ -69,7 +69,7 @@ export default class ViewPicture extends Component {
         .then((responseText) =>    
         {
             if(JSON.parse(responseText).status == true){
-                fetch(GlobalVariables.apiURL+"/user/get-user",
+                fetch(GlobalVariables.apiURL+"/user",
                 { 
                     method: 'GET',
                     headers: new Headers({
@@ -138,23 +138,22 @@ export default class ViewPicture extends Component {
         }
 
         return (
-            <View style={{flex: 1, backgroundColor: "#0C0C54"}}>
-                <View style={{marginTop: '40%'}}>
-                    <Image style={{width:'80%', height:'70%', marginLeft: '10%', borderRadius:145,  }} source={{ uri: this.state.image}}/> 
+            <View style={{flex: 1, backgroundColor:"#0C0C54"}}>
+                <View style={{marginTop:'40%'}}>
+                    <Image style={{width:'80%', height:'70%', marginLeft:'10%', borderRadius:145}} source={{ uri: this.state.image}}/> 
                 </View>
                 <View style={{marginTop: '20%', flexDirection:'row', padding:1, width:'100%'}}>
                     <TouchableOpacity style={{color: 'white', marginLeft: '15%'}} onPress={() => {this.backPressed()}}>
-                        <Text style={{color: 'white', fontSize: 15,}}>Cancel</Text>
+                        <Text style={{color: 'white', fontSize: 15}}>Cancel</Text>
                     </TouchableOpacity>
                     
                     <TouchableOpacity style={{color: 'white', marginLeft: '22%'}}>
                         <FontAwesome name={'rotate-left'} color={'white'} size={15} />
                     </TouchableOpacity>
                     <TouchableOpacity style={{color: 'white', marginLeft: '22%'}} onPress={() => {this.uploadPicture()}}>
-                        <Text style={{color: 'white', marginLeft: '0%', fontSize: 15,}}>Done</Text>
+                        <Text style={{color: 'white', marginLeft: '0%', fontSize: 15}}>Done</Text>
                     </TouchableOpacity>
-                </View>
-                
+                </View>               
             </View>
         );
     }

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
-import DropDownPicker from 'react-native-dropdown-picker';
+// import DropDownPicker from 'react-native-dropdown-picker';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -42,7 +43,11 @@ export default class Data extends Component {
             
             isLoading:false,
             transaction:false, 
-            there_cards: false
+            there_cards: false,
+            phoneError: false,
+            phoneErrorMessage: '',
+            bundleError: false,
+            bundleErrorMessage: ''
         };
     }
 
@@ -56,7 +61,6 @@ export default class Data extends Component {
             }
         );
         this.loadWalletBalance();
-        this.getUserCards();
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         await Font.loadAsync({
             'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
@@ -139,58 +143,6 @@ export default class Data extends Component {
             this.setState({isLoading:false});
             alert("Network error. Please check your connection settings");
         });        
-    }
-
-    getUserCards(){
-        this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/cards",
-        { 
-            method: 'GET',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  ""         
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => {
-            let response_status = JSON.parse(responseText).status;
-             
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;
-                if(data != ''){
-                    // this.setState({ cards: data })
-                    let newArray = data.map((item) => {
-                        if (item.reusable == true) {
-                            return item
-                        }
-                    })
-                    if(newArray.length != 0){
-                        this.setState({there_cards: true});
-                    }
-                    this.setState({isLoading:false});
-                }else{
-                    this.setState({there_cards: false});
-                    this.setState({isLoading:false});
-                }
-            }else if(response_status == false){
-                this.setState({there_cards: false});
-                this.setState({isLoading:false});
-            }
-        })
-        .catch((error) => {
-            // alert("Network error. Please check your connection settings");
-            this.setState({isLoading:false});
-        });      
-    }
-
-    checkIfUserHasCard(){
-        if (this.state.there_cards == false) {
-            this.buyDataWithNewCardPayment();
-        }else{
-            this.buyDataWithCardPayment();
-        }
     }
 
     getDataPlans(network){
@@ -288,10 +240,19 @@ export default class Data extends Component {
     confirmPurchase(thetype){
         let bundleplan = this.state.bundleValue;
         let phonenumber_value = this.state.phonenumber_value;
+        let error = 0;
 
-        if(phonenumber_value == ""  && bundleplan ==""){
-            alert("Phone number and Bundle Plan must be inserted");
-        }else{
+        if(phonenumber_value == ""){
+            this.setState({phoneError: true});
+            this.setState({phoneErrorMessage: 'Phone Number must be inputted'});
+            error++;
+        }if(bundleplan ==""){
+            this.setState({bundleError: true});
+            this.setState({bundleErrorMessage: 'Data bundle must be selected'});
+            error++;
+        }
+        
+        if(error == 0){
             let string = bundleplan.split("#");
 
             this.setState({
@@ -354,7 +315,7 @@ export default class Data extends Component {
                         },
                         {
                             text: 'Yes, Pay with Card',  
-                            onPress: () => {this.checkIfUserHasCard();},
+                            onPress: () => {this.buyDataWithCardPayment();},
                             style: 'cancel',
                         }, 
                     ],
@@ -523,6 +484,24 @@ export default class Data extends Component {
         }));
     }
 
+    setBundle = (value) => {
+        this.setState({
+            bundleValue: value
+        })
+        if(value !== null){
+            this.setState({bundleError: false})
+        }
+    }
+
+    setPhone = (phone) => {
+        this.setState({
+            phonenumber_value: phone
+        })
+        if(phone !== ''){
+            this.setState({phoneError: false})
+        }
+    }
+
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("light-content", true);
@@ -553,8 +532,9 @@ export default class Data extends Component {
                         <Text style={styles.labeltext}>Enter Phone Number</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setState({phonenumber_value})} value={this.state.phonenumber_value}  />
+                            <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setPhone(phonenumber_value)}  />
                         </View>
+                        {this.state.phoneError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.phoneErrorMessage}</Text>}
                     </View>
                 </View>
                 <View style={[styles.formLine, {marginTop: '4%'}]}>
@@ -563,7 +543,7 @@ export default class Data extends Component {
                     </View>
                 </View>
                 <View style={styles.grid}>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:1, borderColor:(this.state.mtn) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:3, borderColor:(this.state.mtn) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({mtn:true});
                             this.setState({glo:false});
@@ -575,7 +555,7 @@ export default class Data extends Component {
                         <Image source={require('../../Images/mtn-logo.png')} style={{height:70, width:70, borderRadius:15}} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:1, borderColor:(this.state.glo) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:3, borderColor:(this.state.glo) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({mtn:false});
                             this.setState({glo:true});
@@ -584,9 +564,9 @@ export default class Data extends Component {
                             this.getDataPlans('glo');
                         }}
                     >
-                        <Image source={require('../../Images/glo-logo.png')} style={{height:65, width:65, borderRadius:10}} />
+                        <Image source={require('../../Images/glo.png')} style={{height:55, width:55, borderRadius:10}} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:1, borderColor:(this.state.airtel) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:3, borderColor:(this.state.airtel) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({mtn:false});
                             this.setState({glo:false});
@@ -595,9 +575,9 @@ export default class Data extends Component {
                             this.getDataPlans('airtel');
                         }}
                     >
-                        <Image source={require('../../Images/airtel-logo.png')} style={{height:55, width:55, borderRadius:10}} />
+                        <Image source={require('../../Images/airtel-logo.png')} style={{height:50, width:50, borderRadius:10}} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:1, borderColor:(this.state.etisalat) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:3, borderColor:(this.state.etisalat) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({mtn:false});
                             this.setState({glo:false});
@@ -606,7 +586,7 @@ export default class Data extends Component {
                             this.getDataPlans('9mobile');
                         }}
                     >
-                        <Image source={require('../../Images/etisalat.jpg')} style={{height:55, width:55, borderRadius:10}} />
+                        <Image source={require('../../Images/etisalat.jpg')} style={{height:50, width:50, borderRadius:10}} />
                     </TouchableOpacity>
                 </View>
                 <View>
@@ -621,7 +601,7 @@ export default class Data extends Component {
                         >Select Bundle Plan</Text>
                     </View>
                     
-                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:40, zIndex:1000}}>
+                    {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:40, zIndex:1000}}>
                         <DropDownPicker
                             placeholder={'Select Bundle Plan'}
                             open={this.state.bundleOpen}
@@ -635,7 +615,23 @@ export default class Data extends Component {
                             searchable={false}
                             disabled={this.state.bundleDisable}
                         />
+                    </View> */}
+                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                        <Picker
+                            selectedValue={this.state.bundleValue}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this.setBundle(itemValue)
+                            }
+                            enabled={this.state.bundleEnable}
+                        >
+                            <Picker.Item label="Select Bundle Plan" value={null} style={{fontSize: 14}}/>
+                            
+                            {this.state.bundles.map((plan, index) => (
+                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                            ))}
+                        </Picker>
                     </View>
+                    {this.state.bundleError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.bundleErrorMessage}</Text>}
                 </View>
 
                 {/* Card Option*/}

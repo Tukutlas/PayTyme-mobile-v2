@@ -79,14 +79,13 @@ export default class Profile extends Component {
         this.setState({ compatible });
     };
 
-    loadWalletBalance(){
-        this.setState({isLoading:true});   
-        fetch(GlobalVariables.apiURL+"/wallet/get-details",
+    loadWalletBalance(){   
+        fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
             method: 'GET',
             headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+            'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+            'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
             }),
             body:  ""         
             // <-- Post parameters
@@ -97,9 +96,8 @@ export default class Profile extends Component {
             let response_status = JSON.parse(responseText).status;
             if(response_status == true){
                 let data = JSON.parse(responseText).data;  
-                let wallet = data.wallet;
-                this.setState({balance:wallet.balance});
-                this.setState({wallet_id:wallet.wallet_id});
+                let wallet = data;
+                this.setState({balance:parseInt(wallet.balance)});
             }else if(response_status == false){
                 Alert.alert(
                     'Session Out',
@@ -116,8 +114,9 @@ export default class Profile extends Component {
             }
         })
         .catch((error) => {
+            this.setState({isLoading:false});
             alert("Network error. Please check your connection settings");
-        });
+        });     
     }
     
     setModalVisible = (visible) => {

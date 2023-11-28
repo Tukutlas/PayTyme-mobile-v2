@@ -145,19 +145,20 @@ const styles = StyleSheet.create({
     width: '97%',
     marginLeft: '1.5%'
   },
+
   iconStyle:{
     width: 50,
     height: 50
   },
+
   iconStyle2:{
     width: 35,
     height: 20
   },
-  labeltext:{
-    color:'#222222',
-    marginTop:'1%',
-    fontSize:14,
-    fontFamily: "Roboto-Medium",
+
+  iconStyle3:{
+    width: 40,
+    height: 18
   },
 
   buttonImage: {

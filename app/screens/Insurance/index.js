@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, ScrollView, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
-import DropDownPicker from 'react-native-dropdown-picker';
+// import DropDownPicker from 'react-native-dropdown-picker';
+import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
@@ -29,7 +30,6 @@ export default class Insurance extends Component {
             vehicleOpen: false,
             vehicleError: false,
             vehicleErrorMessage: "",
-            packageName: "",
             packageAmount: 0,
             productCode: "",
             isLoading:false,
@@ -73,7 +73,8 @@ export default class Insurance extends Component {
             modelErrorMessage: "",
             address: "",
             addressError: false,
-            addressErrorMessage: ""
+            addressErrorMessage: "",
+            serviceProvider: ""
         };
     }
 
@@ -82,7 +83,7 @@ export default class Insurance extends Component {
 
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.loadWalletBalance();
-        this.getUserCards();
+
         this.getInsurancePackages();
         //check random balances
         await Font.loadAsync({
@@ -160,49 +161,6 @@ export default class Insurance extends Component {
         });       
     }
 
-    getUserCards(){
-        this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/cards",
-        { 
-            method: 'GET',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  ""         
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => {
-            let response_status = JSON.parse(responseText).status;
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;
-                if(data != ''){
-                    // this.setState({ cards: data })
-                    let bouquets = data.map((item) => {
-                        if (item.reusable == true) {
-                            return item
-                        }
-                    })
-                    if(bouquets.length != 0){
-                        this.setState({there_cards: true});
-                    }
-                    this.setState({isLoading:false});
-                }else{
-                    this.setState({there_cards: false});
-                    this.setState({isLoading:false});
-                }
-            }else if(response_status == false){
-                this.setState({there_cards: false});
-                this.setState({isLoading:false});
-            }
-        })
-        .catch((error) => {
-            alert("Network error. Please check your connection settings");
-            this.setState({isLoading:false});
-        });      
-    }
-
     getInsurancePackages() {
         this.setState({isLoading:true});
         fetch(GlobalVariables.apiURL+"/insurance/packages",
@@ -217,6 +175,7 @@ export default class Insurance extends Component {
         })
         .then((response) => response.text())
         .then((responseText) => {
+            console.log(responseText)
             let response = JSON.parse(responseText);
             let status = response.status;
             let service_provider = response.service_provider
@@ -227,15 +186,15 @@ export default class Insurance extends Component {
                         return {label: item.name, value: item.name+"#"+item.amount+"#"+item.code}
                     })
 
-                    let years = data.year_of_make.map((item) => {
+                    let years = data.years_of_make.map((item) => {
                         return {label: item, value: item}
                     })
 
-                    let colors = data.color.map((item) => {
+                    let colors = data.colors.map((item) => {
                         return {label: item, value: item}
                     })
 
-                    this.setState({service_provider: service_provider, vehicles: vehicles, years:years, colors:colors});
+                    this.setState({serviceProvider: service_provider, vehicles: vehicles, years: years, colors: colors});
                     
                     this.setState({isLoading:false});
                 }else{
@@ -248,6 +207,7 @@ export default class Insurance extends Component {
             }
         })
         .catch((error) => {
+            console.log(error)
             alert("Network error. Please check your connection settings");
             this.setState({isLoading:false});
         }); 
@@ -256,7 +216,7 @@ export default class Insurance extends Component {
     setOwnerName = (ownerName) => {
         this.setState({
           ownerName: ownerName,
-          ownerName: false
+          ownerNameError: false
         });
     }
 
@@ -282,6 +242,15 @@ export default class Insurance extends Component {
         this.setState({yearError: false})
     }
 
+    setYear = (value) => {
+        this.setState({
+            year: value
+        });
+        if(value != null){
+            this.setState({yearError: false});
+        }
+    }
+
     setYearItems = (callback) => {
         this.setState(state => ({
           yearItems: callback(state.yearItems)
@@ -301,6 +270,15 @@ export default class Insurance extends Component {
           color: callback(state.colorValue)
         }));
         this.setState({colorError: false})
+    }
+
+    setColor = (value) => {
+        this.setState({
+            color: value
+        });
+        if(value != null){
+            this.setState({colorError: false});
+        }
     }
 
     setColorItems = (callback) => {
@@ -324,6 +302,15 @@ export default class Insurance extends Component {
         this.setState({vehicleError: false})
     }
 
+    setVehicle = (value) => {
+        this.setState({
+            vehicle: value
+        });
+        if(value != null){
+            this.setState({vehicleError: false});
+        }
+    }
+
     setVehicleItems = (callback) => {
         this.setState(state => ({
             vehicleItems: callback(state.vehicleItems)
@@ -332,11 +319,12 @@ export default class Insurance extends Component {
 
     publishAmount(product){
         let string = product.split("#");
+        console.log(string)
 
         this.setState({
             packageName: string[0],
             amount:parseInt(string[1]),
-            packageCode: string[3],
+            packageCode: string[2],
         });
     }
 
@@ -388,7 +376,250 @@ export default class Insurance extends Component {
           addressError: false
         });
     }
+
+    confirmPurchase(thetype){
+        let vehicle_type = this.state.packageName;
+        let year = this.state.year;
+        let color = this.state.color;
+        let ownerName = this.state.ownerName;
+        let email = this.state.email;
+        let phoneNo = this.state.phoneNumber;
+        let plateNumber = this.state.plateNumber;
+        let engineNumber = this.state.engineNumber;
+        let chassisNumber = this.state.chassisNumber;
+        let brand = this.state.brand;
+        let model = this.state.model;
+        let address = this.state.address;
+        let code = this.state.packageCode;
+        let amount = this.state.amount;
+        let countError = 0;
+
+        if(vehicle_type == null || vehicle_type == ''){
+            this.setState({vehicleError: true, vehicleErrorMessage: "Please kindly select the Vehicle's Type"});
+            countError++;
+        }
+
+        if(year == null){
+            this.setState({yearError: true, yearErrorMessage: "Please kindly select the Vehicle's year of make"});
+            countError++;
+        }
+
+        if(color == null){
+            this.setState({colorError: true, colorErrorMessage: "Please kindly select the Vehicle's color"});
+            countError++;
+        }
+        if (ownerName == '') {
+            this.setState({ownerNameError: true, ownerNameErrorMessage: "Please kindly input the Vehicle's owner name"});
+            countError++;
+        }
+
+        if(email == ''){
+            this.setState({emailError: true, emailErrorMessage: "Please kindly input the Vehicle's owner email address"});
+            countError++;
+        }
+
+        if(phoneNo == ""){
+            this.setState({phoneError: true, phoneErrorMessage: "Recipient Phone Number must be inserted"});
+            countError++;
+        }
+
+        if(phoneNo.length < 11){
+            this.setState({phoneError: true, phoneNoErrorMessage: "Kindly check the Phone Number"});
+            countError++;
+        }
+        
+        if(plateNumber == ""){
+            this.setState({plateError: true, plateErrorMessage: "Please insert the Vehicle's plate number"});
+            countError++;
+        }
+        if(engineNumber == ""){
+            this.setState({engineError: true, engineErrorMessage: "Please insert the Vehicle's engine number"});
+            countError++;
+        }
+        if(chassisNumber == ""){
+            this.setState({chassisError: true, chassisErrorMessage: "Please insert the Vehicle's chassis number"});
+            countError++;
+        }
+        if(brand == ""){
+            this.setState({brandError: true, brandErrorMessage: "Please insert the Vehicle's brand"});
+            countError++;
+        }
+
+        if(model == ""){
+            this.setState({modelError: true, modelErrorMessage: "Please insert the Vehicle's model"});
+            countError++;
+        }
+
+        if(address == ""){
+            this.setState({addressError: true, addressErrorMessage: "Please kindly input the Vehicle's owner contact address"});
+            countError++;
+        }
+        
+        if(countError == 0){
+            if(thetype=="wallet"){
+                Alert.alert(
+                    'Confirm Purchase',
+                    `Do you want to purchase insurance for a ${vehicle_type} ${amount} with wallet?\n`,
+                    [
+                        {  
+                            text: 'Cancel',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
+                        {
+                            text: 'Yes, Pay with Wallet',
+                            onPress: () => {this.purchaseInsurance()},
+                            style: 'cancel',
+                        },
+                    ],
+                    {cancelable: false},
+                );
+            }else{
+                Alert.alert(
+                    'Confirm Purchase',
+                    `Do you want to purchase insurance for a ${vehicle_type} ${amount} with card?\n`,
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => {},
+                            style: 'cancel',
+                        },
+                        {
+                            text: 'Yes, Pay with Card',  
+                            onPress: () => {this.purchaseInsuranceWithCard();},
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }
+        }
+    }
+
+    purchaseInsurance(){
+        let vehicle_type = this.state.packageName;
+        let year = this.state.year;
+        let color = this.state.color;
+        let ownerName = this.state.ownerName;
+        let email = this.state.email;
+        let phoneNo = this.state.phoneNumber;
+        let plateNumber = this.state.plateNumber;
+        let engineNumber = this.state.engineNumber;
+        let chassisNumber = this.state.chassisNumber;
+        let brand = this.state.brand;
+        let model = this.state.model;
+        let address = this.state.address;
+        let code = this.state.packageCode;
+        let amount = this.state.amount;
+        let balance = this.state.balance;
+        let serviceProvider = this.state.serviceProvider;
+
+        this.setState({isLoading:true});
+  
+        if(Math.floor(amount) < Math.floor(balance)){
+            let myHeaders = new Headers();
+            myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+            myHeaders.append("Content-Type", "application/json");
+  
+            let raw = JSON.stringify({
+                "code": code,
+                "phone": phoneNo,
+                "email": email,
+                "amount": amount,
+                "insured_name": ownerName,
+                "engine_number": engineNumber,
+                "chasis_number": chassisNumber,
+                "plate_number": plateNumber,
+                "provider": serviceProvider,
+                "channel": 'wallet',
+                "vehicle_make": brand,
+                "vehicle_model": model,
+                "vehicle_color": color,
+                "year_of_make": year,
+                "contact_address": address,
+            });
+
+            let requestOptions = 
+            {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+            };
+
+            fetch(GlobalVariables.apiURL+"/insurance/purchase", requestOptions)
+            .then(response => response.text())
+            .then(responseText => 
+            {
+                this.setState({isLoading:false});
+                let resultjson  = JSON.parse(responseText);
+                if(resultjson.status ==false){
+                    Alert.alert(
+                        "Error",
+                        resultjson.message,
+                        [
+                            {
+                                text: 'Try Again',
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );  
+                    
+                }else if(resultjson.status == true){
+                    this.props.navigation.navigate("SuccessPage",
+                    {
+                        transaction_id:resultjson.data.transaction.id,
+                    }); 
+                }
+            })
+            .catch((error) => {
+                this.setState({isLoading:false});
+                alert("Network error. Please check your connection settings");
+            });
+        }
+    }
     
+    purchaseInsuranceWithCard(){
+        let vehicle_type = this.state.packageName;
+        let year = this.state.year;
+        let color = this.state.color;
+        let ownerName = this.state.ownerName;
+        let email = this.state.email;
+        let phoneNo = this.state.phoneNumber;
+        let plateNumber = this.state.plateNumber;
+        let engineNumber = this.state.engineNumber;
+        let chassisNumber = this.state.chassisNumber;
+        let brand = this.state.brand;
+        let model = this.state.model;
+        let address = this.state.address;
+        let code = this.state.packageCode;
+        let amount = this.state.amount;
+        let serviceProvider = this.state.serviceProvider;
+        console.log(code, phoneNo, email, amount, ownerName, engineNumber, chassisNumber, plateNumber, brand, model, color, year, address, serviceProvider)
+        // return;
+
+        this.setState({isLoading:true});
+
+        this.props.navigation.navigate("DebitCardPayment",
+        {
+            transaction_type:"Insurance",
+            amount: amount,
+            phoneNo: phoneNo,
+            vehicle_type: vehicle_type,
+            year: year,
+            color: color,
+            ownerName: ownerName,
+            email: email,
+            plateNumber: plateNumber,
+            engineNumber: engineNumber,
+            chassisNumber: chassisNumber,
+            brand: brand,
+            model: model,
+            address: address,
+            code: code,
+            serviceProvider: serviceProvider
+        });
+    }
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("light-content", true);
@@ -423,7 +654,7 @@ export default class Insurance extends Component {
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Vehicle Type</Text>
                 </View>
                 
-                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor: '#F6F6F6', zIndex:1000, marginTop:'0.5%',}}>
+                {/* <View style={{width:'95%', marginLeft:'2.5%', zIndex:1000, marginTop:'0.5%',}}>
                     <DropDownPicker
                         placeholder={'Select your vehicle type'}
                         open={this.state.vehicleOpen}
@@ -437,7 +668,27 @@ export default class Insurance extends Component {
                         onSelectItem={(item) => {
                             this.publishAmount(item.value);
                         }}
+                        dropDownContainerStyle={{
+                            width:'97%',
+                            marginLeft:'1.5%'
+                        }}  
                     />    
+                </View> */}
+                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                    <Picker
+                        selectedValue={this.state.vehicle}
+                        onValueChange={(itemValue, itemIndex) =>{
+                            this.setVehicle(itemValue)
+                            this.publishAmount(itemValue)
+
+                        }}
+                    >
+                        <Picker.Item label="Select your vehicle type" value={null} style={{fontSize: 14}}/>
+                        
+                        {this.state.vehicles.map((plan, index) => (
+                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                        ))}
+                    </Picker>
                 </View>
                 {this.state.vehicleError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.vehicleErrorMessage}</Text>}
                 
@@ -455,7 +706,7 @@ export default class Insurance extends Component {
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Year of Make</Text>
                 </View>
 
-                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
+                {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
                     <DropDownPicker
                         placeholder={'Select your vehicle year of make'}
                         open={this.state.yearOpen}
@@ -468,13 +719,28 @@ export default class Insurance extends Component {
                         listMode="MODAL"  
                         searchable={false}
                     />
+                </View> */}
+                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                    <Picker
+                        selectedValue={this.state.year}
+                        onValueChange={(itemValue, itemIndex) =>{
+                            this.setYear(itemValue)
+
+                        }}
+                    >
+                        <Picker.Item label="Select your vehicle year" value={null} style={{fontSize: 14}}/>
+                        
+                        {this.state.years.map((plan, index) => (
+                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                        ))}
+                    </Picker>
                 </View>
                 {this.state.yearError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.yearErrorMessage}</Text>}
 
                 <View style={{justifyContent:'center', marginTop:'1.2%'}}>
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Vehicle's Color</Text>
                 </View>
-                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', borderRadius:5}}>
+                {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', borderRadius:5}}>
                     <DropDownPicker
                         placeholder={'Select your vehicle\'s color'}
                         open={this.state.colorOpen}
@@ -488,6 +754,20 @@ export default class Insurance extends Component {
                         searchable={false}
                         // disabled={this.state.ColorDisable}
                     />
+                </View> */}
+                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                    <Picker
+                        selectedValue={this.state.color}
+                        onValueChange={(itemValue, itemIndex) =>{
+                            this.setColor(itemValue)
+                        }}
+                    >
+                        <Picker.Item label="Select your vehicle color" value={null} style={{fontSize: 14}}/>
+                        
+                        {this.state.colors.map((plan, index) => (
+                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                        ))}
+                    </Picker>
                 </View>
                 {this.state.colorError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.colorErrorMessage}</Text>}
 

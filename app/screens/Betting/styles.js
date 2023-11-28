@@ -128,12 +128,6 @@ const styles = StyleSheet.create({
     paddingLeft:'2%',
   },
 
-  labeltext: {
-    color: '#222222',
-    marginTop: '1%',
-    fontSize: 14,
-    fontFamily: 'Roboto-Medium',
-  },
   textBox: {
     fontSize: 13,
     flex: 1,

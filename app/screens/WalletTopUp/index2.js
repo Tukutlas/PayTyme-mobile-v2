@@ -287,7 +287,8 @@ const WalletTopUp = ({ navigation }) => {
             {/* {displayCards && <Text style={{ marginTop: '7%', marginLeft: '3%', color: 'red' }}>Please select a payment channel</Text>} */}
             <View style={[styles.tcview, { marginTop:'30%', marginLeft:'30%' }]}>
                 <View style={styles.tandcView}>
-                    <TouchableOpacity onPress={() => navigation.navigate("PaymentConfirmation")}>
+                    {/* <TouchableOpacity onPress={() => navigation.navigate("PaymentConfirmation")}> */}
+                    <TouchableOpacity onPress={() => { alert("Coming Soon"); }} >
                         <Text style={[styles.textTermsCondition, { marginTop: '2%', color: '#1D59E1' }]}>
                             Upload Proof of Payment
                         </Text>

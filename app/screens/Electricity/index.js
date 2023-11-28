@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, ScrollView } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
+import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -33,13 +34,13 @@ export default class Electricity extends Component {
             payOnDelieveryChecked:false,
             discoOpen: false,
             discoValue: null,
-            discos: [{label:'AEDC - Abuja Electricity Distribution Company',value:'AEDC', icon: () => <Image source={require('../../Images/Electricity/aedc.png')} style={styles.iconStyle} />},{label:'BEDC - Benin Electricity Distribution Company',value:'BEDC', icon: () => <Image source={require('../../Images/Electricity/bedc.png')} style={styles.iconStyle2} />}, {label:'EEDC - Enugu Electricity Distribution Company',value:'EEDC', icon: () => <Image source={require('../../Images/Electricity/eedc.png')} style={styles.iconStyle} />}, {label:'EKEDC - Eko Electricity Distribution Company',value:'EKEDC', icon: () => <Image source={require('../../Images/Electricity/ekedc.png')} style={styles.iconStyle} />},
-                {label:'IBEDC - Ibadan Electricity Distribution Company',value:'IBEDC', icon: () => <Image source={require('../../Images/Electricity/ibedc.png')} style={styles.iconStyle} />}, {label:'IKEDC - Ikeja Electricity Distribution Company',value:'IKEDC', icon: () => <Image source={require('../../Images/Electricity/ikedc.png')} style={styles.iconStyle} />}, {label:'JEDC- Jos Electricity Distribution Company',value:'JEDC', icon: () => <Image source={require('../../Images/Electricity/jedc.png')} style={styles.iconStyle} />},
-                {label:'KAEDC - Kaduna Electricity Distribution Company',value:'KAEDC', icon: () => <Image source={require('../../Images/Electricity/kaedc.png')} style={styles.iconStyle} />}, {label:'KEDC - Kano Electricity Distribution Company',value:'KEDC', icon: () => <Image source={require('../../Images/Electricity/kedc.png')} style={styles.iconStyle} />}, {label:'PHEDC - Port Harcourt Electricity Distribution Company',value:'PHEDC', icon: () => <Image source={require('../../Images/Electricity/phedc.png')} style={styles.iconStyle} />}
+            discos: [{label:'AEDC - Abuja Electricity Distribution Company',value:'AEDC', icon: () => <Image source={require('../../Images/Electricity/aedc.png')} style={styles.iconStyle} />},{label:'BEDC - Benin Electricity Distribution Company',value:'BEDC', icon: () => <Image source={require('../../Images/Electricity/bedc.png')} style={styles.iconStyle3} />}, {label:'EEDC - Enugu Electricity Distribution Company',value:'EEDC', icon: () => <Image source={require('../../Images/Electricity/eedc.png')} style={styles.iconStyle} />}, {label:'EKEDC - Eko Electricity Distribution Company',value:'EKEDC', icon: () => <Image source={require('../../Images/Electricity/ekedc.png')} style={styles.iconStyle2} />},
+                {label:'IBEDC - Ibadan Electricity Distribution Company',value:'IBEDC', icon: () => <Image source={require('../../Images/Electricity/ibedc.png')} style={styles.iconStyle} />}, {label:'IKEDC - Ikeja Electricity Distribution Company',value:'IKEDC', icon: () => <Image source={require('../../Images/Electricity/ikedc.png')} style={styles.iconStyle2} />}, {label:'JEDC- Jos Electricity Distribution Company',value:'JEDC', icon: () => <Image source={require('../../Images/Electricity/jedc.png')} style={styles.iconStyle} />},
+                {label:'KAEDC - Kaduna Electricity Distribution Company',value:'KAEDC', icon: () => <Image source={require('../../Images/Electricity/kaedc.png')} style={styles.iconStyle2} />}, {label:'KEDC - Kano Electricity Distribution Company',value:'KEDC', icon: () => <Image source={require('../../Images/Electricity/kedc.png')} style={styles.iconStyle} />}, {label:'PHEDC - Port Harcourt Electricity Distribution Company',value:'PHEDC', icon: () => <Image source={require('../../Images/Electricity/phedc.png')} style={styles.iconStyle} />}
             ],
             typeOpen: false,
             typeValue: null,
-            meter_type: [{label:'Prepaid',value:'prepaid'}, {label:'Postpaid',value:'postpaid'}],
+            meterTypes: [{label:'Prepaid',value:'prepaid'}, {label:'Postpaid',value:'postpaid'}],
             transaction: false,
             there_cards: false,
             serviceProvider: '',
@@ -60,7 +61,6 @@ export default class Electricity extends Component {
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
 
         this.loadWalletBalance();
-        this.getUserCards();
         await Font.loadAsync({
             'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
             'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
@@ -330,58 +330,6 @@ export default class Electricity extends Component {
             }); 
     }
 
-    getUserCards(){
-        this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/cards",
-        { 
-            method: 'GET',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  ""         
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => {
-            let response_status = JSON.parse(responseText).status;
-             
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;
-                if(data != ''){
-                    // this.setState({ cards: data })
-                    let newArray = data.map((item) => {
-                        if (item.reusable == true) {
-                            return item
-                        }
-                    })
-                    if(newArray.length != 0){
-                        this.setState({there_cards: true});
-                    }
-                    this.setState({isLoading:false});
-                }else{
-                    this.setState({there_cards: false});
-                    this.setState({isLoading:false});
-                }
-            }else if(response_status == false){
-                this.setState({there_cards: false});
-                this.setState({isLoading:false});
-            }
-        })
-        .catch((error) => {
-            alert("Network error. Please check your connection settings");
-            this.setState({isLoading:false});
-        });      
-    }
-
-    checkIfUserHasCard(){
-        if (this.state.there_cards == false) {
-            this.payPowerWithNewCard();
-        }else{
-            this.payPowerWithCard();
-        }
-    }
-
     confirmPurchase(thetype){
         let company = this.state.discoValue;
         let meter_no = this.state.meterno;
@@ -439,7 +387,7 @@ export default class Electricity extends Component {
                         },
                         {
                             text: 'Yes, Pay with Card',  
-                            onPress: () => {this.checkIfUserHasCard();},
+                            onPress: () => {this.payPowerWithCard();},
                             style: 'cancel',
                         }, 
                     ],
@@ -485,6 +433,17 @@ export default class Electricity extends Component {
         this.setState(state => ({
             typeItems: callback(state.typeItems)
         }));
+    }
+
+    setMeterType = (value) => {
+        this.setState({
+            typeValue: value
+        });
+        if(value != null){
+            this.setState({
+                meterTypeError: false
+            })
+        }
     }
 
     setMeterNo = (meterno) => {
@@ -552,8 +511,8 @@ export default class Electricity extends Component {
                             persistentScrollbar: true,
                         }}
                         dropDownContainerStyle={{
-                            width:'100%',
-                            marginLeft:'0%',
+                            width:'97%',
+                            marginLeft:'1.5%',
                             position: 'relative',
                             top: 0
                         }}           
@@ -563,12 +522,12 @@ export default class Electricity extends Component {
                 <View style={{justifyContent:'center', marginTop: '1.2%'}}>
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1.2%',marginLeft:'3.5%'}}>Meter Type</Text>
                 </View>
-                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
+                {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
                     <DropDownPicker
                         placeholder={'Select Meter Type'}
                         open={this.state.typeOpen}
                         value={this.state.typeValue}
-                        items={this.state.meter_type}
+                        items={this.state.meterTypes}
                         style={[styles.dropdown]}
                         setOpen={this.setTypeOpen}
                         setValue={this.setTypeValue}
@@ -576,7 +535,25 @@ export default class Electricity extends Component {
                         onSelectItem={(item) => {
                             this.setState({meterTypeError: false})
                         }}
+                        dropDownContainerStyle={{
+                            width:'97%',
+                            marginLeft:'1.5%'
+                        }}  
                     />
+                </View> */}
+                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                    <Picker
+                        selectedValue={this.state.typeValue}
+                        onValueChange={(itemValue, itemIndex) =>
+                            this.setMeterType(itemValue)
+                        }
+                    >
+                        <Picker.Item label="Select Meter Type" value={null} style={{fontSize: 14}}/>
+                        
+                        {this.state.meterTypes.map((plan, index) => (
+                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                        ))}
+                    </Picker>
                 </View>
                 {this.state.meterTypeError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select the meter type</Text>}
                 <View style={[styles.formLine, {marginTop:'1.2%'}]}>

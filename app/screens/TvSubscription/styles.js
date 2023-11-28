@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     },
 
     buttonPurchase: {
-        borderWidth: 0,
+        borderWidth: 1,
         borderColor: "#8493d5",
         backgroundColor: "#0C0C54",
         alignSelf: "center",
@@ -90,10 +90,9 @@ const styles = StyleSheet.create({
         paddingRight: 40,
         paddingTop: 15,
         paddingBottom: 15,
-        marginTop: 20,
-        height: '56px',
+        marginTop: '4%',
         borderRadius: 15,
-        width: '241px'
+        width: Metrics.WIDTH * 0.91
     },
 
     purchaseButton: {
@@ -220,6 +219,7 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         marginLeft: 10
     },
+    
     verifyButtonText: {
         color: '#fff',
         fontWeight: 'bold',
