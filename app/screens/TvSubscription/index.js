@@ -307,6 +307,7 @@ export default class TvSubscription extends Component {
     }
 
     payTV(){
+        console.log(this.state.balance)
         if(this.state.amount <= this.state.balance){
             var myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
@@ -367,14 +368,25 @@ export default class TvSubscription extends Component {
                 .then(result => {
                 //go on
                     let resultjson  = JSON.parse(result);
-
                     if(resultjson.status == true){
                         this.setState({isLoading:false});
-                        this.props.navigation.navigate("SuccessPage",
-                        {
-                            transaction_id:resultjson.data.transaction.id
-                        }); 
-                        this.setState({isLoading:false}); 
+                        if(resultjson.data.status == 'successful'){
+                             this.props.navigation.navigate("SuccessPage",
+                            {
+                                transaction_id:resultjson.data.transaction.id,
+                            }); 
+                        }else{
+                            Alert.alert(
+                                resultjson.message,
+                                [
+                                    {
+                                        text: 'Ok',
+                                        style: 'cancel',
+                                    }, 
+                                ],
+                                {cancelable: false},
+                            ); 
+                        }
                     }else{
                         this.setState({isLoading:false})
                         Alert.alert(
@@ -427,14 +439,26 @@ export default class TvSubscription extends Component {
                 .then(response => response.text())
                 .then(result => {
                     let resultjson  = JSON.parse(result);
-
+                    
                     if(resultjson.status == true){
                         this.setState({isLoading:false});
-                        this.props.navigation.navigate("SuccessPage",
-                        {
-                            transaction_id:resultjson.data.transaction.id,
-                        }); 
-                        this.setState({isLoading:false}); 
+                        if(resultjson.data.status == 'successful'){
+                             this.props.navigation.navigate("SuccessPage",
+                            {
+                                transaction_id:resultjson.data.transaction.id,
+                            }); 
+                        }else{
+                            Alert.alert(
+                                resultjson.message,
+                                [
+                                    {
+                                        text: 'Ok',
+                                        style: 'cancel',
+                                    }, 
+                                ],
+                                {cancelable: false},
+                            ); 
+                        }
                     }else{
                         this.setState({isLoading:false})
                         Alert.alert(
@@ -457,7 +481,6 @@ export default class TvSubscription extends Component {
         }else {
             //insufficient balance
             this.setState({isLoading:false});
-
             Alert.alert(
                 'Insufficient Balance',
                 'You have insufficient balance. Kindly top up your wallet and try again',
@@ -466,7 +489,6 @@ export default class TvSubscription extends Component {
                         text: 'Try Again',
                         style: 'cancel',
                     }, 
-                
                 ],
                 {cancelable: false},
             );  
@@ -706,6 +728,17 @@ export default class TvSubscription extends Component {
         });
         if(value != null){
             this.setState({bouquetError: false});
+        }
+
+        if(value != null){
+            let string = value.split("#");
+            this.setState({
+                packageName: string[0],
+                packageAmount: parseInt(string[1]),
+                amount:parseInt(string[1]),
+                period: string[2],
+                productCode: string[3],
+            });
         }
     }
 

@@ -9,14 +9,13 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: Colors.transparent,
-    height: Metrics.HEIGHT * 0.15,
+    height: Metrics.HEIGHT * 0.08,
     borderBottomWidth: 0,
-    paddingTop: Metrics.HEIGHT * 0.0554,
-    marginTop: Metrics.HEIGHT * 0.0314,
+    marginTop: Metrics.HEIGHT * 0.08,
     elevation: 0,
     flexDirection: 'row',
     flexWrap: 'wrap'
-  },
+},
 
   left: {
     alignSelf: "flex-start",
