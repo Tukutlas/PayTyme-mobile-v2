@@ -77,8 +77,7 @@ export default class Home extends Component {
                 if (response_status == true) {
                     let data = JSON.parse(responseText).data;
                     let wallet = data;
-                    this.setState({ balance: wallet.balance });
-                    this.setState({ wallet_id: wallet.wallet_identifier });
+                    this.setState({balance:parseInt(wallet.balance), wallet_id: wallet.wallet_identifier});
                 } else if (response_status == 'error') {
                      Alert.alert(
                        'Session Out',

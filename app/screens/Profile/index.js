@@ -97,7 +97,7 @@ export default class Profile extends Component {
             if(response_status == true){
                 let data = JSON.parse(responseText).data;  
                 let wallet = data;
-                this.setState({balance:parseInt(wallet.balance)});
+                this.setState({balance:parseInt(wallet.balance), wallet_id: wallet.wallet_identifier});
             }else if(response_status == false){
                 Alert.alert(
                     'Session Out',
