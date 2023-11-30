@@ -13,6 +13,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import Spinner from 'react-native-loading-spinner-overlay';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
 import { CommonActions } from '@react-navigation/native';
@@ -32,8 +33,8 @@ export default class WalletTransfer extends Component {
             amount: 0,
             account_id: '',
             transaction: false,
-            there_cards:false
-        
+            there_cards:false,
+            customerName: ''
         };
     }
 
@@ -46,7 +47,6 @@ export default class WalletTransfer extends Component {
             }
         );
         this.loadWalletBalance();
-        this.getUserCards();
        
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
 
@@ -89,8 +89,8 @@ export default class WalletTransfer extends Component {
         this.setState({ modalVisible: visible });
     }
 
-    loadWalletBalance(){   
-        fetch(GlobalVariables.apiURL+"/wallet/get-details",
+    loadWalletBalance(){
+        fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
             method: 'GET',
             headers: new Headers({
@@ -102,11 +102,10 @@ export default class WalletTransfer extends Component {
         }) 
         .then((response) => response.text())
         .then((responseText) => { 
-            this.setState({isLoading:false});
             let response_status = JSON.parse(responseText).status;
+           
             if(response_status == true){
-                let data = JSON.parse(responseText).data;  
-                let wallet = data.wallet;
+                let wallet = JSON.parse(responseText).data;  
                 this.setState({balance:parseInt(wallet.balance)});
             }else if(response_status == false){
                 Alert.alert(
@@ -114,9 +113,9 @@ export default class WalletTransfer extends Component {
                 'Your session has timed-out. Login and try again',
                 [
                     {
-                    text: 'OK',
-                    onPress: () => this.props.navigation.navigate('Signin'),
-                    style: 'cancel',
+                        text: 'OK',
+                        onPress: () => this.props.navigation.navigate('Signin'),
+                        style: 'cancel',
                     }, 
                     ],
                 {cancelable: false},
@@ -129,25 +128,60 @@ export default class WalletTransfer extends Component {
         });      
     }
 
-
     numberFormat = x => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
+
+    verifyId(walletId){
+        if(walletId.length < 8){
+            return;
+        }
+        this.setState({isLoading:true});
+        fetch(GlobalVariables.apiURL+`/wallet/lookup?wallet_identifier=${walletId}`,
+        { 
+            method: 'GET',
+            headers: new Headers({
+              'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+              'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body:  ""         
+            // <-- Post parameters
+        }) 
+        .then((response) => response.text())
+        .then((responseText) => { 
+            let response = JSON.parse(responseText);
+            console.log(response)
+            if(response.status == true){
+                let data = response.data;  
+                this.setState({customerName:data.account_name, account_id: walletId, verified:true, receiverError: true});
+            }else if(response_status == false){
+                this.setState({receiverError: true, receiverErrorMessage:response.message, account_id: walletId, verified:false})
+            }
+            this.setState({isLoading:false});
+        })
+        .catch((error) => {
+            this.setState({isLoading:false});
+            alert("Network error. Please check your connection settings");
+        }); 
+    }
     
     confirmTransfer(type){
         let amount = this.state.amount;
         let account_id = this.state.account_id;
-
-        if(amount == "" || account_id == ""){
-            alert("Account ID and Amount must be inserted");
-        }else{
-            let amount ="";
-            
-            amount = "N"+this.numberFormat(this.state.amount);
+        let error = 0;
+        if(amount == ""){
+            error++;
+            this.setState({amountError: true, amountErrorMessage: 'Amount must be inserted'})
+        }
+        if(account_id == ""){
+            error++;
+            this.setState({receiverError: true, receiverErrorMessage: 'Wallet Id must be inserted'})
+        }
+        if(error == 0){
             if(type=='wallet'){
                 Alert.alert(
                     'Confirm Transfer',
-                    'Do you want to transfer '+amount+'( to '+account_id+') ?\n',
+                    'Do you want to transfer ₦'+this.numberFormat(amount)+' to '+account_id+'?\n',
                     [
                         {  
                             text: 'Cancel',
@@ -174,7 +208,7 @@ export default class WalletTransfer extends Component {
                         },
                         {
                             text: 'Yes, Transfer from Card',
-                            onPress: () => {this.checkIfUserHasCard();},
+                            onPress: () => {this.transferFundsWithCard();},
                             style: 'cancel',
                         },
                     ],
@@ -278,8 +312,7 @@ export default class WalletTransfer extends Component {
         {
             transaction_type:"WalletTransfer",
             amount: amount,
-            account_id: account_id,
-            url: "/wallet/transfer"
+            account_id: account_id
         }); 
     }
 
@@ -376,55 +409,6 @@ export default class WalletTransfer extends Component {
         //end send API for transferring funds
     }
 
-    getUserCards(){
-        this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/get-cards",
-        { 
-            method: 'GET',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  ""         
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => { 
-            let response_status = JSON.parse(responseText).status;
-             
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;
-                if(data != ''){
-                    let newArray = data.map((item) => {
-                        if (item.reusable == true) {
-                            return item
-                        }
-                    })
-                    if(newArray.length != 0){
-                        this.setState({there_cards: true});
-                    }
-                    this.setState({isLoading:false});
-                }else{
-                    this.setState({there_cards: false});
-                }
-            }else if(response_status == false){
-                
-            }
-        })
-        .catch((error) => {
-            // console.error(error);
-            alert("Network error. Please check your connection settings");
-        });      
-    }
-
-    checkIfUserHasCard(){
-        if (this.state.there_cards == false) {
-            this.transferFundsWithNewCard();
-        }else{
-            this.transferFundsWithCard();
-        }
-    }
-
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("light-content", true);
@@ -445,22 +429,36 @@ export default class WalletTransfer extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formLine]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Enter amount</Text>
-                        <View roundedc style={styles.inputitem}>
-                            {/* <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/> */}
-                            <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref='amount' onChangeText={(amount) => this.setState({amount})}/>
-                        </View>
-                    </View>
-                </View>
+                
                 <View style={[styles.formLine]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter receiver's ID</Text>
                         <View roundedc style={styles.inputitem}>
-                            {/* <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/> */}
-                            <TextInput placeholder="Type in the wallet ID you are transferring to" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id})} value={this.state.account_id}/>
+                            <FontAwesome5 name={'wallet'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput placeholder="Type in the wallet ID you are transferring to" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.verifyId(account_id)}/>
                         </View>
+                        {this.state.receiverError && <Text style={{ color: 'red' }}>{this.state.receiverErrorMessage}</Text>}
+                    </View>
+                </View>
+
+                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Account Name</Text>
+                        <View roundedc style={[styles.inputitem, {height:30}]}>
+                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.customerName}</Text>
+                        </View>
+                    </View>
+                </View>
+
+                <View style={[styles.formLine]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Enter amount</Text>
+                        <View roundedc style={styles.inputitem}>
+                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref='amount' onChangeText={(amount) => this.setState({amount})}/>
+                        </View>
+                        {this.state.amountError && <Text style={{ color: 'red' }}>{this.state.amountErrorMessage}</Text>}
                     </View>
                 </View>
                 {/* Card Option*/}
@@ -537,7 +535,6 @@ export default class WalletTransfer extends Component {
                         </Text>
                    }
                 </TouchableOpacity>
-
             </View>
         );
     }

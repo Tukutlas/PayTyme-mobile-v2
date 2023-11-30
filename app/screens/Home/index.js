@@ -176,7 +176,7 @@ export default class Home extends Component {
                                 {this.state.view == true ?
                                     <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: '0%', color: "#fff", fontFamily: "SFUIDisplay-Medium" }}>₦{(this.state.balance == "" || this.state.balance == null) ? this.numberFormat(0) : this.numberFormat(this.state.balance)}</Text>
                                     :
-                                    <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: '0%', color: "#fff", fontFamily: "SFUIDisplay-Medium" }}>₦****</Text>
+                                    <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: '0%', color: "#fff", fontFamily: "SFUIDisplay-Medium" }}>****</Text>
                                 }
                                 <View style={{ flexDirection: 'row', padding: 5 }}>
                                     <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.props.navigation.navigate('Tabs', { screen: 'Send' }) }}>

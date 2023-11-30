@@ -58,29 +58,36 @@ const styles = StyleSheet.create({
     backgroundColor:'#fff'
   },
 
-  formLine:{
+  
+  formLine: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor:'#fff',
-    width: '100%',
-    // paddingTop:0
-    paddingTop: Metrics.HEIGHT * 0.00001,
-  },
+    backgroundColor: '#fff',
+    width: '97%',
+    paddingTop: 0,
+},
 
-  formCenter:{
-    paddingLeft: Metrics.WIDTH * 0.0421,
-    width: Metrics.WIDTH * 1.05
+formCenter: {
+    marginLeft: '4%', // Adjust the padding according to your requirement
+    width: '95%',
   },
 
   inputitem: {
-    borderRightColor:'transparent',
-    borderWidth:0,
-    elevation:0,
-    borderRadius:1,
-    width: '90%',
-    backgroundColor:'#F6F6F6',
-    marginTop:'0.5%',
-    height: 45
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 5,
+      height: 40,
+      marginTop: '1%',
+      backgroundColor: '#F6F6F6',
+  },
+
+  labeltext: {
+      color: '#222222',
+      marginTop: '1%',
+      fontSize: 14,
+      fontFamily: 'Roboto-Medium',
   },
 
   buttonPurchase: {
@@ -109,29 +116,18 @@ const styles = StyleSheet.create({
     paddingLeft:'2%',
   },
 
-  labeltext:{
-    color:'#222222',
-    marginTop:'1%',
-    fontSize:14,
-    fontFamily: "Roboto-Medium",
-  },
-
   textBox: {
-    fontSize: 20,
-    alignSelf: 'stretch',
+    fontSize: 13,
+    flex: 1,
     height: 35,
-    borderWidth: 0,
     paddingVertical: 0,
+    paddingHorizontal: 10, // Adjust the padding according to your requirement
     borderRadius: 2,
-    backgroundColor:'#F6F6F6',
+    backgroundColor: '#F6F6F6',
   },
 
-  inputIcon:{
-      position: 'absolute',
-      marginLeft: 6,
-      height: 20,
-      width: 35,
-      padding: 2
+  inputIcon: {
+      marginHorizontal: 10, // Adjust the margin according to your requirement
   },
 
   buttonImage: {
