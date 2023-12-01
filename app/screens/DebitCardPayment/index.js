@@ -157,11 +157,11 @@ export default class DebitCardPayment extends Component {
             let card = this.state.card;
             this.payTVSubscription(amount, smart_card_no, type, package_name, product_code,
                 addon_product_code, addon_product_name, period, has_addon, addon_amount, card);
-        } else if (transaction_type == 'WalletTransfer') {
+        } else if (transaction_type == 'Wallet Transfer') {
             let account_id = this.props.route.params.account_id;
-            let card = this.state.card;
+            let card = this.state.card_id;
             let amount = this.props.route.params.amount;
-            this.transferToWallet(amount, account_id, card);
+            this.transferToWallet(amount, account_id, card, saveCard);
         }else if(transaction_type == 'Insurance'){
             let amount = this.props.route.params.amount;
             let card = this.state.card_id;
@@ -179,10 +179,7 @@ export default class DebitCardPayment extends Component {
             let address = this.props.route.params.address;
             let code = this.props.route.params.code;
             let serviceProvider = this.props.route.params.serviceProvider;
-
             // vehicle_type: vehicle_type,
-            
-            
             this.payInsurance(code, phoneNo, email, amount, ownerName, engineNumber, chassisNumber, plateNumber, brand, model, color, year, address, card, serviceProvider, saveCard);
         }
     }
@@ -232,18 +229,8 @@ export default class DebitCardPayment extends Component {
                     [
                         {
                             text: 'Try Again',
-                            onPress: () => {
-
-                                this.props.navigation.dispatch(StackActions.reset({
-                                    index: 0, key: null, actions: [NavigationActions.navigate({ routeName: 'DrawerSocial' })]
-                                }));
-
-                                //this.props.navigation.navigate("CardTopUp");
-                            },
                             style: 'cancel',
                         },
-
-
                     ],
                     { cancelable: false },
                 );
@@ -926,96 +913,85 @@ export default class DebitCardPayment extends Component {
         });
     }
 
-    transferToWallet(amount, account_id, card) {
+    transferToWallet(amount, account_id, card, saveCard) {
         this.setState({ isLoading: true });
-        let endpoint = "";
         //send api for wallet transfer
-        endpoint = "/wallet/transfer";
 
-        fetch(GlobalVariables.apiURL + endpoint,
-            {
-                method: 'POST',
-                headers: new Headers({
-                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                    'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
-                }),
-                body: "wallet_id=" + account_id
-                    + "&amount=" + amount
-                    + "&channel=card"
-                    + "&card_position=" + card
+        fetch(GlobalVariables.apiURL+"/wallet/transfer?with_card="+ (card == '' ? "0" : "1"),
+        { 
+            method: 'POST',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body:  "wallet_id="+account_id
+                +"&amount="+amount
+                +"&channel=card"
+                +"&card_id="+card
+                +"&gateway="+this.state.gatewayValue
                 // <-- Post parameters
-            })
-            .then((response) => response.text())
-            .then((responseText) => {
-                this.setState({ isLoading: true });
-                let response = JSON.parse(responseText);
-                if (response.status == true) {
-                    let data = JSON.parse(response).data;
-                    if (data.payment_info) {
-                        let datat = data.payment_info.data;
-                        this.props.navigation.navigate("NewDebitCardPayment",
-                            {
-                                datat: datat,
-                                verifyUrl: "/wallet/verify-transfer",
-                                routeName: 'WalletTransfer'
-                            });
-                    } else {
-                        this.props.navigation.navigate("SuccessPage",
-                            {
-                                transaction_id: response.data.transaction.id,
-                            });
-                    }
-                } else if (response.status == false) {
-                    this.setState({ isLoading: false });
-                    Alert.alert(
-                        'Oops. Transaction Error',
-                        response.message,
-                        [
-                            {
-                                text: 'Try Again',
-                                onPress: () => {
-                                    //this.props.navigation.navigate("CardTopUp");
-                                },
-                                style: 'cancel',
-                            },
-                        ],
-                        { cancelable: false },
-                    );
+        }) 
+        .then((response) => response.text())
+        .then((responseText) =>    
+        {
+            this.setState({isLoading:true});
+            let response = JSON.parse(responseText);
+            if (response.status == true) {
+                let data = JSON.parse(responseText).data;
+                if (data.payment_link) {
+                    let payment_link = data.payment_link;
+                    this.props.navigation.navigate("Paystack", { payment_link, saveCard });
                 } else {
-                    this.setState({ isLoading: false });
-                    Alert.alert(
-                        'Oops. Transaction Error',
-                        'Platform Error. Please try again',
-                        [
-                            {
-                                text: 'Try Again',
-                                onPress: () => {
-
-                                },
-                                style: 'cancel',
-                            },
-                        ],
-                        { cancelable: false },
-                    );
+                    this.props.navigation.navigate("SuccessPage",
+                    {
+                        transaction_id: response.data.transaction.id,
+                    });
                 }
-            })
-            .catch((error) => {
-                this.setState({ isLoading: false });
+            }else if(response.status == false){
+                this.setState({isLoading:false});
                 Alert.alert(
-                    'Oops. Network Error',
-                    'Could not connect to server. Check your network and try again',
+                    'Oops. Transaction Error',
+                    response.message,
+                    [
+                        {  
+                            text: 'Try Again',
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }else{
+                this.setState({isLoading:false});
+                Alert.alert(
+                    'Oops. Transaction Error',
+                    'Platform Error. Please try again',
                     [
                         {
                             text: 'Try Again',
-                            onPress: () => {
-
-                            },
-                            style: 'cancel'
-                        },
+                            style: 'cancel',
+                        }, 
                     ],
-                    { cancelable: false },
+                    {cancelable: false},
                 );
-            });
+            }
+        })
+        .catch((error) => {
+            this.setState({isLoading:false});
+            Alert.alert(
+                'Oops. Network Error',
+                'Could not connect to server. Check your network and try again',
+                [
+                    {
+                        text: 'Try Again',
+                        onPress: () => {
+                        
+                        },
+                        style: 'cancel'
+                    }, 
+                ],
+                {cancelable: false},
+            );
+        });
         //end send API for transferring funds
     }
 
@@ -1037,8 +1013,6 @@ export default class DebitCardPayment extends Component {
             "provider": serviceProvider,
             "gateway": this.state.gatewayValue
         });
-
-        console.log(raw);
 
         let requestOptions =
         {
@@ -1110,7 +1084,6 @@ export default class DebitCardPayment extends Component {
     }
 
     payInsurance(code, phoneNo, email, amount, ownerName, engineNumber, chassisNumber, plateNumber, brand, model, color, year, address, card, serviceProvider, saveCard){
-        // console.log(code, phoneNo, email, amount, ownerName, engineNumber, chassisNumber, plateNumber, brand, model, color, year, address, card, serviceProvider, saveCard)
         this.setState({isLoading: true});
         let myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer "+this.state.auth_token);

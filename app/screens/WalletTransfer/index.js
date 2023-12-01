@@ -137,7 +137,7 @@ export default class WalletTransfer extends Component {
             return;
         }
         this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+`/wallet/lookup?wallet_identifier=${walletId}`,
+        fetch(GlobalVariables.apiURL+`/wallet/look-up?wallet_identifier=${walletId}`,
         { 
             method: 'GET',
             headers: new Headers({
@@ -149,8 +149,9 @@ export default class WalletTransfer extends Component {
         }) 
         .then((response) => response.text())
         .then((responseText) => { 
+            
+            console.log(responseText);
             let response = JSON.parse(responseText);
-            console.log(response)
             if(response.status == true){
                 let data = response.data;  
                 this.setState({customerName:data.account_name, account_id: walletId, verified:true, receiverError: true});
@@ -160,6 +161,7 @@ export default class WalletTransfer extends Component {
             this.setState({isLoading:false});
         })
         .catch((error) => {
+            console.log(error)
             this.setState({isLoading:false});
             alert("Network error. Please check your connection settings");
         }); 
@@ -181,7 +183,7 @@ export default class WalletTransfer extends Component {
             if(type=='wallet'){
                 Alert.alert(
                     'Confirm Transfer',
-                    'Do you want to transfer ₦'+this.numberFormat(amount)+' to '+account_id+'?\n',
+                    'Do you want to transfer ₦'+this.numberFormat(amount)+' to '+this.state.customerName+ ' ('+account_id+') ?\n',
                     [
                         {  
                             text: 'Cancel',
@@ -199,7 +201,7 @@ export default class WalletTransfer extends Component {
             }else{
                 Alert.alert(
                     'Confirm Transfer',
-                    'Do you want to transfer '+amount+'( to '+account_id+') ?\n',
+                    'Do you want to transfer ₦'+this.numberFormat(amount)+' to '+this.state.customerName+ ' ('+account_id+') ?\n',
                     [
                         {  
                             text: 'Cancel',
@@ -247,7 +249,7 @@ export default class WalletTransfer extends Component {
             if(response.status == true) {
                 this.props.navigation.navigate("SuccessPage",
                 {
-                    transaction_id:response.transaction.id,
+                    transaction_id:response.data.transaction.id,
                 });
             }else if(response.status == false){
                 this.setState({isLoading:false});
@@ -310,7 +312,7 @@ export default class WalletTransfer extends Component {
 
         this.props.navigation.navigate("DebitCardPayment",
         {
-            transaction_type:"WalletTransfer",
+            transaction_type:"Wallet Transfer",
             amount: amount,
             account_id: account_id
         }); 
