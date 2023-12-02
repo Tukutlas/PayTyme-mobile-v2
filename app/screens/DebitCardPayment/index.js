@@ -128,8 +128,8 @@ export default class DebitCardPayment extends Component {
             this.transferToBettingAccount(amount, betplatform, account_id, card);
         } else if (transaction_type == 'Education') {
             let examBody = this.props.route.params.examBody;
-            let card = this.state.card;
-            this.buyPins(examBody, card);
+            let card = this.state.card_id;
+            this.buyPins(examBody, card, saveCard);
         } else if (transaction_type == 'WalletTopUp') {
             let amount = this.props.route.params.amount;
             let card = this.state.card_id;
@@ -463,31 +463,32 @@ export default class DebitCardPayment extends Component {
         //end send API for airtime purchase
     }
 
-    buyPins(examBody, card) {
-        if (examBody == 'WAEC') {
+    buyPins(examBody, card, saveCard) {
+        if (examBody == 'waec') {
             this.setState({ isLoading: true });
             let amount = this.props.route.params.amount;
-            let phone_number = this.props.route.params.phonenumber_value;
+            let phone = this.props.route.params.phone;
             let quantity = this.props.route.params.quantity;
-            let endpoint = "";
-            //send api for waec pin purchase
-            endpoint = "/education/purchase-waec-pin";
-            let verify = "/verify";
+            let code = this.props.route.params.code;
+            let serviceProvider = this.props.route.params.serviceProvider;
 
-            fetch(GlobalVariables.apiURL + endpoint,
+            //send api for waec pin purchase
+            fetch(GlobalVariables.apiURL + "/education/purchase/waec?with_card="+ (card == '' ? "0" : "1"),
                 {
                     method: 'POST',
                     headers: new Headers({
                         'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                         'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
                     }),
-                    body:
-                        "recipient_phone=" + phone_number
-                        + "&no_of_pins=" + quantity
-                        + "&unit_amount=" + amount
-                        + "&channel=card"
-                        + "&callback_url=" + GlobalVariables.apiURL + verify
-                        + "&card_position=" + card
+                    body: "phone_number="+phone
+                        +"&quantity="+quantity
+                        +"&amount="+amount
+                        +"&channel=wallet"
+                        +"&type=waec"
+                        +"&code="+code
+                        +"&gateway="+ this.state.gatewayValue
+                        +"&card_id=" + card
+                        +"&provider="+serviceProvider
                     // <-- Post parameters
                 })
                 .then((response) => response.text())
@@ -496,14 +497,9 @@ export default class DebitCardPayment extends Component {
                     if (response.status == true) {
                         this.setState({ isLoading: false });
                         let data = JSON.parse(responseText).data;
-                        if (data.payment_info) {
-                            let datat = data.payment_info.data;
-                            this.props.navigation.navigate("NewDebitCardPayment",
-                                {
-                                    datat: datat,
-                                    verifyUrl: "/education/verify/waec-pin-purchase",
-                                    routeName: 'Education'
-                                });
+                        if (data.payment_link) {
+                            let payment_link = data.payment_link;
+                            this.props.navigation.navigate("Paystack", { payment_link, saveCard });
                         } else {
                             this.props.navigation.navigate("SuccessPage",
                                 {
@@ -560,49 +556,43 @@ export default class DebitCardPayment extends Component {
                     //     {cancelable: false},
                     // );
                 });
-        } else if (examBody == 'JAMB') {
+        } else if (examBody == 'jamb') {
             this.setState({ isLoading: true });
-            let phone_number = this.props.route.params.phonenumber_value;
+            let phone = this.props.route.params.phone;
             let charge = this.props.route.params.charge;
-            let type = this.props.route.params.type;
+            let code = this.props.route.params.code;
             let profile_code = this.props.route.params.profile_code;
             let amount = this.props.route.params.amount;
-            let endpoint = "";
-            //send api for jamb pin purchase
-            endpoint = "/education/purchase-jamb-pin";
-            let verify = "/verify";
+            let serviceProvider = this.props.route.params.serviceProvider;
 
-            fetch(GlobalVariables.apiURL + endpoint,
+            fetch(GlobalVariables.apiURL + "/education/purchase/jamb?with_card="+ (card == '' ? "0" : "1"),
                 {
                     method: 'POST',
                     headers: new Headers({
                         'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                         'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
                     }),
-                    body: "recipient_phone=" + phone_number
-                        + "&amount=" + amount
-                        + "&type=" + type
-                        + "&profile_code=" + profile_code
-                        + "&charge=" + charge
-                        + "&channel=card"
-                        + "&callback_url=" + GlobalVariables.apiURL + verify
-                        + "&card_position=" + card
+                    body: "phone="+phone
+                        +"&amount="+amount
+                        +"&type=jamb"
+                        +"&profile_code="+profile_code
+                        +"&code="+code
+                        +"&channel=card"
+                        +"&gateway="+ this.state.gatewayValue
+                        +"&card_id=" + card
+                        +"&provider="+serviceProvider
                     // <-- Post parameters
                 })
                 .then((response) => response.text())
                 .then((responseText) => {
+                    console.log(responseText)
                     this.setState({ isLoading: false });
                     let response = JSON.parse(responseText);
                     if (response.status == true) {
                         let data = JSON.parse(responseText).data;
-                        if (data.payment_info) {
-                            let datat = data.payment_info.data;
-                            this.props.navigation.navigate("NewDebitCardPayment",
-                                {
-                                    datat: datat,
-                                    verifyUrl: "/education/verify/jamb-pin-purchase",
-                                    routeName: 'Education'
-                                });
+                        if (data.payment_link) {
+                            let payment_link = data.payment_link;
+                            this.props.navigation.navigate("Paystack", { payment_link, saveCard });
                         } else {
                             this.props.navigation.navigate("SuccessPage",
                                 {
@@ -644,6 +634,7 @@ export default class DebitCardPayment extends Component {
                     }
                 })
                 .catch((error) => {
+                    console.log(error)
                     // this.setState({isLoading:false});
                     // Alert.alert(
                     //     'Oops. Network Error',

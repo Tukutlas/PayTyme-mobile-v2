@@ -1,12 +1,12 @@
 import React, { Component} from "react";
-import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
+import { Platform, StatusBar, View, ScrollView, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DropDownPicker from 'react-native-dropdown-picker';
+// import DropDownPicker from 'react-native-dropdown-picker';
+import { Picker } from "@react-native-picker/picker";
 import styles from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
-
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
 
@@ -39,11 +39,24 @@ export default class Education extends Component {
             // jambTypes: [],
             jambType: '',
             profile_code: '',
+            profileError: false,
+            profileErrorMessage: '',
             quantity: 0,
-            phone_number: '',
+            quantityError: false,
+            quantityErrorMessage: '',
+            phone: '',
+            phoneError: false,
+            phoneErrorMessage: '',
             charge: 0,
             transaction:false,
-            there_cards: false
+            there_cards: false,
+            pinDropdownEnable: false,
+            typeError: false,
+            typeErrorMessage: '',
+            pinTypes: [],
+            serviceProvider: '',
+            name: '',
+            code: ''
         };
     }
 
@@ -56,7 +69,6 @@ export default class Education extends Component {
             }
         );
         this.loadWalletBalance();
-        this.getUserCards();
        
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         await Font.loadAsync({
@@ -118,37 +130,47 @@ export default class Education extends Component {
     }
 
     loadWalletBalance(){
-        fetch(GlobalVariables.apiURL+"/wallet/get-details",
+        fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
             method: 'GET',
             headers: new Headers({
-            'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-            'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+              'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+              'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
             }),
             body:  ""         
             // <-- Post parameters
         }) 
         .then((response) => response.text())
         .then((responseText) => { 
-            this.setState({isLoading:false});
-    
             let response_status = JSON.parse(responseText).status;
+           
             if(response_status == true){
-                let data = JSON.parse(responseText).data;  
-                let wallet = data.wallet;
+                let wallet = JSON.parse(responseText).data;  
                 this.setState({balance:parseInt(wallet.balance)});
-                // console.log(parseInt(wallet.balance));
             }else if(response_status == false){
                 Alert.alert(
                 'Session Out',
                 'Your session has timed-out. Login and try again',
                 [
                     {
-                    text: 'OK',
-                    onPress: () => this.props.navigation.navigate('Signin'),
-                    style: 'cancel',
+                        text: 'OK',
+                        onPress: () => this.props.navigation.navigate('Signin'),
+                        style: 'cancel',
                     }, 
-                    ],
+                ],
+                {cancelable: false},
+                );
+            }else if(response_status == 'error'){
+                Alert.alert(
+                'Session Out',
+                'Your session has timed-out. Login and try again',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => this.props.navigation.navigate('Signin'),
+                        style: 'cancel',
+                    }, 
+                ],
                 {cancelable: false},
                 );
             }
@@ -159,9 +181,9 @@ export default class Education extends Component {
         });      
     }
 
-    getUserCards(){
+    getPricing(type){
         this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/user/get-cards",
+        fetch(GlobalVariables.apiURL+"/education/pricing?type="+ type,
         { 
             method: 'GET',
             headers: new Headers({
@@ -172,106 +194,29 @@ export default class Education extends Component {
             // <-- Post parameters
         }) 
         .then((response) => response.text())
-        .then((responseText) => {
-            let response_status = JSON.parse(responseText).status;
-             
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;
-                if(data != ''){
-                    // this.setState({ cards: data })
-                    let newArray = data.map((item) => {
-                        if (item.reusable == true) {
-                            return item
-                        }
-                    })
-                    if(newArray.length != 0){
-                        this.setState({there_cards: true});
-                    }else{
-                        this.setState({quantity: 1});
-                    }
-                    this.setState({isLoading:false});
-                }else{
-                    this.setState({there_cards: false});
-                    this.setState({isLoading:false});
-                    this.setState({quantity: 1});
-                }
-            }else if(response_status == false){
-                this.setState({there_cards: false});
-                this.setState({isLoading:false});
-            }
-        })
-        .catch((error) => {
-            alert("Network error. Please check your connection settings");
-            this.setState({isLoading:false});
-        });      
-    }
-
-    checkIfUserHasCard(examBody){
-        if (this.state.there_cards == false) {
-            this.buyPinsWithNewCardPayment(examBody);
-        }else{
-            this.buyPinsWithCardPayment(examBody);
-        }
-    }
-
-    getPricing(type){
-        this.setState({isLoading:true});
-        let endpoint = "";
-        if(type =='waec'){
-            endpoint = "waec-pricing";
-        }else if(type =='jamb'){
-            endpoint = "jamb-pricing";
-        }
-        fetch(GlobalVariables.apiURL+"/education/"+ endpoint,
-        { 
-            method: 'GET',
-            headers: new Headers({
-            'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-            'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  ""         
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
         .then((responseText) => { 
             console.log(responseText)
             this.setState({isLoading:false});
-            let response_status = JSON.parse(responseText).status;
-            if(response_status == '200'){
-                let product = JSON.parse(responseText).product;  
-                let type = JSON.parse(responseText).type;
-                if(type =='WAEC'){
-                    this.setState({examBody: type});
-                    let price = product.map((item) => {
-                        return item.price
-                    })
-                    this.setState({amount:price[0]});
-                }else if(type =='JAMB'){
-                    let charge = JSON.parse(responseText).charge;
-                    this.setState({examBody: type, charge: charge});
-                    let jambType = this.state.jambTypeValue;
-                    let price = product.map((item) => {
-                        if(item.type == jambType){
-                            this.setState({amount:item.price});
-                            return item.price;
-                        }
-                    })
-                }
-                
-                
-            }else if(response_status == false){
-                // Alert.alert(
-                // 'Session Out',
-                // 'Your session has timed-out. Login and try again',
-                // [
-                //     {
-                //     text: 'OK',
-                //     onPress: () => this.props.navigation.navigate('Signin'),
-                //     style: 'cancel',
-                //     }, 
-                //     ],
-                // {cancelable: false},
-                // );
+            let response = JSON.parse(responseText);
+            if(response.status == true){
+                let products = response.data.items;  
+                let newArray = products.map((item) => {
+                    return {label: item.name+" - ₦"+this.numberFormat(item.amount), value: item.name+"#"+item.code+"#"+item.amount}
+                })
+                this.setState({pinTypes: newArray, pinDropdownEnable: true, serviceProvider:response.data.provider});
+            }else if(response.status == false){
+                Alert.alert(
+                    'Error',
+                    response.message,
+                    [
+                        {
+                            text: 'OK',
+                            // onPress: () => this.props.navigation.navigate('Signin'),
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
             }
         })
         .catch((error) => {
@@ -280,173 +225,212 @@ export default class Education extends Component {
         });  
     }
 
+    setPinType(value){
+        this.setState({
+            typeValue: value
+        });
+        
+        if(value !== null){
+            this.setState({typeError: false})
+            let string = value.split("#");
+
+            this.setState({
+                name: string[0],
+                code: string[1],
+                amount: parseInt(string[2])
+            });
+        }
+        // let bundlePlan = string[0];
+    }
+
     numberFormat = x => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
 
     confirmPurchase(thetype){
         let amount = this.state.amount;
-        let phone_number = this.state.phone_number;
+        let phone = this.state.phone;
         let exam_body = this.state.examBody;
         let quantity = this.state.quantity;
         let profile_code = this.state.profile_code;
-        let jamb_type = this.state.jambTypeValue;
+        let name = this.state.name;
+        let typeValue = this.state.typeValue;
+        let error = 0;
 
         if(exam_body == ""){
+            error++;
             alert("Pls select an exam body");
-        }else if(phone_number == ''){
-            alert("Recipient phone number must be inserted");
         }
 
-        if (exam_body == "WAEC") {
-            let sub_amount = amount * quantity;
-            if(quantity == 0){
-                alert("Quantity must be inserted");
-            }
-            let message ="";
+        if(typeValue == null || typeValue == ''){
+            error++;
+            this.setState({typeError: true, typeErrorMessage: 'Please select an option'});
+        }
 
-            message = quantity+" "+exam_body+" Pin(s):  (N"+this.numberFormat(sub_amount);
-            
-            if(thetype=="wallet"){
-                Alert.alert(
-                    'Confirm Purchase',
-                    'Do you want to puchase '+message+') ?',
+        if(phone == ''){
+            error++;
+            this.setState({phoneError: true, phoneErrorMessage: 'Recipient phone number must be inserted'});
+        }
 
-                    [
-                        {  
-                            text: 'Cancel',
-                            onPress: () => {},
-                            style: 'cancel',
-                        },
-                        {
-                            text: 'Yes, Pay with Wallet',
-                            onPress: () => {this.buyPins(exam_body);},
-                            style: 'cancel',
-                        },
-                    ],
-                    {cancelable: false},
-                );
-            }else{
-                Alert.alert(
-                    'Confirm Purchase',
-                    'Do you want to puchase '+message+') ?',
-                    [
-                        {
-                            text: 'Cancel',
-                            onPress: () => {},
-                            style: 'cancel',
-                        },
-                        {
-                            text: 'Yes, Pay with Card',  
-                            onPress: () => {this.checkIfUserHasCard(exam_body);},
-                            style: 'cancel',
-                        }, 
-                    ],
-                    {cancelable: false},
-                );
-            }
-        }else if(exam_body == "JAMB"){
-            if(jamb_type ==null){
-                alert("Please select JAMB type")
-            }else if(profile_code ==''){
-                alert("Input Profile Code")
-            }else if(amount <= this.state.balance){
-                let message ="";
-                message = exam_body+' '+jamb_type+" Pin: (N"+this.numberFormat(amount)+') for this profile code:'+profile_code+'?';
-            
-                if(thetype=="wallet"){
-                    Alert.alert(
-                        'Confirm Purchase',
-                        'Do you want to puchase '+message,
+        if(exam_body == 'waec' && quantity == 0){
+            error++;
+            this.setState({quantityError: true, quantityErrorMessage: 'Quantity must be inserted'});
+        }
 
-                        [
-                            {  
-                                text: 'Cancel',
-                                onPress: () => {},
-                                style: 'cancel',
-                            },
-                            {
-                                text: 'Yes, Pay with Wallet',
-                                onPress: () => {this.buyPins(exam_body);},
-                                style: 'cancel',
-                            },
-                        ],
-                        {cancelable: false},
-                    );
-                }else{
-                    Alert.alert(
-                        'Confirm Purchase',
-                        'Do you want to puchase '+message+') ?',
-                        [
-                            {
-                                text: 'Cancel',
-                                onPress: () => {},
-                                style: 'cancel',
-                            },
-                            {
-                                text: 'Yes, Pay with Card',  
-                                onPress: () => {this.checkIfUserHasCard(exam_body);},
-                                style: 'cancel',
-                            }, 
-                        ],
-                        {cancelable: false},
-                    );
+        if(exam_body == 'jamb' && profile_code ==''){
+            error++;
+            this.setState({profileError: true, profileErrorMessage: 'Please kindly input the recipient profile code'});
+        }
+
+        if(error == 0){
+            if (exam_body == "waec") {
+                let sub_amount = amount * quantity;
+                if(sub_amount <= this.state.balance){
+                    let message = quantity+" "+exam_body+" Pin(s):  (N"+this.numberFormat(sub_amount);
+                    
+                    if(thetype=="wallet"){
+                        Alert.alert(
+                            'Confirm Purchase',
+                            'Do you want to puchase '+message+') ?',
+                            [
+                                {  
+                                    text: 'Cancel',
+                                    onPress: () => {},
+                                    style: 'cancel',
+                                },
+                                {
+                                    text: 'Yes, Pay with Wallet',
+                                    onPress: () => {this.buyPins(exam_body);},
+                                    style: 'cancel',
+                                },
+                            ],
+                            {cancelable: false},
+                        );
+                    }else{
+                        Alert.alert(
+                            'Confirm Purchase',
+                            'Do you want to puchase '+message+') ?',
+                            [
+                                {
+                                    text: 'Cancel',
+                                    onPress: () => {},
+                                    style: 'cancel',
+                                },
+                                {
+                                    text: 'Yes, Pay with Card',  
+                                    onPress: () => {this.buyPinsWithCardPayment(exam_body);},
+                                    style: 'cancel',
+                                }, 
+                            ],
+                            {cancelable: false},
+                        );
+                    }
                 }
-            }else{
-                alert("Insufficient Balance, Pls fund your wallet");
+            }else if(exam_body == "jamb"){
+                if(amount <= this.state.balance){
+                    let message = exam_body+' '+name+" Pin: (N"+this.numberFormat(amount)+') for this profile code:'+profile_code+'?';
+                
+                    if(thetype=="wallet"){
+                        Alert.alert(
+                            'Confirm Purchase',
+                            'Do you want to purchase '+message,
+
+                            [
+                                {  
+                                    text: 'Cancel',
+                                    onPress: () => {},
+                                    style: 'cancel',
+                                },
+                                {
+                                    text: 'Yes, Pay with Wallet',
+                                    onPress: () => {this.buyPins(exam_body);},
+                                    style: 'cancel',
+                                },
+                            ],
+                            {cancelable: false},
+                        );
+                    }else{
+                        Alert.alert(
+                            'Confirm Purchase',
+                            'Do you want to purchase '+message+') ?',
+                            [
+                                {
+                                    text: 'Cancel',
+                                    onPress: () => {},
+                                    style: 'cancel',
+                                },
+                                {
+                                    text: 'Yes, Pay with Card',  
+                                    onPress: () => {this.buyPinsWithCardPayment(exam_body);},
+                                    style: 'cancel',
+                                }, 
+                            ],
+                            {cancelable: false},
+                        );
+                    }
+                }else{
+                    alert("Insufficient Balance, Pls fund your wallet");
+                }
             }
         }
-        
     }
 
     buyPinsWithCardPayment(examBody){
-        if(examBody == 'WAEC'){
+        if(examBody == 'waec'){
             let amount = this.state.amount;
-            let phone_number = this.state.phone_number;
+            let phone = this.state.phone;
             let quantity = this.state.quantity;
+            let serviceProvider = this.state.serviceProvider;
+        
+            let name = this.state.name;
+            let code = this.state.code;
 
             this.props.navigation.navigate("DebitCardPayment",
             {
                 transaction_type:"Education",
                 amount: amount,
-                phonenumber_value: phone_number,
+                phone: phone,
                 quantity: quantity,
                 examBody: examBody,
-                url: "/education/purchase-waec-pin"
+                code: code,
+                serviceProvider: serviceProvider
             }); 
-        }else if(examBody == 'JAMB'){
+        }else if(examBody == 'jamb'){
             let amount = this.state.amount;
-            let phone_number = this.state.phone_number;
+            let phone = this.state.phone;
             let profile_code = this.state.profile_code;
-            let type = this.state.jambTypeValue;
             let charge = this.state.charge;
+            let name = this.state.name;
+            let code = this.state.code;
+            let serviceProvider = this.state.serviceProvider;
 
             this.props.navigation.navigate("DebitCardPayment",
             {
                 transaction_type:"Education",
                 amount: amount,
-                phonenumber_value: phone_number,
+                phone: phone,
                 charge: charge,
-                type: type,
                 profile_code: profile_code,
                 examBody: examBody,
-                url: "/education/purchase-jamb-pin"
+                code: code,
+                serviceProvider: serviceProvider
             }); 
         }   
     }
   
     buyPins(examBody){
-        if(examBody == 'WAEC'){
+        if(examBody == 'waec'){
             this.setState({isLoading:true});
             let amount = this.state.amount;
-            let phone_number = this.state.phone_number;
+            let phone = this.state.phone;
             let quantity = this.state.quantity;
-            let endpoint ="";  
-            //send api for waec pin purchase
-            endpoint = "/education/purchase-waec-pin";
-            let verify = "/verify";
+            let endpoint =""; 
+        
+            let name = this.state.name;
+            let code = this.state.code;
 
-            fetch(GlobalVariables.apiURL+endpoint,
+            //send api for waec pin purchase
+            fetch(GlobalVariables.apiURL+'/education/purchase/waec',
             { 
                 method: 'POST',
                 headers: new Headers({
@@ -454,12 +438,13 @@ export default class Education extends Component {
                     'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
                 }),
                 body:  
-                    "recipient_phone="+phone_number
-                    +"&no_of_pins="+quantity
-                    +"&unit_amount="+amount
+                    "phone_number="+phone
+                    +"&quantity="+quantity
+                    +"&amount="+amount
                     +"&channel=wallet"
-                    +"&callback_url="+GlobalVariables.apiURL+verify
-                    +"&card_position=primary"
+                    +"&type=waec"
+                    +"&code="+code
+                    +"&provider="+this.state.serviceProvider
                 // <-- Post parameters
             }) 
             .then((response) => response.text())
@@ -523,33 +508,30 @@ export default class Education extends Component {
                     {cancelable: false},
                 );
             });
-        }else if(examBody == 'JAMB'){
+        }else if(examBody == 'jamb'){
             this.setState({isLoading:true});
             let amount = this.state.amount;
-            let phone_number = this.state.phone_number;
+            let phone = this.state.phone;
             let profile_code = this.state.profile_code;
-            let type = this.state.jambTypeValue;
             let charge = this.state.charge;
-            let endpoint ="";  
-            //send api for airtime purchase
-            endpoint = "/education/purchase-jamb-pin";
-            let verify = "/verify";
+            let name = this.state.name;
+            let code = this.state.code;
 
-            fetch(GlobalVariables.apiURL+endpoint,
+            //send api for airtime purchase
+            fetch(GlobalVariables.apiURL+"/education/purchase/jamb",
             { 
                 method: 'POST',
                 headers: new Headers({
                     'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                     'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
                 }),
-                body:  "recipient_phone="+phone_number
+                body:  "phone="+phone
                     +"&amount="+amount
-                    +"&type="+type
+                    +"&type=jamb"
                     +"&profile_code="+profile_code
-                    +"&charge="+charge
+                    +"&code="+code
                     +"&channel=wallet"
-                    +"&callback_url="+GlobalVariables.apiURL+verify
-                    +"&card_position=primary"
+                    +"&provider="+this.state.serviceProvider
                 // <-- Post parameters
             }) 
             .then((response) => response.text())
@@ -618,143 +600,113 @@ export default class Education extends Component {
         }
     }
 
-    buyPinsWithNewCardPayment(examBody){
-        if(examBody == 'WAEC'){
-            this.setState({isLoading:true});
-            let amount = this.state.amount;
-            let phone_number = this.state.phone_number;
-            let quantity = this.state.quantity;
-            let endpoint ="";  
-            //send api for waec pin purchase
-            endpoint = "/education/purchase-waec-pin";
-            let verify = "/verify";
+    setPhone = (phone) => {
+        this.setState({
+            phone: phone
+        })
+        if(phone !== ''){
+            this.setState({phoneError: false})
+        }else if(phone == ''){
+            this.setState({phoneError: true, phoneErrorMessage: 'Recipient phone number must be inserted'})
+        }
+    }
 
-            fetch(GlobalVariables.apiURL+endpoint,
-            { 
+    setQuanity = (quantity) => {
+        this.setState({
+            quantity: quantity
+        })
+        if(quantity !== ''){
+            this.setState({quantityError: false})
+        }else if(phone == ''){
+            this.setState({quantityError: true, quantityErrorMessage: 'Quantity must be inserted'})
+        }
+    }
+
+    setProfileCode = (profile_code) => {
+        this.setState({
+            profile_code: profile_code
+        })
+        if(profile_code !== ''){
+            this.setState({profileError: false})
+        }else if(profile_code == ''){
+            this.setState({profileError: true, profileErrorMessage: 'Please kindly input the recipient profile code'})
+        }
+    }
+
+    handleVerify(){
+        let profile_code = this.state.profile_code;
+        let code = this.state.code;
+        let provider = this.state.serviceProvider;
+        this.validateProfileCode(profile_code, code, provider);
+    }
+
+    validateProfileCode(profile_code, code, provider){
+        if(code == null || code == ''){
+            this.setState({TypeError: true, typeErrorMessage: 'Please select an option'});
+        }else if (profile_code == '') {
+            this.setState({profileError: true, profileErrorMessage: "Please kindly input the recipient profile code"})
+        }else if(code != '' && code != null && profile_code != '' && provider != ''){ 
+            let myHeaders = new Headers();
+            myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+            myHeaders.append("Content-Type", "application/json");
+
+            let raw = JSON.stringify({
+                "profile_code": profile_code,
+                "code": code,
+                "provider": provider,
+            });
+
+            let requestOptions = {
                 method: 'POST',
-                headers: new Headers({
-                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                    'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-                }),
-                body:  
-                    "recipient_phone="+phone_number
-                    +"&no_of_pins="+quantity
-                    +"&unit_amount="+amount
-                    +"&channel=card"
-                    +"&callback_url="+GlobalVariables.apiURL+verify
-                    +"&card_position=new"
-                // <-- Post parameters
-            }) 
-            .then((response) => response.text())
-            .then((responseText) =>    
+                headers: myHeaders,
+                body: raw
+            };
+            
+            this.setState({isLoading:true});
+            
+            fetch(GlobalVariables.apiURL+'/education/validate-profile-code?type=jamb', requestOptions)
+            .then(response => response.text())
+            .then(responseText => 
             {
-                let response = JSON.parse(responseText);
-                if(response.status == true) { 
-                    let data = JSON.parse(responseText).data;
-                    if (data.payment_info) {
-                        this.setState({transaction:true});
-                        let datat = data.payment_info.data;
-                        this.props.navigation.navigate("NewDebitCardPayment", 
-                        {
-                            datat: datat,
-                            verifyUrl: "/education/verify/waec-pin-purchase",
-                            routeName: 'Education'
-                        });
-                    }
-                }else if(response.status == false){
+                let result = JSON.parse(responseText);
+                if(result.status == true){
+                    this.setState({customerName:result.data.fullname, phone:result.data.phone, isValidated:true});
                     this.setState({isLoading:false});
-                    let message = JSON.parse(responseText).message;
-                    alert(message);
+                }else if(result.status != true){
+                    Alert.alert(
+                        'Error',
+                        result.message,
+                        [
+                            {
+                                text: 'OK',
+                                // onPress: () => this.props.navigation.navigate('Signin'),
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );
+                    this.setState({isLoading:false});
+                }else{
+                    Alert.alert(
+                        'Error',
+                        result.data,
+                        [
+                            {
+                                text: 'OK',
+                                // onPress: () => this.props.navigation.navigate('Signin'),
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );
+                    this.setState({isLoading:false});
                 }
             })
             .catch((error) => {
+                console.log(error)
                 this.setState({isLoading:false});
-                Alert.alert(
-                    'Oops. Network Error',
-                    'Could not connect to server. Check your network and try again',
-                    [
-                        {
-                            text: 'Try Again',
-                            onPress: () => {
-                            
-                            },
-                            style: 'cancel'
-                        }, 
-                    ],
-                    {cancelable: false},
-                );
-            });
-        }else if(examBody == 'JAMB'){
-            this.setState({isLoading:true});
-            let amount = this.state.amount;
-            let phone_number = this.state.phone_number;
-            let profile_code = this.state.profile_code;
-            let type = this.state.jambTypeValue;
-            let charge = this.state.charge;
-            let endpoint ="";  
-            //send api for airtime purchase
-            endpoint = "/education/purchase-jamb-pin";
-            let verify = "/verify";
-
-            fetch(GlobalVariables.apiURL+endpoint,
-            { 
-                method: 'POST',
-                headers: new Headers({
-                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                    'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-                }),
-                body:  "recipient_phone="+phone_number
-                    +"&amount="+amount
-                    +"&type="+type
-                    +"&profile_code="+profile_code
-                    +"&charge="+charge
-                    +"&channel=card"
-                    +"&callback_url="+GlobalVariables.apiURL+verify
-                    +"&card_position=new"
-                // <-- Post parameters
-            }) 
-            .then((response) => response.text())
-            .then((responseText) =>    
-            {
-                this.setState({isLoading:false});
-                let response = JSON.parse(responseText);
-                console.log(response)
-                if(response.status == true) { 
-                    let data = JSON.parse(responseText).data;
-                    if (data.payment_info) {
-                        this.setState({transaction:true});
-                        let datat = data.payment_info.data;
-                        this.props.navigation.navigate("NewDebitCardPayment", 
-                        {
-                            datat: datat,
-                            verifyUrl: "/education/verify/jamb-pin-purchase",
-                            routeName: 'Education'
-                        });
-                    }
-                }else if(response.status == false){
-                    this.setState({isLoading:false});
-                    let message = JSON.parse(responseText).data;
-                    alert(message);
-                }
-            })
-            .catch((error) => {
-                this.setState({isLoading:false});
-                Alert.alert(
-                    'Oops. Network Error',
-                    'Could not connect to server. Check your network and try again',
-                    [
-                        {
-                            text: 'Try Again',
-                            onPress: () => {
-                            
-                            },
-                            style: 'cancel'
-                        }, 
-                    ],
-                    {cancelable: false},
-                );
-            });
-            //end send API for jamb pin purchase
+                alert("Network error. Please check your connection settings");
+            });   
         }
     }
 
@@ -767,7 +719,7 @@ export default class Education extends Component {
         }
     
         return (
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                 <View style={styles.header}>
                     <View style={styles.left}>
@@ -783,17 +735,20 @@ export default class Education extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formLine, {marginTop:'-5%'}]}>
+                <View style={[styles.formLine]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Select Exam Body</Text>
                     </View>
                 </View>
                 <View style={[styles.grid,{marginTop:'-3%'}]}>
+                    <TouchableOpacity style={[styles.flexb]}>
+                    </TouchableOpacity>
                     <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:1.4, borderColor:(this.state.waec) ? "#445cc4" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({waec:true});
                             this.setState({jamb:false});
                             this.setState({amount:0});
+                            this.setState({examBody:'waec'});
                             this.getPricing('waec');
                         }}
                     >
@@ -804,102 +759,169 @@ export default class Education extends Component {
                             this.setState({waec:false});
                             this.setState({jamb:true});
                             this.setState({amount:0});
-                            this.setState({examBody:'JAMB'});
+                            this.setState({examBody:'jamb'});
+                            this.getPricing('jamb');
                         }}
                     >
                         <Image source={require('../../Images/Education/jamb.png')} style={{height:65, width:65, borderRadius:10}} />
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.flexb]}>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexb]}>
-                    </TouchableOpacity>
                 </View>
-                {
+                {/* {
                     this.state.jamb ?
                     <View style={[styles.formLine, {marginTop:'-1%'}]}>
                         <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Jamb Options</Text>
+                            <Text style={styles.labeltext}>Select Options</Text>
                         </View>
                     </View>
                     :
                     <View></View> 
                 }
                 {
-                    this.state.jamb ?
-                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:30, zIndex:1000, marginTop:'2%'}}>
-                        <DropDownPicker
-                            placeholder={'Select Jamb Options'}
-                            open={this.state.jambTypeOpen}
-                            value={this.state.jambTypeValue}
-                            style={[styles.dropdown, {flexDirection: 'row', height: 15}]}
-                            items={this.state.jambTypes}
-                            setOpen={this.setJambTypeOpen}
-                            setValue={this.setJambTypeValue}
-                            setItems={this.setJambTypeItems}
-                            searchable={false}
-                            disabled={this.state.jambTypeDisable}
-                        />    
+                    this.state.waec ?
+                    <View style={[styles.formLine, {marginTop:'-1%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Waec Options</Text>
+                        </View>
                     </View>
                     :
                     <View></View> 
-                }
-                <View style={[styles.formLine, {marginTop:'8%'}]}>
+                } */}
+
+
+                {/* {
+                    this.state.jamb ? 
+                    // <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:30, zIndex:1000, marginTop:'2%'}}>
+                    //     <DropDownPicker
+                    //         placeholder={'Select Jamb Options'}
+                    //         open={this.state.jambTypeOpen}
+                    //         value={this.state.jambTypeValue}
+                    //         style={[styles.dropdown, {flexDirection: 'row', height: 15}]}
+                    //         items={this.state.jambTypes}
+                    //         setOpen={this.setJambTypeOpen}
+                    //         setValue={this.setJambTypeValue}
+                    //         setItems={this.setJambTypeItems}
+                    //         searchable={false}
+                    //         disabled={this.state.jambTypeDisable}
+                    //     />    
+                    // </View>
+                    <>*/}
+                <View style={[styles.formLine, {marginTop:'-2%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Select Options</Text>
+                    </View>
+                </View>
+                <View style={{width:'94%', marginLeft:'3.0%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                    <Picker
+                        selectedValue={this.state.typeValue}
+                        onValueChange={(itemValue, itemIndex) =>
+                            this.setPinType(itemValue)
+                        }
+                        enabled={this.state.pinDropdownEnable}
+                    >
+                        <Picker.Item label="Select Pin Types" value={null} style={{fontSize: 14}}/>
+                        
+                        {this.state.pinTypes.map((type, index) => (
+                            <Picker.Item key={index} label={type.label} value={type.value} style={{fontSize: 14}} />
+                        ))}
+                    </Picker>
+                </View>
+                {this.state.typeError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.typeErrorMessage}</Text>}
+                    {/* </>
+                    :
+                    <View></View> 
+                } */}
+                
+                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Unit Amount</Text>
-                    </View>
-                    <View style={styles.formCenter}>
-                        <View roundedc style={[styles.inputitem,{height:25}]}>
-                            <Text style={{color:'black'}}>{this.state.amount}</Text>
+                        <View roundedc style={[styles.inputitem, {height:40}]}>
+                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6'}}>{this.state.amount}</Text>
                         </View>
                     </View>
                 </View>
                 {
                     this.state.waec ?
-                    <View style={[styles.formLine, {marginTop:'2%'}]}>
-                        <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Quantity</Text>
-                            <TextInput placeholder="Type in no of pins" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="quantity" onChangeText={(quantity) => this.setState({quantity})}/>
-                        </View>
-                    </View>
+                    // <View style={[styles.formLine, {marginTop:'2%'}]}>
+                    //     <View style={styles.formCenter}>
+                    //         <Text style={styles.labeltext}>Quantity</Text>
+                    //         <TextInput placeholder="Type in no of pins" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="quantity" onChangeText={(quantity) => this.setState({quantity})}/>
+                    //     </View>
+                    // </View>
+                    <>
+                        <View style={[styles.formLine, {marginTop:'1.2%'}]}>            
+                            <View style={styles.formCenter}>
+                                <Text style={styles.labeltext}>Quantity</Text>
+                                <View roundedc style={styles.inputitem}>
+                                    <FontAwesome5 name={'sort-numeric-up'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                    <TextInput placeholder="Type in no of pins" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="quantity" onChangeText={(quantity) => this.setQuanity(quantity)}/>
+                                </View>
+                            </View>
+                        </View> 
+                        {this.state.quantityError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.quantityErrorMessage}</Text>}
+                    </>
                     :
                     <View></View>
                 }
                 {
-                    this.state.jamb ?
-                    <View style={[styles.formLine, {marginTop:'1%'}]}>
-                        <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Profile Code</Text>
-                            <TextInput placeholder="Type in profile code" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="profile_code" onChangeText={(profile_code) => this.setState({profile_code})}/>
+                    this.state.jamb ?    
+                    <>
+                        <View style={[styles.formLine, {marginTop:'1.2%'}]}>            
+                            <View style={styles.formCenter}>
+                                <Text style={styles.labeltext}>Profile Code</Text>
+                                <View roundedc style={styles.inputitem}>
+                                    <FontAwesome5 name={'sort-numeric-up'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                    <TextInput placeholder="Type in profile code" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="profile_code" onChangeText={(profile_code) => this.setProfileCode(profile_code)}/>
+                                    <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
+                                        <Text style={styles.verifyButtonText}>Verify</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>  
+                        {this.state.profileError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.profileErrorMessage}</Text>}
+                        <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                            <View style={styles.formCenter}>
+                                <Text style={styles.labeltext}>Recipient Name</Text>
+                                <View roundedc style={[styles.inputitem, {height:40}]}>
+                                    <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                    <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6'}}>{this.state.customerName}</Text>
+                                </View>
+                            </View>
                         </View>
-                    </View>
+                    </>  
                     :
                     <View></View> 
                 }
 
-                <View style={[styles.formLine, {marginTop:'2%'}]}>
+                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Recipient Phone-Number</Text>
-                        <TextInput placeholder="Type in recipient phone-number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phone_number" onChangeText={(phone_number) => this.setState({phone_number})}/>
+                        <View roundedc style={styles.inputitem}>
+                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput placeholder="Type in recipient phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phone" onChangeText={(phone) => this.setPhone(phone)} value={this.state.phone.toString()}/>
+                        </View>
                     </View>
-                </View> 
-                
+                </View>
+                {this.state.phoneError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.phoneErrorMessage}</Text>}
                 
                 {/* Card Option*/}
                 <View
                     style={{
                         backgroundColor:'#fff',
-                        marginTop:'3%',
+                        marginTop:'5%',
                         marginLeft: '4%',
                         borderRadius: 30,
                         borderWidth: 1,
                         marginRight: '4%',
                         borderColor: 'transparent',
-                        elevation: 2
+                        elevation: 20
                     }}>
                     <View 
                         style={{
                             paddingLeft:1,
-                            marginTop:'2%',
+                            marginTop:'3%',
                             marginLeft:'2%',
                             marginRight:'6%'
                         }}
@@ -913,7 +935,7 @@ export default class Education extends Component {
                                 <View style={{marginLeft:'1%', padding:7}}>
                                     <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
                                     <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
-                                    <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
+                                    <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:25, marginLeft:-7, borderRadius:20 }}/>
                                 </View>
                             </TouchableOpacity>
                         </View> 
@@ -936,7 +958,6 @@ export default class Education extends Component {
                         </View> 
                     </View>   
                 </View> 
-
                 {/* Card Option */}
 
                 <TouchableOpacity
@@ -951,7 +972,7 @@ export default class Education extends Component {
                     </Text>
                 </TouchableOpacity>
 
-            </View>
+            </ScrollView>
         );
     }
 }

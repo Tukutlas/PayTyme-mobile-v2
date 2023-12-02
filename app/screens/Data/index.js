@@ -137,6 +137,19 @@ export default class Data extends Component {
                     ],
                     {cancelable: false},
                 );
+            }else if(response_status == 'error'){
+                Alert.alert(
+                'Session Out',
+                'Your session has timed-out. Login and try again',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => this.props.navigation.navigate('Signin'),
+                        style: 'cancel',
+                    }, 
+                ],
+                {cancelable: false},
+                );
             }
         })
         .catch((error) => {
@@ -499,6 +512,8 @@ export default class Data extends Component {
         })
         if(phone !== ''){
             this.setState({phoneError: false})
+        }else if(phone == ''){
+            this.setState({phoneError: true, phoneErrorMessage: 'Recipient phone number must be inserted'})
         }
     }
 

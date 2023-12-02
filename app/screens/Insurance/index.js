@@ -828,7 +828,6 @@ export default class Insurance extends Component {
                         <Text style={styles.labeltext}>Vehicle Engine Number</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'sort-numeric-up'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            
                             <TextInput placeholder="Type in your vehicle engine number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="engineNumber" onChangeText={(engineNumber) => this.setEngineNo(engineNumber)}/>
                         </View>
                         {this.state.engineError && <Text style={{ color: 'red' }}>{this.state.engineErrorMessage}</Text>}

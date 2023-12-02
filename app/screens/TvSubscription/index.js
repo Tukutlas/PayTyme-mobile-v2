@@ -160,6 +160,19 @@ export default class TvSubscription extends Component {
                 //     ],
                 // {cancelable: false},
                 // );
+            }else if(response_status == 'error'){
+                Alert.alert(
+                'Session Out',
+                'Your session has timed-out. Login and try again',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => this.props.navigation.navigate('Signin'),
+                        style: 'cancel',
+                    }, 
+                ],
+                {cancelable: false},
+                );
             }
         })
         .catch((error) => {
