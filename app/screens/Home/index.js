@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Alert, StatusBar, TouchableOpacity, Image, View, Text, Platform, ToastAndroid } from 'react-native';
+import { Alert, StatusBar, Modal, TouchableOpacity, Image, View, Text, Platform, ToastAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import Spinner from "react-native-loading-spinner-overlay";
 import * as Font from 'expo-font';
 import { GlobalVariables } from '../../../global';
 import * as Clipboard from 'expo-clipboard';
@@ -16,8 +17,10 @@ export default class Home extends Component {
             balance: "...",
             username: "...",
             wallet_id: "",
-            view: true,
-            profilePicture: null
+            tier: "",
+            view: false,
+            profilePicture: null,
+            isLoading: true
         };
     }
 
@@ -33,11 +36,14 @@ export default class Home extends Component {
                 await AsyncStorage.getItem('login_response')).user.access_token,
             username: JSON.parse(
                 await AsyncStorage.getItem('login_response')).user.username,
+            tier: JSON.parse(
+                await AsyncStorage.getItem('login_response')).user.tier
         });
         if (JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null) {
             this.setState({ profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image })
         }
         this.loadWalletBalance();
+        this.checkIfUserHasVirtualAccount();
         let walletVisibility = await AsyncStorage.getItem('walletVisibility');
         if(walletVisibility != null && walletVisibility == "true"){
             this.setWalletVisibility(true)
@@ -55,7 +61,9 @@ export default class Home extends Component {
             'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
             'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
+            'Lato-Regular': require('../../Fonts/Lato-Regular.ttf'),
         });
+
         this.setState({ fontLoaded: true });
     }
 
@@ -98,6 +106,13 @@ export default class Home extends Component {
                 // console.log(error)
             });
 
+    }
+
+    async checkIfUserHasVirtualAccount(){
+        let showVirtualModal = await AsyncStorage.getItem('showVirtualModal');
+        if(showVirtualModal == 'true'){
+            this.setModalVisible(true)
+        }
     }
 
     setModalVisible = (visible) => {
@@ -150,6 +165,7 @@ export default class Home extends Component {
 
         return (
             <View style={styles.container}>
+                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'} />
                 <View style={styles.header}>
                     <View style={styles.left}>
                         <Text style={styles.greeting}>Hi, {this.state.username}</Text>
@@ -169,39 +185,39 @@ export default class Home extends Component {
                         </View>
                     </View>
                 </View>
-                    <View style={styles.headerButtom}>
-                        <View style={{ flexDirection: 'row', padding: 15 }}>
-                            <View style={{ flex: 4, alignItems: "center", marginLeft: '7.0%' }}>
-                                <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#fff', fontFamily: "SFUIDisplay-Medium" }}> Wallet Balance</Text>
-                                {this.state.view == true ?
-                                    <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: '0%', color: "#fff", fontFamily: "SFUIDisplay-Medium" }}>₦{(this.state.balance == "" || this.state.balance == null) ? this.numberFormat(0) : this.numberFormat(this.state.balance)}</Text>
-                                    :
-                                    <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: '0%', color: "#fff", fontFamily: "SFUIDisplay-Medium" }}>****</Text>
-                                }
-                                <View style={{ flexDirection: 'row', padding: 5 }}>
-                                    <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.props.navigation.navigate('Tabs', { screen: 'Send' }) }}>
-                                        <FontAwesome name={'send'} size={20} color={'#fff'} />
-                                        <Text style={{ fontFamily: "SFUIDisplay-Medium", color: '#fff' }}>Send </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.props.navigation.navigate("WalletTopUp") }}>
-                                        <FontAwesome5 name={'wallet'} size={20} color={'#fff'} />
-                                        <Text style={{ fontFamily: "SFUIDisplay-Medium", color: '#fff' }}>Fund Wallet</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            <View style={{ alignItems: "flex-end" }}>
-                                {
-                                    this.state.view == true ?
-                                        <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.setWalletVisibility(false) }}>
-                                            <FontAwesome5 name={'eye-slash'} size={12} color={'#fff'} />
-                                        </TouchableOpacity> :
-                                        <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.setWalletVisibility(true) }}>
-                                            <FontAwesome5 name={'eye'} size={12} color={'#fff'} />
-                                        </TouchableOpacity>
-                                }
+                <View style={styles.headerButtom}>
+                    <View style={{ flexDirection: 'row', padding: 15 }}>
+                        <View style={{ flex: 4, alignItems: "center", marginLeft: '7.0%' }}>
+                            <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#fff', fontFamily: "SFUIDisplay-Medium" }}> Wallet Balance</Text>
+                            {this.state.view == true ?
+                                <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: '0%', color: "#fff", fontFamily: "SFUIDisplay-Medium" }}>₦{(this.state.balance == "" || this.state.balance == null) ? this.numberFormat(0) : this.numberFormat(this.state.balance)}</Text>
+                                :
+                                <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: '0%', color: "#fff", fontFamily: "SFUIDisplay-Medium" }}>****</Text>
+                            }
+                            <View style={{ flexDirection: 'row', padding: 5 }}>
+                                <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.props.navigation.navigate('Tabs', { screen: 'Send' }) }}>
+                                    <FontAwesome name={'send'} size={20} color={'#fff'} />
+                                    <Text style={{ fontFamily: "SFUIDisplay-Medium", color: '#fff' }}>Send </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.props.navigation.navigate("WalletTopUp") }}>
+                                    <FontAwesome5 name={'wallet'} size={20} color={'#fff'} />
+                                    <Text style={{ fontFamily: "SFUIDisplay-Medium", color: '#fff' }}>Fund Wallet</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
+                        <View style={{ alignItems: "flex-end" }}>
+                            {
+                                this.state.view == true ?
+                                    <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.setWalletVisibility(false) }}>
+                                        <FontAwesome5 name={'eye-slash'} size={12} color={'#fff'} />
+                                    </TouchableOpacity> :
+                                    <TouchableOpacity style={{ padding: 5, justifyContent: 'center', alignItems: "center" }} onPress={() => { this.setWalletVisibility(true) }}>
+                                        <FontAwesome5 name={'eye'} size={12} color={'#fff'} />
+                                    </TouchableOpacity>
+                            }
+                        </View>
                     </View>
+                </View>
                 
                 <View style={styles.grid}>
                     <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Airtime") }}>
@@ -246,7 +262,50 @@ export default class Home extends Component {
                         <FontAwesome5 name={'plane-departure'} color={'#FF7D00'} size={35} />
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Flight Booking</Text>
                     </TouchableOpacity>
-                    
+                </View>
+
+                <View style={{ flex: 1}}>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={this.state.modalVisible}
+                        onRequestClose={() => {
+                            // setModalVisible(!modalVisible);
+                            this.setState({modalVisible: false})
+                        }}
+                    >
+                        <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end'}}>
+                            <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 0, width: '100%', height: '50%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
+                                <View style={{ width: '95%', height: '15%', marginTop:'2%', alignItems:"flex-end" }}>
+                                    <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '40%', width: '6%', alignItems:"center", justifyContent:"center"}} onPress={()=>{this.setState({modalVisible: false})}}>
+                                        <FontAwesome name={'times'} size={18} color={'#0C0C54'} style={{marginTop: '0%', }} />
+                                    </TouchableOpacity>
+                                </View>
+                                
+                                <View style={{ marginTop: '0%', alignItems: 'center'}}>
+                                    <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#393636", fontWeight:'600'}}>Register your BVN for better experience</Text>
+                                </View>
+                                <View style={{ marginTop: '2%', alignItems: 'center', justifyContent:"center"}}>
+                                    <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}>Kindly note that you would be required to register your BVN to have access to the Virtual account option for wallet funding and other services attached to this option. </Text>
+                                </View>
+                                
+                                <View style={{marginLeft: '3%', marginTop: '10%', }}>
+                                    <TouchableOpacity info style={styles.proceedButton} onPress={() => {this.props.navigation.navigate("CreateVirtualAccount") }}>
+                                        <Text autoCapitalize="words" style={styles.proceedText}>
+                                            Proceed
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{marginLeft: '3%', marginTop: '-15%', }}>
+                                    <TouchableOpacity info style={styles.skipButton} onPress={() => {this.setState({modalVisible: false})}}>
+                                        <Text autoCapitalize="words" style={styles.skipText}>
+                                            Skip for now
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
             </View>
         );

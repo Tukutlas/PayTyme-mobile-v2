@@ -173,6 +173,16 @@ export default class Signin extends Component {
         }
     }
 
+    async setItemValue(key, value) {
+        try {
+            await AsyncStorage.setItem(key, ""+value+"");
+            return true;
+        }
+        catch (exception) {
+            return false;
+        }
+    }
+
     setPasswordVisibility = () => {
         this.setState({ hidePassword: !this.state.hidePassword });
     }
@@ -262,18 +272,25 @@ export default class Signin extends Component {
                     let firstname = JSON.parse(responseText).data.first_name;
                     let lastname = JSON.parse(responseText).data.last_name;
                     let image = JSON.parse(responseText).data.image;
+                    let tier = JSON.parse(responseText).data.tier;
                     let response = {
                         "status": "ok",
                         "user": {
                             "access_token": "" + access_token + "",
                             "username": "" + username + "",
                             "fullname": "" + firstname + " " + lastname + "",
-                            "image": image
+                            "image": image,
+                            "tier": tier
                         }
                     };
 
                     if (this.state.compatible) {
                         this.setPersonalDetails(email, password)
+                    }
+                    if(tier == '0'){
+                        this.setItemValue('showVirtualModal', true)
+                    }else{
+                        this.setItemValue('showVirtualModal', false)
                     }
                     //remove previous records: 
                     this.removeItemValue("login_response");

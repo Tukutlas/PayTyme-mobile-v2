@@ -70,7 +70,7 @@ export default class VirtualAccount extends Component {
                         </TouchableOpacity>
                     </View> 
                     <View style={styles.headerBody}>
-                        <Text style={styles.body}>Bank Transfer via Virtual Account</Text>
+                        <Text style={styles.body}>Virtual Account</Text>
                     </View>
                     <View style={styles.right}>
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 

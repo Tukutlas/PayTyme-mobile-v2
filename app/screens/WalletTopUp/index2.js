@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Image, View, StatusBar, Platform, TouchableOpacity, BackHandler, Text, TextInput } from "react-native";
+import { Image, View, StatusBar, Modal, TouchableOpacity, BackHandler, Text, TextInput } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -19,6 +19,7 @@ const WalletTopUp = ({ navigation }) => {
     const [displayCards, setDisplayCards] = useState(false);
     const [cards, setCards] = useState([]);
     const [authToken, setAuthToken] = useState("");
+    const [tier, setTier] = useState("");
     const [paymentChannels, setPaymentChannels] = useState([
         // { label: "", value: "paystack", icon: () => <Image source={require('../../Images/Payment-Gateway/paystack.png')} style={styles.iconStyle} />},
         // { label: "", value: "flutterwave", icon: () => <Image source={require('../../Images/Payment-Gateway/flutterwave.png')} style={styles.iconStyle} />},
@@ -39,7 +40,8 @@ const WalletTopUp = ({ navigation }) => {
             setAuthToken(token);
             // Fetch user cards if necessary
             // ...
-            
+            const tier = JSON.parse(await AsyncStorage.getItem('login_response')).user.tier;
+            setTier(tier);
         };
         fetchData();
         getUserCards();
@@ -195,8 +197,11 @@ const WalletTopUp = ({ navigation }) => {
         //     checkIfUserHasCard();
         // } 
         else if (paymentChannelValue === "virtual_account") {
-            setChannelError(false);
-            alert('Virtual Account is coming soon');
+            if(tier == '0'){
+                navigation.navigate('CreateVirtualAccount');
+            }else{
+                navigation.navigate('VirtualAccount');
+            }
         } else if (paymentChannelValue === "bank_transfer") {
             // Navigate to BankTransfer screen
             navigation.navigate('BankTransfer');
@@ -252,9 +257,10 @@ const WalletTopUp = ({ navigation }) => {
                             value={amount.toString()}
                             onChangeText={(text) => setAmountValue(text)}
                         />
-                        {amountError && <Text style={{ color: 'red' }}>Please input the amount</Text>}
+                        
                     </View>
                 </View>
+                {amountError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>Please input the amount</Text>}
             </View>
             <View style={[styles.formLine, { marginTop: '5%' }]}>
                 <View style={styles.formCenter}>

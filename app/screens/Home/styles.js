@@ -120,5 +120,33 @@ module.exports = StyleSheet.create({
         fontFamily: "Roboto-Medium",
         justifyContent:'center',
         textAlign: 'center'
-    }
+    },
+
+    proceedButton: {
+        backgroundColor: "#0C0C54",
+        alignSelf: "center",
+        justifyContent: "center",
+        height: '30%',
+        borderRadius: 15,
+        width: Metrics.WIDTH * 0.71
+    },
+
+    proceedText: {
+        fontFamily: 'Roboto-Medium',
+        color: "#fff",
+        alignSelf: "center"
+    },
+
+    skipButton: {
+        alignSelf: "center",
+        borderRadius: 15,
+        width: Metrics.WIDTH * 0.71
+    },
+
+    skipText: {
+        fontFamily: 'Roboto-Medium',
+        // color: "#fff",
+        alignSelf: "center"
+    },
+
 });

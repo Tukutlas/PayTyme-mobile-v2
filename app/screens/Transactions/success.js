@@ -54,6 +54,16 @@ export default class SuccessPage extends Component {
     };
 
 
+    async setItemValue(key, value) {
+        try {
+            await AsyncStorage.setItem(key, ""+value+"");
+            return true;
+        }
+        catch (exception) {
+            return false;
+        }
+    }
+
     viewTransactionDetails(){
         let transaction_id = this.props.route.params.transaction_id;
         this.props.navigation.navigate("SingleTransaction",
@@ -92,13 +102,14 @@ export default class SuccessPage extends Component {
                 </View>
                 <View style={{marginTop:'5%', marginBottom:'0%'}}>
                     <TouchableOpacity info style={[styles.buttonPurchase, {backgroundColor:'linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), #FFFFFF'}]} onPress={() => {
-                        this.props.navigation.dispatch(
-                            CommonActions.reset({
-                                routes: [
-                                    { name: 'Tabs' }
-                                ],
-                            })
-                        );
+                            this.setItemValue('showVirtualModal', false),
+                            this.props.navigation.dispatch(
+                                CommonActions.reset({
+                                    routes: [
+                                        { name: 'Tabs' }
+                                    ],
+                                })
+                            );
                         }}
                     >
                         <Text autoCapitalize="words" style={{color:'#0C0C54', alignSelf: "center"}}>

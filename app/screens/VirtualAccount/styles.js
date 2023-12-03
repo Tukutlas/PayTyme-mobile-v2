@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     text:{
         fontFamily: "Roboto-Regular",
         color: "black",
-        fontSize: 14,
+        fontSize: 15,
     },
     
     right: {
