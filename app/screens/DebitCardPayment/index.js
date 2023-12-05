@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image, TouchableOpacity, BackHandler, Alert, View } from 'react-native';
+import { Text, StatusBar, Image, TouchableOpacity, BackHandler, Alert, View } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { FontAwesome5 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -1248,6 +1248,11 @@ export default class DebitCardPayment extends Component {
 
     render() {
         const { navigation } = this.props;
+        StatusBar.setBarStyle("light-content", true);
+        if (Platform.OS === "android") {
+          StatusBar.setBackgroundColor("#ffff", true);
+          StatusBar.setTranslucent(true);
+        }
         return (
             <View style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Image, View, StatusBar, Modal, TouchableOpacity, BackHandler, Text, TextInput } from "react-native";
+import { Image, View, StatusBar, Modal, TouchableOpacity, BackHandler, Text, TextInput , Platform} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -229,7 +229,7 @@ const WalletTopUp = ({ navigation }) => {
     return (
         <View style={{ backgroundColor: "#ffff", flex: 1 }}>
             <Spinner visible={isLoading} textContent={''} color={'blue'} />
-            <StatusBar barStyle="light-content" />
+            <StatusBar barStyle="light-content" backgroundColor={Platform.OS === "android" ? '#ffff' : ''} translucent={true}/>
             <View style={styles.header}>
                 <View style={styles.left}>
                     <TouchableOpacity onPress={() => navigation.navigate(transaction ? "Tabs" : "Tabs")}>

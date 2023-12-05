@@ -268,11 +268,11 @@ export default class Signup extends Component {
 
     render() {
         StatusBar.setBarStyle("light-content", true);
-    
+        
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("transparent", true);
+          StatusBar.setBackgroundColor("#ffff", true);
           StatusBar.setTranslucent(true);
-        }   
+        } 
 
         return (
             <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} contentContainerStyle={[styles.container, {backgroundColor: 'white'}]} scrollEnabled={true}>

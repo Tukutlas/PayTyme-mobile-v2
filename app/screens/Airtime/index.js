@@ -419,7 +419,7 @@ export default class Airtime extends Component {
         const { navigation } = this.props;
         StatusBar.setBarStyle("light-content", true);
         if (Platform.OS === "android") {
-            StatusBar.setBackgroundColor("#445cc4", true);
+            StatusBar.setBackgroundColor("#ffff", true);
             StatusBar.setTranslucent(true);
         }
     

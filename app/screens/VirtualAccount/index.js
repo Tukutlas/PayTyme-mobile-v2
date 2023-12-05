@@ -54,11 +54,10 @@ export default class VirtualAccount extends Component {
     }
 
     render(){
-        StatusBar.setBarStyle("light-content", true);  
-
+        StatusBar.setBarStyle("light-content", true);
         if (Platform.OS === "android") {
-            StatusBar.setBackgroundColor("#445cc4", true);
-            StatusBar.setTranslucent(true);
+          StatusBar.setBackgroundColor("#ffff", true);
+          StatusBar.setTranslucent(true);
         }
         return (
             <View style={styles.container}>

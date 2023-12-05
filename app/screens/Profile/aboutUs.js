@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {BackHandler} from 'react-native';
+import {BackHandler, StatusBar} from 'react-native';
 import { WebView } from 'react-native-webview';
 
 export default class AboutUs extends Component {
@@ -24,6 +24,11 @@ export default class AboutUs extends Component {
     };
 
     render() {
+        StatusBar.setBarStyle("light-content", true);
+        if (Platform.OS === "android") {
+          StatusBar.setBackgroundColor("#ffff", true);
+          StatusBar.setTranslucent(true);
+        }
         return (
             <WebView
                 source={{ uri: "https://paytyme.com.ng" }}

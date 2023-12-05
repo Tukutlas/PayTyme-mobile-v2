@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BackHandler, View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { BackHandler, View, Text, TouchableOpacity, StatusBar, ScrollView, Image } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import styles from './faqStyles';
 
@@ -26,6 +26,11 @@ class FAQ extends Component {
     };
 
     render() {
+        StatusBar.setBarStyle("light-content", true);
+        if (Platform.OS === "android") {
+          StatusBar.setBackgroundColor("#ffff", true);
+          StatusBar.setTranslucent(true);
+        }
         const faqs = [
             {
                 question: "What types of bills can I pay through this platform?",
