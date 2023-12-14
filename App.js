@@ -21,13 +21,15 @@ import Airtime from './app/screens/Airtime';
 import Data from './app/screens/Data';
 import TvSubscription from './app/screens/TvSubscription';
 import Insurance from './app/screens/Insurance';
-// import Education from './app/screens/Education';
+import Education from './app/screens/Education';
 import Betting from './app/screens/Betting';
 import Electricity from './app/screens/Electricity';
 import Paystack from './app/screens/Paystack';
 import DebitCardPayment from './app/screens/DebitCardPayment';
 import NewDebitCardPayment from './app/screens/DebitCardPayment/New';
 // import PaymentConfirmation from './app/screens/PaymentConfirmation';
+import CreateVirtualAccount from './app/screens/VirtualAccount/create';
+import VirtualAccount from './app/screens/VirtualAccount';
 import ForgotPassword from './app/screens/ForgotPassword';
 import ResetPassword from './app/screens/ForgotPassword/ResetPassword';
 import Otp from './app/screens/ForgotPassword/Otp';
@@ -88,7 +90,7 @@ const RootStack = () => {
                 <Stack.Screen name="Airtime" component={Airtime} />
                 <Stack.Screen name="Data" component={Data} />
                 <Stack.Screen name="TvSubscription" component={TvSubscription}/>
-                {/* <Stack.Screen name="Education" component={Education} /> */}
+                <Stack.Screen name="Education" component={Education} />
                 <Stack.Screen name="Betting" component={Betting} />
                 <Stack.Screen name="Electricity" component={Electricity} />
                 <Stack.Screen name="WalletTopUp" component={WalletTopUp} />
@@ -100,6 +102,8 @@ const RootStack = () => {
                 <Stack.Screen name="BankTransfer" component={BankTransfer} />
                 <Stack.Screen name="DebitCardPayment" component={DebitCardPayment} />
                 <Stack.Screen name="NewDebitCardPayment" component={NewDebitCardPayment} />
+                <Stack.Screen name="CreateVirtualAccount" component={CreateVirtualAccount} />
+                <Stack.Screen name="VirtualAccount" component={VirtualAccount} />
                 <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
                 <Stack.Screen name="ResetPassword" component={ResetPassword} />
                 <Stack.Screen name="Otp" component={Otp}/>

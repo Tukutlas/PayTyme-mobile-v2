@@ -23,7 +23,7 @@ const WalletTopUp = ({ navigation }) => {
     const [paymentChannels, setPaymentChannels] = useState([
         // { label: "", value: "paystack", icon: () => <Image source={require('../../Images/Payment-Gateway/paystack.png')} style={styles.iconStyle} />},
         // { label: "", value: "flutterwave", icon: () => <Image source={require('../../Images/Payment-Gateway/flutterwave.png')} style={styles.iconStyle} />},
-        { label: "Card", value: "card", icon: () =>  <FontAwesome5 name={'credit-card'} color={'#fof'} size={20}/>},
+        { label: "Card", value: "card", icon: () =>  <FontAwesome5 name={'credit-card'} color={'#000'} size={20}/>},
         { label: "Virtual Account", value: "virtual_account" , icon: () => <Image source={require('../../Images/Bank/default-image.png')} style={styles.iconStyle2} />},
         { label: "Bank Transfer", value: "bank_transfer" , icon: () => <Image source={require('../../Images/Bank/default-image.png')} style={styles.iconStyle2} />},
         
