@@ -256,7 +256,7 @@ export default class WalletTopUp extends Component {
     }
 
     render(){
-        StatusBar.setBarStyle("light-content", true);  
+        StatusBar.setBarStyle("dark-content", true);  
 
         if (Platform.OS === "android") {
             StatusBar.setBackgroundColor("#445cc4", true);

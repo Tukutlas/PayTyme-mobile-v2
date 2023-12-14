@@ -74,7 +74,7 @@ export default class SuccessPage extends Component {
     }
 
     render(){
-        StatusBar.setBarStyle("light-content", true);
+        StatusBar.setBarStyle("dark-content", true);
         
         if (Platform.OS === "android") {
           StatusBar.setBackgroundColor("#ffff", true);
@@ -88,12 +88,15 @@ export default class SuccessPage extends Component {
                 <View>
                     <Image source={require('../../Images/success.jpg')} style={{height:'72%', width:'100%',}}/>
                 </View>
-                <View style={{backgrouncColor:'black', marginBottom:'0%'}}>
-                    <Text autoCapitalize="words" style={{color:'#0C0C54',marginTop:'-50%', alignSelf: "center", fontSize:42, fontWeight:'bold'}}>
-                        Transaction Successful
+                <View style={{backgrouncColor:'black', marginBottom:'0%', marginTop:'-50%', alignSelf: "center"}}>
+                    <Text autoCapitalize="words" style={{color:'#0C0C54', fontSize:42, fontWeight:'bold'}}>
+                        Transaction 
+                    </Text>
+                    <Text autoCapitalize="words" style={{color:'#0C0C54', fontSize:42, fontWeight:'bold'}}>
+                        {this.props.route.params.status == 'processing' ?  ' Processing' : ' Successful'}
                     </Text>
                 </View>
-                <View style={{marginTop:'-15%', marginBottom:'0%'}}>
+                <View style={{marginTop:'5%', marginBottom:'0%'}}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => {this.viewTransactionDetails();}}>
                         <Text autoCapitalize="words" style={{color:'white',alignSelf: "center"}}>
                             View Details

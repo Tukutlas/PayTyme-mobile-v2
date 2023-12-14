@@ -59,7 +59,7 @@ export default class ResetPassword extends Component {
     }
 
     setCPasswordVisibility = () => {
-        this.setState({ hideCPassword: !this.state.ChidePassword });
+        this.setState({ hideCPassword: !this.state.hideCPassword });
     }
 
     showLoader() {
@@ -119,7 +119,6 @@ export default class ResetPassword extends Component {
     }
 
     resetPassword() {
-
         let phone = this.state.phone;
         let password = this.state.password;
         let confirm_password = this.state.confirm_password;
@@ -144,8 +143,8 @@ export default class ResetPassword extends Component {
                 .then((responseText) => {
                     this.setState({ isLoading: false });
                     let response_status = JSON.parse(responseText).status;
-                    console.log(JSON.parse(responseText));
                     if (response_status == true) {
+                        AsyncStorage.setItem('password',  password);
                         Alert.alert(
                             'Success',
                             'Password Reset Complete',
@@ -187,7 +186,7 @@ export default class ResetPassword extends Component {
     }
 
     render() {
-        StatusBar.setBarStyle("light-content", true);
+        StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
             StatusBar.setBackgroundColor("#ffff", true);
             StatusBar.setTranslucent(true);
@@ -209,29 +208,33 @@ export default class ResetPassword extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')} />
                     </View>
                 </View>
-                <View style={[styles.formline]}>
+                <View style={[styles.formLine, { paddingTop: 10 }]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter your Password</Text>
-                        <View roundedc style={styles.textBoxContainer}>
-                            <TextInput placeholder="Type in the new Password" secureTextEntry={this.state.hidePassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })} value={this.state.password} />
+                        <View roundedc style={styles.inputitem}>
+                            <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput placeholder="Type in the new Password" secureTextEntry={this.state.hidePassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })}/>
                             <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
                                 <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                             </TouchableOpacity>
+                            {/* <TextInput placeholder="" secureTextEntry={true} style={styles.input}  placeholderTextColor={"#000"} ref="password" onChangeText={(password) => this.setState({password})} value={this.state.password}/> */}
                         </View>
                     </View>
                 </View>
-                <View style={[styles.formline]}>
+                <View style={[styles.formLine, {marginTop:'2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Confirm Password</Text>
-                        <View roundedc style={styles.textBoxContainer}>
-                            <TextInput placeholder="Confirm the new Password" secureTextEntry={this.state.hideCPassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="confirm_password" onChangeText={(confirm_password) => this.setState({ confirm_password })} value={this.state.confirm_password} />
+                        <View roundedc style={styles.inputitem}>
+                            <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput placeholder="Confirm the new Password" secureTextEntry={this.state.hideCPassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="confirm_password" onChangeText={(confirm_password) => this.setState({ confirm_password })}/>
                             <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setCPasswordVisibility}>
-                                <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
+                                <Image source={(this.state.hideCPassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                             </TouchableOpacity>
+                            {/* <TextInput placeholder="" secureTextEntry={true} style={styles.input}  placeholderTextColor={"#000"} ref="password" onChangeText={(password) => this.setState({password})} value={this.state.password}/> */}
                         </View>
                     </View>
                 </View>
-
+                
                 <View style={{ marginTop: '95%' }}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => { this.resetPassword(); }}>
                         <Text autoCapitalize="words" style={{ color: 'white' }}>

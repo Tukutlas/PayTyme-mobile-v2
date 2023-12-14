@@ -7,6 +7,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as Font from 'expo-font';
 import * as Clipboard from 'expo-clipboard';
+import { GlobalVariables } from '../../../global';
 
 export default class VirtualAccount extends Component {
     constructor(props) {
@@ -20,11 +21,20 @@ export default class VirtualAccount extends Component {
             isProgress: false,
             
             auth_token: '',
+            bank_name: '',
+            account_number: '',
+            account_name: ''
         }
     }
 
     async componentDidMount() {
-        this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});
+        this.setState(
+            {
+                auth_token:JSON.parse( 
+                    await AsyncStorage.getItem('login_response')
+                ).user.access_token
+            }
+        );
         
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         await Font.loadAsync({
@@ -41,6 +51,7 @@ export default class VirtualAccount extends Component {
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
         });
         this.setState({ fontLoaded: true });
+        this.virtualAccount();
     }
 
     backPressed = () => {
@@ -53,15 +64,71 @@ export default class VirtualAccount extends Component {
         ToastAndroid.show('Paytyme Account Number Copied', ToastAndroid.SHORT);
     }
 
+    async virtualAccount(){
+        let bank_details = await AsyncStorage.getItem('bank_details');
+
+        if(bank_details == null){
+            //getVirtualAccount
+            let myHeaders = new Headers();
+            myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+            myHeaders.append("Content-Type", "application/json");
+
+            let requestOptions = {
+                method: 'GET',
+                headers: myHeaders
+            };
+            
+            fetch(GlobalVariables.apiURL+'/bank-account', requestOptions)
+            .then(response => response.text())
+            .then(responseText => 
+            {
+                let result = JSON.parse(responseText);
+                if(result.status == true){
+                    let bank = result.data.bank_name;
+                    let account_name = result.data.account_name;
+                    let account_number = result.data.account_number;
+                    
+                    let bank_details = {
+                        "bank": "" + bank + "",
+                        "account_name": "" + account_name + "",
+                        "account_number": "" + account_number + "",
+                    };
+                    AsyncStorage.setItem('bank_details', JSON.stringify(bank_details))
+                    // result.message
+                    this.setState({bank_name: bank, account_name:account_name, account_number:account_number});
+                }else if(result.status != true){
+                    this.props.navigation.navigate('CreateVirtualAccount')
+                    this.setState({isLoading:false});
+                }else{
+                    this.props.navigation.navigate('CreateVirtualAccount')
+                    this.setState({isLoading:false});
+                }
+            })
+            .catch((error) => {
+                this.setState({isLoading:false});
+                alert("Network error. Please check your connection settings");
+            });
+        }else{
+            this.setState({
+                bank_name: JSON.parse(
+                    await AsyncStorage.getItem('bank_details')).bank,
+                account_number: JSON.parse(
+                    await AsyncStorage.getItem('bank_details')).account_number,
+                account_name: JSON.parse(
+                    await AsyncStorage.getItem('bank_details')).account_name
+            });
+        }
+    }
+
     render(){
-        StatusBar.setBarStyle("light-content", true);
+        StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
           StatusBar.setBackgroundColor("#ffff", true);
           StatusBar.setTranslucent(true);
         }
         return (
             <View style={styles.container}>
-                <Spinner visible={this.state.isLoading} textContent={''}  />  
+                <Spinner visible={this.state.isLoading} textContent={''}  color={'blue'}/>  
                 <View style={styles.header}>
                     <View style={styles.left}>
                         <TouchableOpacity onPress={() =>this.backPressed()}>
@@ -94,8 +161,8 @@ export default class VirtualAccount extends Component {
                 </View>
                 <View style={styles.accountBox}>
                     <View style={styles.accountLeft}>
-                        <Text style={styles.text2}> Paytyme Technologies </Text>
-                        <Text style={[styles.text2, {alignSelf: "center"}]}>Limited.</Text>
+                        <Text style={[styles.text2, {alignSelf: "center"}]}> {this.state.account_name}</Text>
+                        {/* <Text style={[styles.text2, {alignSelf: "center"}]}>Limited.</Text> */}
                     </View> 
                     <View style={styles.accountRight}>
                         <TouchableOpacity onPress={() => this.copyAccountNumber()}>
@@ -103,8 +170,8 @@ export default class VirtualAccount extends Component {
                         </TouchableOpacity>
                         
                         <View style={{marginLeft: '3%'}}>
-                            <Text style={[styles.text2, {color: 'black', alignSelf: "center"}]} selectable={true}>1024141760</Text>
-                            <Text style={[styles.text2, {color: 'black', alignSelf: "center"}]}>UBA</Text>
+                            <Text style={[styles.text2, {color: 'black', alignSelf: "center"}]} selectable={true}>{this.state.account_number}</Text>
+                            <Text style={[styles.text2, {color: 'black', alignSelf: "center"}]}>{this.state.bank_name}</Text>
                         </View>
                     </View> 
                 </View>

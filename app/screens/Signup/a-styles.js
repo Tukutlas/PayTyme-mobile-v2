@@ -31,14 +31,14 @@ const styles = StyleSheet.create({
     width: 220,
   },
 
-  body:{
+  body: {
     fontFamily: "Roboto-Regular",
     color: "black",
     fontSize: 24,
-    fontWeight:'bold'
+    fontWeight: 'bold'
   },
 
-  text:{
+  text: {
     fontFamily: "Roboto-Regular",
     color: "black",
     fontSize: 14,
@@ -56,31 +56,31 @@ const styles = StyleSheet.create({
     height: Metrics.HEIGHT * 0.08,
     borderColor: "white",
     borderWidth: 3,
-    backgroundColor:'#fff'
+    backgroundColor: '#fff'
   },
 
-  formLine:{
+  formLine: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor:'#fff',
+    backgroundColor: '#fff',
     width: '100%',
     // paddingTop:0
     paddingTop: Metrics.HEIGHT * 0.00001,
   },
 
-  formCenter:{
+  formCenter: {
     paddingLeft: Metrics.WIDTH * 0.0421,
     width: Metrics.WIDTH * 1.05
   },
 
   inputitem: {
-    borderRightColor:'transparent',
-    borderWidth:0,
-    elevation:0,
-    borderRadius:1,
+    borderRightColor: 'transparent',
+    borderWidth: 0,
+    elevation: 0,
+    borderRadius: 1,
     width: '90%',
-    backgroundColor:'#F6F6F6',
-    marginTop:'0.5%',
+    backgroundColor: '#F6F6F6',
+    marginTop: '0.5%',
     height: 45
   },
 
@@ -106,14 +106,14 @@ const styles = StyleSheet.create({
     alignSelf: "center"
   },
 
-  input:{
-    paddingLeft:'2%',
+  input: {
+    paddingLeft: '2%',
   },
 
-  labeltext:{
-    color:'#222222',
-    marginTop:'1%',
-    fontSize:14,
+  labeltext: {
+    color: '#222222',
+    marginTop: '1%',
+    fontSize: 14,
     fontFamily: "Roboto-Medium",
   },
 
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     paddingVertical: 0,
     borderRadius: 2,
-    backgroundColor:'#F6F6F6',
+    backgroundColor: '#F6F6F6',
   },
 
   touchableButton: {
@@ -142,19 +142,19 @@ const styles = StyleSheet.create({
     marginRight: Metrics.WIDTH * 0.10,
   },
 
-  formline:{
+  formline: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor:'#fff',
+    backgroundColor: '#fff',
     width: '100%'
   },
 
-  inputIcon:{
-      position: 'absolute',
-      marginLeft: 6,
-      height: 20,
-      width: 35,
-      padding: 2
+  inputIcon: {
+    position: 'absolute',
+    marginLeft: 6,
+    height: 20,
+    width: 35,
+    padding: 2
   },
 
   buttonImage: {
@@ -163,40 +163,40 @@ const styles = StyleSheet.create({
     width: '5%'
   },
 
-  grid:{
-    flexDirection:'row',
-    padding:1,
-    width:'100%',
+  grid: {
+    flexDirection: 'row',
+    padding: 1,
+    width: '100%',
     // marginTop: 50
     paddingTop: Metrics.HEIGHT * 0.015,
   },
 
-  flexx:{
-    height:60,
-    justifyContent:'center',
-    alignItems:'center',
-    margin:'4%',
-    elevation:8,
-    flex:3,
-    borderRadius:10,
-    backgroundColor:'#E0EBEC'
+  flexx: {
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '4%',
+    elevation: 8,
+    flex: 3,
+    borderRadius: 10,
+    backgroundColor: '#E0EBEC'
   },
 
-  flexa:{
-    height:20,
-    justifyContent:'center',
-    alignItems:'center',
-    margin:'4%',
-    elevation:8,
-    flex:3,
-    borderRadius:10,
-    backgroundColor:'#E0EBEC'
+  flexa: {
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '4%',
+    elevation: 8,
+    flex: 3,
+    borderRadius: 10,
+    backgroundColor: '#E0EBEC'
   },
 
-  grida:{
-    flexDirection:'row',
-    padding:1,
-    width:'90%',
+  grida: {
+    flexDirection: 'row',
+    padding: 1,
+    width: '90%',
     marginTop: 15,
     // marginLeft: -20
     // marginRight: Metrics.WIDTH * 0.2
@@ -205,25 +205,32 @@ const styles = StyleSheet.create({
   circle: {
     height: 20,
     width: 20,
-    borderRadius: 10,  
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ACACAC',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  checkedCircle: {  
+  checkedCircle: {
     width: 14,
     height: 14,
     borderRadius: 7,
     backgroundColor: '#445cc4',
   },
 
-  buttonpaymentmethod:{
-   borderWidth:4,
-   borderColor:'#f5f5f5'
+  buttonpaymentmethod: {
+    borderWidth: 4,
+    borderColor: '#f5f5f5'
   },
 
+  otpItem: {
+    backgroundColor: '#F6F6F6',
+  },
+
+  otpContainer: {
+    marginTop: '3%'
+  }
 });
 
 export default styles;

@@ -8,7 +8,7 @@ import { GlobalVariables } from '../../../global';
 import { OtpInput } from "react-native-otp-entry";
 import * as Font from 'expo-font';
 
-export default class Transactions extends Component {
+export default class CreateVirtualAccount extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
@@ -198,7 +198,7 @@ export default class Transactions extends Component {
         }
     }
 
-    verifyBVNOtp(){
+    verifyBVNOt(){
         let otp = this.state.otp
         if (otp == '') {
             this.setState({otpError: true, otpErrorMessage: 'Please Kindly insert the verification code'})
@@ -289,6 +289,94 @@ export default class Transactions extends Component {
             })
             .catch((error) => {
                 console.log(error)
+                this.setState({isLoading:false});
+                alert("Network error. Please check your connection settings");
+            });   
+        }
+    }
+
+    verifyBVNOtp(){
+        let otp = this.state.otp
+        if (otp == '') {
+            this.setState({otpError: true, otpErrorMessage: 'Please Kindly insert the verification code'})
+        }else if(otp != ''){ 
+            let myHeaders = new Headers();
+            myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+            myHeaders.append("Content-Type", "application/json");
+
+            let raw = JSON.stringify({
+                "phone": this.state.phone,
+                "verification_code": otp
+            });
+
+            let requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw
+            };
+            
+            this.setState({isLoading:true});
+            
+            fetch(GlobalVariables.apiURL+'/auth/verify-profile', requestOptions)
+            .then(response => response.text())
+            .then(responseText => 
+            {
+                let result = JSON.parse(responseText);
+                if(result.status == true){
+                    let bank = result.data.bank_name;
+                    let account_name = result.data.account_name;
+                    let account_number = result.data.account_number;
+                    
+                    let bank_details = {
+                        "bank": "" + bank + "",
+                        "account_name": "" + account_name + "",
+                        "account_number": "" + account_number + "",
+                    };
+                    AsyncStorage.setItem('bank_details', JSON.stringify(bank_details))
+                    // result.message
+                    Alert.alert(
+                        'Successful',
+                        result.message,
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => this.props.navigation.navigate('VirtualAccount'),
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );
+                }else if(result.status != true){
+                    Alert.alert(
+                        'Error',
+                        result.message,
+                        [
+                            {
+                                text: 'OK',
+                                // onPress: () => this.props.navigation.navigate('Signin'),
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );
+                    this.setState({isLoading:false});
+                }else{
+                    Alert.alert(
+                        'Error',
+                        result.data,
+                        [
+                            {
+                                text: 'OK',
+                                // onPress: () => this.props.navigation.navigate('Signin'),
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );
+                    this.setState({isLoading:false});
+                }
+            })
+            .catch((error) => {
                 this.setState({isLoading:false});
                 alert("Network error. Please check your connection settings");
             });   

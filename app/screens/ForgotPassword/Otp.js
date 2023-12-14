@@ -17,6 +17,7 @@ import styles from "./styles";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
+import { OtpInput } from "react-native-otp-entry";
 import * as Font from 'expo-font';
 
 export default class OTP extends Component {
@@ -81,61 +82,75 @@ export default class OTP extends Component {
         this.setState({ modalVisible1: visible });
     }
 
+    setOtp = (otp) => {
+        this.setState({
+            otp: otp
+        })
+        if(otp !== ''){
+            this.setState({otpError: false})
+        }else if(otp == ''){
+            this.setState({otpError: true, bvnErrorMessage: 'Please insert the verification code'})
+        }
+    }
+
     verifyCode(){
         this.setState({isLoading:true});
         let phone = this.state.phone;
         let otp = this.state.otp;
-        
-        fetch(GlobalVariables.apiURL+"/auth/verify-sent-code",
-        { 
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                // 'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  "phone="+phone
-                +"&verification_code="+otp
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => { 
-            this.setState({isLoading:false});
-            //  console.log(JSON.parse(responseText).data.payment_info.data.access_code)
-            let response_status = JSON.parse(responseText).status;
-            console.log(JSON.parse(responseText));
-            if(response_status == true){
-                // let message = JSON.parse(responseText).message;
-                this.props.navigation.navigate(this.props.route.params.routeName);
-                
-            }else if(response_status == false){
-                let message = JSON.parse(responseText).message;
-                Alert.alert(
-                    'Error',
-                    message,
-                    [
-                        {  
-                            text: 'Cancel',
-                            onPress: () => {
-                                // this.removeItemValue("phone");
-        
-                                // this._storePhoneNumber(phone);
-                                // this.props.navigation.navigate("Otp");
-                                this.setState({otp:''});
-                            },
-                            style: 'cancel',
-                        }
-                    ],
-                    {cancelable: false},
-                );
-            }
-        })
-        .catch((error) => {
-            alert("Network error. Please an error occured.");
-        });
+        if (otp == '') {
+            this.setState({otpError: true, otpErrorMessage: 'Please Kindly insert the verification code'})
+        }else if(otp != ''){ 
+            fetch(GlobalVariables.apiURL+"/auth/verify-sent-code",
+            { 
+                method: 'POST',
+                headers: new Headers({
+                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                    // 'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+                }),
+                body:  "phone="+phone
+                    +"&verification_code="+otp
+                // <-- Post parameters
+            }) 
+            .then((response) => response.text())
+            .then((responseText) => { 
+                this.setState({isLoading:false});
+                //  console.log(JSON.parse(responseText).data.payment_info.data.access_code)
+                let response_status = JSON.parse(responseText).status;
+                console.log(JSON.parse(responseText));
+                if(response_status == true){
+                    // let message = JSON.parse(responseText).message;
+                    this.props.navigation.navigate(this.props.route.params.routeName);
+                    
+                }else if(response_status == false){
+                    let message = JSON.parse(responseText).message;
+                    Alert.alert(
+                        'Error',
+                        message,
+                        [
+                            {  
+                                text: 'Cancel',
+                                onPress: () => {
+                                    // this.removeItemValue("phone");
+            
+                                    // this._storePhoneNumber(phone);
+                                    // this.props.navigation.navigate("Otp");
+                                    this.setState({otp:''});
+                                },
+                                style: 'cancel',
+                            }
+                        ],
+                        {cancelable: false},
+                    );
+                }
+            })
+            .catch((error) => {
+                alert("Network error. Please an error occured.");
+            });
+        }
     }
 
     render(){
-        StatusBar.setBarStyle("light-content", true);
+        StatusBar.setBarStyle("dark-content", true);
         
         if (Platform.OS === "android") {
           StatusBar.setBackgroundColor("#ffff", true);
@@ -158,12 +173,13 @@ export default class OTP extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formline]}>
+                <View style={[styles.formLine]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter OTP</Text>
-                        <View roundedc style={styles.inputitem}>
+                        {/* <View roundedc style={styles.inputitem}>
                             <TextInput  placeholder="Type in OTP" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="otp" onChangeText={(otp) => this.setState({otp})} value={this.state.otp} />
-                        </View>
+                        </View> */}
+                        <OtpInput numberOfDigits={6} onTextChange={(otp) => this.setOtp(otp)} theme={{containerStyle:styles.otpContainer, pinCodeContainerStyle:styles.otpItem}} />
                     </View>
                 </View>
                 

@@ -229,7 +229,7 @@ const WalletTopUp = ({ navigation }) => {
     return (
         <View style={{ backgroundColor: "#ffff", flex: 1 }}>
             <Spinner visible={isLoading} textContent={''} color={'blue'} />
-            <StatusBar barStyle="light-content" backgroundColor={Platform.OS === "android" ? '#ffff' : ''} translucent={true}/>
+            <StatusBar barStyle="dark-content" backgroundColor={Platform.OS === "android" ? '#ffff' : ''} translucent={true}/>
             <View style={styles.header}>
                 <View style={styles.left}>
                     <TouchableOpacity onPress={() => navigation.navigate(transaction ? "Tabs" : "Tabs")}>

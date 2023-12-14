@@ -149,14 +149,13 @@ export default class DebitCardPayment extends Component {
             let amount = this.props.route.params.amount;
             let package_name = this.props.route.params.package_name;
             let product_code = this.props.route.params.product_code;
-            let period = this.props.route.params.period;
-            let has_addon = this.props.route.params.has_addon;
-            let addon_product_code = this.props.route.params.addon_product_code;
-            let addon_amount = this.props.route.params.addon_amount;
-            let addon_product_name = this.props.route.params.addon_product_name;
-            let card = this.state.card;
-            this.payTVSubscription(amount, smart_card_no, type, package_name, product_code,
-                addon_product_code, addon_product_name, period, has_addon, addon_amount, card);
+            
+            // let addon_product_code = this.props.route.params.addon_product_code;
+            // let addon_amount = this.props.route.params.addon_amount;
+            // let addon_product_name = this.props.route.params.addon_product_name;
+            let card = this.state.card_id;
+            // let serviceProvider = this.props.route.params.serviceProvider;
+            this.payTVSubscription(amount, smart_card_no, type, package_name, product_code, card, saveCard);
         } else if (transaction_type == 'Wallet Transfer') {
             let account_id = this.props.route.params.account_id;
             let card = this.state.card_id;
@@ -655,38 +654,40 @@ export default class DebitCardPayment extends Component {
         }
     }
 
-    payTVSubscription(amount, smart_card_no, type, package_name, product_code,
-        addon_product_code, addon_product_name, period, has_addon, addon_amount, card) {
+    payTVSubscription(amount, smart_card_no, type, package_name, product_code, card, saveCard) {
         this.setState({ isLoading: true });
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + this.state.auth_token);
         myHeaders.append("Content-Type", "application/json");
-
-        let verify = "/verify";
-
-        var raw = JSON.stringify({
-            "smart_card_no": smart_card_no,
-            "type": type,
-            "amount": amount,
-            "package_name": package_name,
-            "product_code": product_code,
-            "period": period,
-            "has_addon": has_addon,
-            "channel": "card",
-            "card_position": card,
-            "callback_url": GlobalVariables.apiURL + verify,
-            "addon_product_code": addon_product_code,
-            "addon_amount": addon_amount,
-            "addon_product_name": addon_product_name
-        });
-
-        var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: raw,
-        };
-
-        fetch(GlobalVariables.apiURL + "/tv/bouquet/payment", requestOptions)
+        let serviceProvider = this.props.route.params.provider;
+        if(serviceProvider == 'shago'){
+            let hasAddon = 0;
+            if(this.props.route.params.has_addon == 0 || this.props.route.params.has_addon == ""){
+                hasAddon = 0;
+            }else{
+                hasAddon = 1;
+            }
+            var raw = JSON.stringify({
+                "smart_card_no": smart_card_no,
+                "type": type,
+                "amount": amount,
+                "package_name": package_name,
+                "product_code": product_code,
+                "period": this.props.route.params.period,
+                "has_addon": hasAddon,
+                "channel": "card",
+                "card_id": card,
+                "gateway": this.state.gatewayValue,
+                "provider": serviceProvider
+            });
+    
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+            };
+    
+            fetch(GlobalVariables.apiURL+"/tv/purchase?with_card="+ (card == '' ? "0" : "1"), requestOptions)
             .then(response => response.text())
             .then(result => {
                 //go on
@@ -695,25 +696,26 @@ export default class DebitCardPayment extends Component {
 
                 if (resultjson.status == true) {
                     this.setState({ isLoading: false });
-                    let data = JSON.parse(result).data;
-                    if (data.payment_info) {
-                        let datat = data.payment_info.data;
-                        // console.log(datat);
-                        this.props.navigation.navigate("NewDebitCardPayment",
-                            {
-                                datat: datat,
-                                verifyUrl: "/tv/bouquet/verify-payment",
-                                routeName: 'TvSubscription'
-                            });
-                    } else {
+                    let data = JSON.parse(responseText).data;
+                    if (data.payment_link) {
+                        let payment_link = data.payment_link;
+                        this.props.navigation.navigate("Paystack", { payment_link, saveCard });
+                    }else if(data.transaction.status == 'successful'){
                         this.props.navigation.navigate("SuccessPage",
-                            {
-                                transaction_id: resultjson.data.transaction.id,
-                            });
+                        {
+                            transaction_id: data.transaction.id,
+                            status: 'successful'
+                        }); 
+                    }else if(data.transaction.status == 'processing'){
+                        this.props.navigation.navigate("SuccessPage",
+                        {
+                            transaction_id: data.transaction.id,
+                            status: 'processing'
+                        }); 
                     }
                     this.setState({ isLoading: false });
                 } else {
-                    this.setState({ isProcessing: false })
+                    this.setState({ isLoading: false })
                     Alert.alert(
                         resultjson.message,
                         [
@@ -730,6 +732,72 @@ export default class DebitCardPayment extends Component {
                 this.setState({ isLoading: false });
                 alert("Network error. Please check your connection settings");
             });
+        }else if(serviceProvider == 'vtpass'){
+            var raw = JSON.stringify({
+                "smart_card_no": smart_card_no,
+                "type": type,
+                "amount": amount,
+                "package_name": package_name,
+                "product_code": product_code,
+                "channel": "card",
+                "card_id": card,
+                "gateway": this.state.gatewayValue,
+                "provider": serviceProvider
+            });
+    
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+            };
+    
+            fetch(GlobalVariables.apiURL+"/tv/purchase?with_card="+ (card == '' ? "0" : "1"), requestOptions)
+            .then(response => response.text())
+            .then(result => {
+                console.log(result)
+                //go on
+                let resultjson = JSON.parse(result);
+                console.log(resultjson);
+
+                if (resultjson.status == true) {
+                    this.setState({ isLoading: false });
+                    let data = JSON.parse(result).data;
+                    if (data.payment_link) {
+                        let payment_link = data.payment_link;
+                        this.props.navigation.navigate("Paystack", { payment_link, saveCard });
+                    }else if(data.transaction.status == 'successful'){
+                        this.props.navigation.navigate("SuccessPage",
+                        {
+                            transaction_id: data.transaction.id,
+                            status: 'successful'
+                        }); 
+                    }else if(data.transaction.status == 'processing'){
+                        this.props.navigation.navigate("SuccessPage",
+                        {
+                            transaction_id: data.transaction.id,
+                            status: 'processing'
+                        }); 
+                    }
+                    this.setState({ isLoading: false });
+                } else {
+                    this.setState({ isLoading: false })
+                    Alert.alert(
+                        resultjson.message,
+                        [
+                            {
+                                text: 'Ok',
+                                style: 'cancel',
+                            },
+                        ],
+                        { cancelable: false },
+                    );
+                }
+            })
+            .catch((error) => {
+                this.setState({ isLoading: false });
+                alert("Network error. Please check your connection settings");
+            });
+        }
     }
 
     getUserCards() {
@@ -1248,7 +1316,7 @@ export default class DebitCardPayment extends Component {
 
     render() {
         const { navigation } = this.props;
-        StatusBar.setBarStyle("light-content", true);
+        StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
           StatusBar.setBackgroundColor("#ffff", true);
           StatusBar.setTranslucent(true);
@@ -1326,8 +1394,8 @@ export default class DebitCardPayment extends Component {
                     ?
                     <View></View>
                     :
-                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
-                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({  card_id: '',primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
                             <View style={(this.state.newCard) ? styles.checkedCircle : styles.circle} />
                         </TouchableOpacity>
 
@@ -1342,8 +1410,8 @@ export default class DebitCardPayment extends Component {
 
                 {this.state.gatewayValue !== null && (!this.state.there_cards)
                     ?
-                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
-                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ card_id: '', primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
                             <View style={(this.state.newCard) ? styles.checkedCircle : styles.circle} />
                         </TouchableOpacity>
 
@@ -1359,8 +1427,8 @@ export default class DebitCardPayment extends Component {
 
                 {this.state.gatewayValue !== null && (this.state.no_of_acards == 0)
                     ?
-                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
-                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({  card_id: '', primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
                             <View style={(this.state.newCard) ? styles.checkedCircle : styles.circle} />
                         </TouchableOpacity>
 

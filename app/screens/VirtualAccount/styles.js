@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     },
 
     accountLeft: {
-        marginLeft: '6.5%'
+        marginLeft: '10%'
     },
 
     accountRight: {

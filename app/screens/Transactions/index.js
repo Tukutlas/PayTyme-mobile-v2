@@ -242,8 +242,8 @@ export default class Transactions extends Component {
         StatusBar.setBarStyle("light-content", true);
         
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#120A47", true);
+            StatusBar.setTranslucent(true);
         }
 
         return (

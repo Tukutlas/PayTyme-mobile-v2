@@ -159,7 +159,7 @@ export default class ForgotPassword extends Component {
     }
 
     render(){
-        StatusBar.setBarStyle("light-content", true);
+        StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
           StatusBar.setBackgroundColor("#ffff", true);
           StatusBar.setTranslucent(true);
@@ -181,11 +181,12 @@ export default class ForgotPassword extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formline, {marginTop: '2%'}]}>
+                <View style={[styles.formLine, {marginTop: '2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter your Phone Number</Text>
                         <View roundedc style={styles.inputitem}>
-                            <TextInput  placeholder="Type in phone Number" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="phone" onChangeText={(phone) => this.setState({phone})} value={this.state.phone} />
+                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput  placeholder="Type in phone Number" style={styles.input} keyboardType={'numeric'} placeholderTextColor={"#A9A9A9"} ref="phone" onChangeText={(phone) => this.setState({phone})} value={this.state.phone} />
                         </View>
                     </View>
                 </View>
