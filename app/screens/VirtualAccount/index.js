@@ -175,13 +175,13 @@ export default class VirtualAccount extends Component {
                         </View>
                     </View> 
                 </View>
-                <View style={{marginTop:'95%', }}>
+                {/* <View style={{marginTop:'95%', }}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => {this.props.navigation.navigate('PaymentConfirmation');}}>
                         <Text autoCapitalize="words" style={{color:'white',alignSelf: "center"}}>
                             Next
                         </Text>
                     </TouchableOpacity>
-                </View>
+                </View> */}
             </View>
         );
     }

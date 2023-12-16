@@ -126,7 +126,7 @@ export default class AccountVerification extends Component {
                         'Your account on Paytyme has been verified successfully.',
                         [
                             {
-                                text: 'Proceed to Verification',
+                                text: 'Proceed to Sign in',
                                 onPress: () => this.props.navigation.navigate(this.props.route.params.routeName),
                                 style: 'cancel',
                             }, 

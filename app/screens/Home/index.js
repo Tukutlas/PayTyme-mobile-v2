@@ -31,20 +31,23 @@ export default class Home extends Component {
     async componentDidMount() {
         //Here is the Trick
         const { navigation } = this.props;
+
         this.setState({
-            auth_token: JSON.parse(
-                await AsyncStorage.getItem('login_response')).user.access_token,
-            username: JSON.parse(
-                await AsyncStorage.getItem('login_response')).user.username,
-            tier: JSON.parse(
-                await AsyncStorage.getItem('login_response')).user.tier
+            auth_token: JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token,
+            username: JSON.parse(await AsyncStorage.getItem('login_response')).user.username,
+            tier: JSON.parse(await AsyncStorage.getItem('login_response')).user.tier
         });
+
         if (JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null) {
             this.setState({ profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image })
         }
+
         this.loadWalletBalance();
+
         this.checkIfUserHasVirtualAccount();
+
         let walletVisibility = await AsyncStorage.getItem('walletVisibility');
+
         if(walletVisibility != null && walletVisibility == "true"){
             this.setWalletVisibility(true)
         }
@@ -69,43 +72,42 @@ export default class Home extends Component {
 
     loadWalletBalance() {
         fetch(GlobalVariables.apiURL + "/wallet/details",
-            {
-                method: 'GET',
-                headers: new Headers({
-                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                    'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
-                }),
-                body: ""
-                // <-- Post parameters
-            })
-            .then((response) => response.text())
-            .then((responseText) => {
-                this.setState({ isLoading: false });
-                let response_status = JSON.parse(responseText).status;
-                if (response_status == true) {
-                    let data = JSON.parse(responseText).data;
-                    let wallet = data;
-                    this.setState({balance:parseInt(wallet.balance), wallet_id: wallet.wallet_identifier});
-                } else if (response_status == 'error') {
-                     Alert.alert(
-                       'Session Out',
-                       'Your session has timed-out. Login and try again',
-                       [
-                          {
-                           text: 'OK',
-                           onPress: () => this.props.navigation.navigate('Signin'),
-                           style: 'cancel',
-                         }, 
-                        ],
-                       {cancelable: false},
-                     );
-                }
-            })
-            .catch((error) => {
-                // alert("Network error. Please check your connection settings");
-                // console.log(error)
-            });
-
+        {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body: ""
+            // <-- Post parameters
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            this.setState({ isLoading: false });
+            let response_status = JSON.parse(responseText).status;
+            if (response_status == true) {
+                let data = JSON.parse(responseText).data;
+                let wallet = data;
+                this.setState({balance:parseInt(wallet.balance), wallet_id: wallet.wallet_identifier});
+            } else if (response_status == 'error') {
+                    Alert.alert(
+                    'Session Out',
+                    'Your session has timed-out. Login and try again',
+                    [
+                        {
+                        text: 'OK',
+                        onPress: () => this.props.navigation.navigate('Signin'),
+                        style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                    );
+            }
+        })
+        .catch((error) => {
+            // alert("Network error. Please check your connection settings");
+            // console.log(error)
+        });
     }
 
     async checkIfUserHasVirtualAccount(){
@@ -113,6 +115,10 @@ export default class Home extends Component {
         if(showVirtualModal == 'true'){
             this.setModalVisible(true)
         }
+    }
+
+    closeVirtualAccountModal(){
+        
     }
 
     setModalVisible = (visible) => {
@@ -143,7 +149,7 @@ export default class Home extends Component {
     async removeItemValue(key) {
         try {
             await AsyncStorage.removeItem(key);
-            return true;
+            // return true;
         }
         catch (exception) {
             return false;
@@ -297,7 +303,7 @@ export default class Home extends Component {
                                     </TouchableOpacity>
                                 </View>
                                 <View style={{marginLeft: '3%', marginTop: '-15%', }}>
-                                    <TouchableOpacity info style={styles.skipButton} onPress={() => {this.setState({modalVisible: false})}}>
+                                    <TouchableOpacity info style={styles.skipButton} onPress={() => {this.setState({modalVisible: false}), this.closeVirtualAccountModal()}}>
                                         <Text autoCapitalize="words" style={styles.skipText}>
                                             Skip for now
                                         </Text>
