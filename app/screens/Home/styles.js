@@ -4,8 +4,8 @@ import { Metrics } from "../../Themes/";
 module.exports = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#E0EBEC",
-       // width:290
+        backgroundColor: "#ffff",
+        // height: '100%',
     },
 
     header:{
@@ -98,6 +98,20 @@ module.exports = StyleSheet.create({
         alignItems:'center',
         margin:'4%',
         elevation:8,
+        shadowOpacity: 8,
+        flex:3,
+        borderRadius:10,
+        backgroundColor:'#E0EBEC'
+    },
+
+    flexy:{
+        height:68,
+        width: 68,
+        justifyContent:'center',
+        alignItems:'center',
+        margin:'4%',
+        elevation:8,
+        shadowOpacity: 8,
         flex:3,
         borderRadius:10,
         backgroundColor:'#E0EBEC'

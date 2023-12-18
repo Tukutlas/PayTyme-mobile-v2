@@ -20,7 +20,9 @@ export default class Home extends Component {
             tier: "",
             view: false,
             profilePicture: null,
-            isLoading: true
+            isLoading: true,
+            transactions: [],
+            transaction_list: [],
         };
     }
 
@@ -43,6 +45,7 @@ export default class Home extends Component {
         }
 
         this.loadWalletBalance();
+        this.getTransactionHistory();
 
         this.checkIfUserHasVirtualAccount();
 
@@ -108,6 +111,98 @@ export default class Home extends Component {
             // alert("Network error. Please check your connection settings");
             // console.log(error)
         });
+    }
+
+    getTransactionHistory(){
+        this.setState({isLoading:true});   
+        fetch(GlobalVariables.apiURL+"/transactions?perpage=3",
+        { 
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body:  ""         
+            // <-- Post parameters
+        }) 
+        .then((response) => response.text())
+        .then((responseText) => { 
+            this.setState({isLoading:false});
+            let response_status = JSON.parse(responseText).status;
+            if(response_status == true){
+                let data = JSON.parse(responseText).data.data;  
+                this.setState({transactions:data});
+                this.transactions();
+            }else if(response_status == false){
+                Alert.alert(
+                    'Oops',
+                    'An error occured',
+                    [
+                        {
+                            text: 'OK',
+                            // onPress: () => this.props.navigation.navigate('Signin'),
+                            onPress: () => {},
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }
+        })
+        .catch((error) => {
+            // console.log(error)
+            alert("Network error. Please check your connection settings");
+        });
+        
+    }
+
+    transactions(){
+        let transaction_list = [];
+        for (let transaction of this.state.transactions) {
+            let status = transaction.status;
+            transaction_list.push(
+                <View style={{marginTop: '2%', marginRight: '0%', borderWidth: 1, borderRadius: 10, borderColor: '#C4C4C4', height:'20%', alignSelf:'center', width:'90%', backgroundColor: '#FFFFFF'}} key={transaction.id}>
+                    <View style={{flexDirection:'row'}}>
+                        <Text style={{fontSize:10, color:'#120A47', marginLeft:'3%', width:'69%', marginTop:'0.4%'}}>{transaction.description}</Text>
+                        {
+                            status == 'successful' ?
+                            <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.4%', justifyContent: "center"}}>
+                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '4%', color:'#0c0c54', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
+                            </View>
+                            :
+                            <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.4%', justifyContent: "center"}}>
+                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '4%', color:'#f03434'}}>{transaction.status}</Text>
+                            </View>
+                        }
+                    </View>
+                    <View 
+                        style={{
+                            marginTop: '0.1%',
+                            borderBottomColor: '#C4C4C4',
+                            borderBottomWidth: 1,
+                            marginRight: '2%',
+                            marginLeft: '2%',
+                        }}
+                    >
+                    </View>
+                    <View style={{flexDirection:'row'}}>
+                        <Text style={{fontSize:10, color:'#C4C4C4', marginLeft:'4%', width:'60%', justifyContent:"center", marginTop: '1%'}}>{transaction.created_at}</Text>
+                        <TouchableOpacity style={{marginLeft:'7%', width:'25%', alignItems: "center", marginTop: '1%', borderRadius: 7, backgroundColor: "#0c0c54", marginBottom: "2%"}} onPress={()=>{ this.viewTransactionDetails(transaction.id)}}>
+                            <Text style={{fontSize:10, paddingBottom: '1%', color:'#ffff'}}>View</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )
+        }
+        this.setState({transaction_list: transaction_list});
+    }
+
+    viewTransactionDetails(transaction_id){
+        this.props.navigation.navigate("SingleTransaction",
+        {
+            route: 'transaction_page',
+            transaction_id:transaction_id,
+        }); 
     }
 
     async checkIfUserHasVirtualAccount(){
@@ -224,8 +319,46 @@ export default class Home extends Component {
                         </View>
                     </View>
                 </View>
-                
+
                 <View style={styles.grid}>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Airtime") }} >
+                        <FontAwesome5 name={'phone-alt'} color={'#1FB0EE'} size={30} />
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Buy Airtime</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Data") }}>
+                        <FontAwesome5 name={'mobile-alt'} color={'#34A853'} size={30} />
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Data Purchase</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("TVSubscription") }}>
+                        <FontAwesome5 name={'tv'} color={'#DD92D8'} size={28} />
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 9}]}>Tv Subscription</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Education") }} >
+                        <FontAwesome5 name={'graduation-cap'} color={'#4285F4'} size={30} />
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Education</Text>
+                    </TouchableOpacity>
+                </View>
+                
+                <View style={styles.gridb}>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }} >
+                        <FontAwesome5 name={'plane-departure'} color={'#FF7D00'} size={30}/>
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Flight Booking</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Betting") }} >
+                        <FontAwesome5 name={'volleyball-ball'} color={'#AA4088'} size={30} />
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Sports Betting</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Electricity") }}>
+                        <FontAwesome5 name={'lightbulb'} color={'#FFCF00'} size={30} />
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10}]}>Electricity</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Insurance") }}>
+                        <FontAwesome5 name={'car'} color={'#F03434'} size={30} />
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Insurance</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* <View style={styles.grid}>
                     <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Airtime") }}>
                         <FontAwesome5 name={'phone-alt'} color={'#1FB0EE'} size={35} />
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Buy Airtime</Text>
@@ -239,8 +372,8 @@ export default class Home extends Component {
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Tv Subscription</Text>
                     </TouchableOpacity>
                 </View>
+                
                 <View style={styles.gridb}>
-                    {/* <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }} > */}
                     <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Education") }} >
                         <FontAwesome5 name={'graduation-cap'} color={'#4285F4'} size={35} />
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Education</Text>
@@ -254,6 +387,7 @@ export default class Home extends Component {
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Electricity</Text>
                     </TouchableOpacity>
                 </View>
+
                 <View style={styles.gridb}>
                     <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("WalletTopUp") }} >
                         <FontAwesome5 name={'wallet'} color={'#34A853'} size={35} />
@@ -264,13 +398,37 @@ export default class Home extends Component {
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Insurance</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }} >
-                        {/* <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC'}]} onPress={()=>{this.props.navigation.navigate("SuccessPage")}} > */}
                         <FontAwesome5 name={'plane-departure'} color={'#FF7D00'} size={35} />
                         <Text style={[styles.menutext, { paddingTop: 13 }]}>Flight Booking</Text>
                     </TouchableOpacity>
-                </View>
+                </View> */}
 
-                <View style={{ flex: 1}}>
+                <View style={[styles.body,{borderRadius: 25, backgroundColor: '#E0EBEC', marginTop:'2%', height:'28%'}]}>
+                    <View style={{flexDirection:'row'}}>
+                        <Text style={{fontSize:18, color:'#120A47', marginLeft:'6%', marginTop:'2%'}}>Recent Transactions</Text>
+                    </View>
+                    <View 
+                        style={{
+                            marginTop: '2%',
+                            borderBottomColor: 'black',
+                            borderBottomWidth: 0,
+                            marginRight: '5%'
+                        }}
+                    >
+                    </View>
+                    
+                    {
+                        this.state.transactions.length === 0?
+                        <View style={{alignItems: 'center'}}>
+                            <Text style={{ fontSize:20, fontWeight: 'normal', fontFamily: "SFUIDisplay-Medium" }}>No transactions found.</Text>
+                        </View>
+                        :this.state.transaction_list
+                    }
+                    <View style={{marginTop: '0%', height: '5%'}}>
+                        <Text style={{marginTop: '2%', height: '5%'}}>  </Text>
+                    </View>
+                </View>
+                <View style={{ flex: 1, backgroundColor:'#ffff'}}>
                     <Modal
                         animationType="slide"
                         transparent={true}

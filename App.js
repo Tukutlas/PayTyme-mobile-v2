@@ -43,12 +43,16 @@ const Tabs = () => (
     <Tab.Navigator
         screenOptions={{
             headerShown: false,
-            TabBarActiveTintColor: '#120A47',
-            TabBarInactiveTintColor: '#5B4AC3',
-            TabBarShowLabel: false,
-            TabBarcolor: '#E0EBEC',
-            TabBarStyle: {
+            tabBarActiveTintColor: '#0C0C54',
+            tabBarInactiveTintColor: '#676767',
+            tabBarShowLabel: true,
+            tabBarStyle: {
                 backgroundColor: '#E0EBEC',
+                borderTopLeftRadius: 25,
+                borderTopRightRadius: 25,
+                borderTopWidth: 0,
+                elevation: 0,
+                shadowOpacity: 0,
             },
         }}
     >

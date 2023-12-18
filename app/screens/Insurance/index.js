@@ -175,7 +175,6 @@ export default class Insurance extends Component {
         })
         .then((response) => response.text())
         .then((responseText) => {
-            console.log(responseText)
             let response = JSON.parse(responseText);
             let status = response.status;
             let service_provider = response.service_provider
