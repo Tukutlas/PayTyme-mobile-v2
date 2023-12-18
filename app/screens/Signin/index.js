@@ -472,7 +472,7 @@ export default class Signin extends Component {
                         <Image style={styles.profileImage} source={require('../../../assets/logo.png')} />
                     </View>
                 </View>
-                <View style={[styles.formline, { paddingTop: 30 }]}>
+                <View style={[styles.formLine, { paddingTop: 10 }]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Email-Address</Text>
                         <View roundedc style={styles.inputitem}>
@@ -490,7 +490,6 @@ export default class Signin extends Component {
                             <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
                                 <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                             </TouchableOpacity>
-                            {/* <TextInput placeholder="" secureTextEntry={true} style={styles.input}  placeholderTextColor={"#000"} ref="password" onChangeText={(password) => this.setState({password})} value={this.state.password}/> */}
                         </View>
                     </View>
                 </View>
@@ -511,8 +510,17 @@ export default class Signin extends Component {
                     </TouchableOpacity>
                 </View>
                 <View>
-                    <TouchableOpacity info style={styles.buttonsignup} onPress={() => { this.props.navigation.navigate("Signup") }}>
-                        <Text autoCapitalize="words" style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14, color: '#1D59E1' }]}>
+                    
+                </View>
+                <View style={{ flexDirection: 'row', marginTop: '4%', marginBottom: '4%', justifyContent: 'center' }}>
+                    <TouchableOpacity>
+                        <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14 }]}>
+                            New To Paytyme?
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => { this.props.navigation.navigate("Signup") }}>
+                        <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14, color: '#1D59E1', fontWeight: 'bold', marginLeft: '2%' }]}>
                             Create Account
                         </Text>
                     </TouchableOpacity>

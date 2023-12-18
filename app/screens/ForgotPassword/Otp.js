@@ -179,7 +179,7 @@ export default class OTP extends Component {
                         {/* <View roundedc style={styles.inputitem}>
                             <TextInput  placeholder="Type in OTP" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="otp" onChangeText={(otp) => this.setState({otp})} value={this.state.otp} />
                         </View> */}
-                        <OtpInput numberOfDigits={6} onTextChange={(otp) => this.setOtp(otp)} theme={{containerStyle:styles.otpContainer, pinCodeContainerStyle:styles.otpItem}} />
+                        <OtpInput numberOfDigits={6} focusColor="#0C0C54" onTextChange={(otp) => this.setOtp(otp)} theme={{containerStyle:styles.otpContainer, pinCodeContainerStyle:styles.otpItem}} />
                     </View>
                 </View>
                 

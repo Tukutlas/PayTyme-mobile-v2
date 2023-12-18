@@ -69,7 +69,7 @@ export default class ViewPicture extends Component {
         .then((responseText) =>    
         {
             if(JSON.parse(responseText).status == true){
-                fetch(GlobalVariables.apiURL+"/user",
+                fetch(GlobalVariables.apiURL+"/user/profile",
                 { 
                     method: 'GET',
                     headers: new Headers({
@@ -83,11 +83,11 @@ export default class ViewPicture extends Component {
                 .then((responseText) => { 
                     let response_status = JSON.parse(responseText).status;
                     if(response_status == true){
-                        let access_token = JSON.parse(responseText).data.login_token;
-                        let username = JSON.parse(responseText).data.user.username;
-                        let firstname = JSON.parse(responseText).data.user.first_name;
-                        let lastname = JSON.parse(responseText).data.user.last_name;
-                        let image = JSON.parse(responseText).data.user.image;
+                        let access_token = this.state.auth_token;
+                        let username = JSON.parse(responseText).data.username;
+                        let firstname = JSON.parse(responseText).data.first_name;
+                        let lastname = JSON.parse(responseText).data.last_name;
+                        let image = JSON.parse(responseText).data.image;
                         let response = {
                             "status": "ok",
                             "user": {
@@ -115,16 +115,16 @@ export default class ViewPicture extends Component {
                         // this.props.navigation.navigate("Tabs", {screen : 'Profile'})
                     }else if(response_status == 'error'){
                         Alert.alert(
-                        'Session Out',
-                        'Your session has timed-out. Login and try again',
-                        [
-                            {
-                                text: 'OK',
-                                onPress: () => this.props.navigation.navigate('Signin'),
-                                style: 'cancel',
-                            }, 
-                        ],
-                        {cancelable: false},
+                            'Session Out',
+                            'Your session has timed-out. Login and try again',
+                            [
+                                {
+                                    text: 'OK',
+                                    onPress: () => this.props.navigation.navigate('Signin'),
+                                    style: 'cancel',
+                                }, 
+                            ],
+                            {cancelable: false}
                         );
                     }
                 })

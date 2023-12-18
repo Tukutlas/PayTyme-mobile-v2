@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         padding: 1,
         width: '90%',
-        marginTop: 15,
+        marginTop: '1%',
         marginLeft: '3%'
         // marginLeft: -20
         // marginRight: Metrics.WIDTH * 0.2

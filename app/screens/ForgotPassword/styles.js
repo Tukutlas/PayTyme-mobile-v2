@@ -11,7 +11,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.transparent,
     height: Metrics.HEIGHT * 0.07,
     borderBottomWidth: 0,
-    // paddingTop: Metrics.HEIGHT * 0.0354,
     marginTop: Metrics.HEIGHT * 0.08,
     elevation: 0,
     flexDirection: 'row',
@@ -217,10 +216,13 @@ const styles = StyleSheet.create({
 
   otpItem: {
     backgroundColor: '#F6F6F6',
+    // marginLeft: '-2%'
   },
 
   otpContainer: {
-    marginTop: '3%'
+    marginTop: '3%',
+    width: '90%',
+    alignSelf: 'center'
   }
 
 });

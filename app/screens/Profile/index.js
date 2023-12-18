@@ -371,7 +371,6 @@ export default class Profile extends Component {
                                 
                                     <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'24%'}}/> 
                                 </TouchableOpacity>
-
                             </View>
                             
                             <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
@@ -383,7 +382,7 @@ export default class Profile extends Component {
                                     ios_backgroundColor="#3e3e3e"
                                     onValueChange={(isEnabled)=>this.setBiometricEnability({isEnabled})}
                                     value={this.state.isEnabled}
-                                    style={{marginLeft:'28%', marginTop:'-4%'}}
+                                    style={{marginLeft:'30%', marginTop:'-4%'}}
                                 />
                             </View>
                                 

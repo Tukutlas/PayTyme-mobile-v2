@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
         paddingTop: 15,
         paddingBottom: 15,
         marginTop: 30,
-        borderRadius: 4,
+        borderRadius: 50,
         width: Metrics.WIDTH * 0.91
     },
 
