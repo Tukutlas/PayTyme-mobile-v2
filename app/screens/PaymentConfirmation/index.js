@@ -1,6 +1,6 @@
 import React, { Component} from "react";
 import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, Button } from "react-native";
-import DropDownPicker from 'react-native-dropdown-picker';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome5 } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -24,18 +24,18 @@ export default class PaymentConfirmation extends Component {
             
             isLoading:false,
             transaction:false, 
-            there_cards: false,
             banks: [],
+            bankEnable: false,
             sender_error: false,
             receipt_error: false,
             amount_error: false,
-            bank_error: false,
+            bankError: false,
             fileUri: null,
             fileType: null,
             fileName: null,
             fileSize: null,
             fileMimeType: null,
-            sender: ""
+            sender: "",
         };
     }
 
@@ -79,75 +79,92 @@ export default class PaymentConfirmation extends Component {
     };
 
     upload = () => {
+        let error = 0;
         const formData = new FormData();
         if(this.state.fileUri == null){
             this.setState({receipt_error: true})
-        }if(this.state.sender == "" || this.state.sender == null){
-            this.setState({sender_error: true})
-        }if(this.state.bankValue == null){
-            this.setState({bank_error: true})
-        }if(this.state.amount == "" || this.state.amount == null){
-            this.setState({amount_error: true})
+            error++;
         }
-        formData.append('payment_proof', {
-            uri: this.state.fileUri,
-            name: this.state.fileName,
-            type: this.state.fileMimeType,
-            size: this.state.fileSize
-        });
-        formData.append('bank', this.state.bankValue)
-        formData.append('amount', this.state.amount)
-        formData.append('sender_name', this.state.sender)
-
-        this.setState({isLoading:true});
-        fetch(GlobalVariables.apiURL+"/wallet/upload-payment-receipt",
-        { 
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'multipart/form-data', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body: formData
-            // <-- Post parameters
-        })
-        .then((response) => response.text())
-        .then((responseText) =>    
-        {
-            this.setState({isLoading:false});
-            let response_status = JSON.parse(responseText).status;
-            if(response_status == true){
-                Alert.alert(
-                    'Success',
-                    'Proof of Payment Uploaded successfully',
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => {this.props.navigation.navigate("Tabs")},
-                            style: 'cancel',
-                        }, 
-                    ],
-                    {cancelable: false},
-                );
-            }else if(response_status == false){
-                Alert.alert(
-                    'Error',
-                    JSON.parse(responseText).message,
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => {},
-                            style: 'cancel',
-                        }, 
-                    ],
-                    {cancelable: false},
-                );
-            }
-        })
-        .catch((error) => {
-            this.setState({isLoading:false});
-            alert("An error Occured");
-        });
-        //end send API for confirm payment
+        if(this.state.sender == "" || this.state.sender == null){
+            this.setState({sender_error: true})
+            error++;
+        }
+        if(this.state.bankValue == null){
+            this.setState({bankError: true})
+            error++;
+        }
+        if(this.state.amount == "" || this.state.amount == null){
+            this.setState({amount_error: true})
+            error++;
+        }
+        if(error == 0){
+            formData.append('payment_proof', {
+                uri: this.state.fileUri,
+                name: this.state.fileName,
+                type: this.state.fileMimeType,
+                size: this.state.fileSize
+            });
+            formData.append('bank', this.state.bankValue)
+            formData.append('amount', this.state.amount)
+            formData.append('sender_name', this.state.sender)
+    
+            this.setState({isLoading:true});
+            fetch(GlobalVariables.apiURL+"/wallet/upload-payment-receipt",
+            { 
+                method: 'POST',
+                headers: new Headers({
+                    'Content-Type': 'multipart/form-data', // <-- Specifying the Content-Type
+                    'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+                }),
+                body: formData
+                // <-- Post parameters
+            })
+            .then((response) => response.text())
+            .then((responseText) =>    
+            {
+                this.setState({isLoading:false});
+                let response_status = JSON.parse(responseText).status;
+                if(response_status == true){
+                    this.props.navigation.navigate("StatusPage",
+                    {
+                        // transaction_id:response.data.transaction.id,
+                        status: 'progress',
+                        type: 'confirmation',
+                        Screen: 'PaymentConfirmation'
+                    }); 
+                    // Alert.alert(
+                    //     'Success',
+                    //     'Proof of Payment Uploaded successfully',
+                    //     [
+                    //         {
+                    //             text: 'OK',
+                    //             onPress: () => {this.props.navigation.navigate("Tabs")},
+                    //             style: 'cancel',
+                    //         }, 
+                    //     ],
+                    //     {cancelable: false},
+                    // );
+                }else if(response_status == false){
+                    Alert.alert(
+                        'Error',
+                        JSON.parse(responseText).message,
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => {},
+                                style: 'cancel',
+                            }, 
+                        ],
+                        {cancelable: false},
+                    );
+                }
+            })
+            .catch((error) => {
+                this.setState({isLoading:false});
+                alert("An error Occured");
+            });
+            //end send API for confirm payment
+        }
     }
 
     pickDocument = async () => {
@@ -194,6 +211,15 @@ export default class PaymentConfirmation extends Component {
         }));
     }
     
+    setBank = (value) => {
+        this.setState({
+            bankValue: value
+        })
+        if (value !== null) {
+            this.setState({ bankError: false })
+        }
+    }
+
     getBanks(){
         this.setState({isLoading:true});
         fetch(GlobalVariables.apiURL+"/wallet/banks",
@@ -216,7 +242,7 @@ export default class PaymentConfirmation extends Component {
             })
 
             this.setState({banks: newArray});
-            this.setState({isLoading:false, bankDisable:false});
+            this.setState({isLoading:false, bankDisable:false, bankEnable: true});
         })
         .catch((error) => {
             this.setState({isLoading:false});
@@ -248,85 +274,86 @@ export default class PaymentConfirmation extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formLine, {marginTop: '3%'}]}>
+                <View style={[styles.formLine, {marginTop: '2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter amount</Text>
                         <View roundedc style={styles.inputitem}>
-                            <TextInput placeholder="Type in amount" style={[styles.textBox]} placeholderTextColor={"#A9A9A9"} ref="amount" onChangeText={(amount) => this.setState({amount: amount, amount_error: false})} />
-                            {
-                                this.state.amount_error ?
-                                <View >
-                                    <Text style={{color: 'red'}}>Please input the amount</Text>
-                                </View>
-                                :
-                                <View></View>
-                            }
+                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                            <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount: amount, amount_error: false})}/>
                         </View>
                     </View>
                 </View>
-                <View style={[styles.formLine, {marginTop:'5%'}]}>
+                
+                {
+                    this.state.amount_error ?
+                    <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
+                        <Text style={{color: 'red'}}>Please input the amount</Text>
+                    </View>
+                    :
+                    <View></View>
+                }
+                <View style={[styles.formLine, {marginTop:'2%'}]}>
                     <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Banks</Text>
+                        <Text style={styles.labeltext}>Banks Transferred From</Text>
                     </View>
                 </View>
-                <View style={{width:'91%', marginLeft:'4%', backgroundColor:'#fff', height:25, zIndex:1000}}>
-                    <DropDownPicker
-                        placeholder={'Select Bank'}
-                        open={this.state.bankOpen}
-                        value={this.state.bankValue}
-                        style={[styles.dropdown, {flexDirection: 'row', marginTop:'2%'}]}
-                        items={this.state.banks}
-                        setOpen={this.setBankOpen}
-                        setValue={this.setBankValue}
-                        setItems={this.setBankItems}
-                        searchable={true}
-                        onSelectItem={(item) => {
-                            this.setState({bank_error:false});
-                        }}
-                        listMode="MODAL"
-                        disabled={this.state.bankDisable}
-                    />
+                <View style={{ width: '93.7%', marginLeft: '2.7%', backgroundColor: "#f6f6f6", height: 40, borderWidth: 1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center' }}>
+                    <Picker
+                        selectedValue={this.state.bankValue}
+                        onValueChange={(itemValue, itemIndex) =>
+                            this.setBank(itemValue)
+                        }
+                        enabled={this.state.bankEnable}
+                    >
+                        <Picker.Item label="Select Bank" value={null} style={{ fontSize: 14 }} />
+
+                        {this.state.banks.map((bank, index) => (
+                            <Picker.Item key={index} label={bank.label} value={bank.value} style={{ fontSize: 14 }} />
+                        ))}
+                    </Picker>
                 </View>
                 {
-                    this.state.bank_error ?
-                    <View style={{marginTop: '8%', marginLeft: '4%'}}>
+                    this.state.bankError ?
+                    <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
                         <Text style={{color: 'red'}}>Please select a bank</Text>
                     </View>
                     :
                     <View></View>
                 }
-                <View style={[styles.formLine, {marginTop:'12%'}]}>
+                <View style={[styles.formLine, {marginTop:'2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Sender's Name</Text>
                         <View roundedc style={styles.inputitem}>
+                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in sender's name" style={[styles.textBox]} placeholderTextColor={"#A9A9A9"} ref="sender" onChangeText={(sender) => this.setState({sender: sender, sender_error: false})}  />
-                            {
-                                this.state.sender_error ?
-                                <View>
-                                    <Text style={{color: 'red'}}>Please input the sender's name</Text>
-                                </View>
-                                :
-                                <View></View>
-                            }
                         </View>
                     </View>
                 </View>
-                <View style={[styles.formLine, {marginTop:'5%'}]}>
+                {
+                    this.state.sender_error ?
+                    <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
+                        <Text style={{color: 'red'}}>Please input the sender's name</Text>
+                    </View>
+                    :
+                    <View></View>
+                }
+                <View style={[styles.formLine, {marginTop:'2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Upload Receipt</Text>
-                        <View roundedc style={styles.inputitem}>
+                        <View roundedc >
                             <Button title="Select receipt" onPress={this.pickDocument} />
-                            {
-                                this.state.receipt_error ?
-                                <View >
-                                    <Text style={{color: 'red'}}>Please upload payment receipt</Text>
-                                </View>
-                                :
-                                <View></View>
-                            }
+                            
                         </View>
                     </View>
                 </View>
+                {
+                    this.state.receipt_error ?
+                    <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
+                        <Text style={{color: 'red'}}>Please upload payment receipt</Text>
+                    </View>
+                    :
+                    <View></View>
+                }
                 {this.state.fileUri && (
                     <>
                         {this.state.fileMimeType === 'application/pdf' ? (

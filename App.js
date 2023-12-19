@@ -28,7 +28,7 @@ import Electricity from './app/screens/Electricity';
 import Paystack from './app/screens/Paystack';
 import DebitCardPayment from './app/screens/DebitCardPayment';
 import NewDebitCardPayment from './app/screens/DebitCardPayment/New';
-// import PaymentConfirmation from './app/screens/PaymentConfirmation';
+import PaymentConfirmation from './app/screens/PaymentConfirmation';
 import CreateVirtualAccount from './app/screens/VirtualAccount/create';
 import VirtualAccount from './app/screens/VirtualAccount';
 import ForgotPassword from './app/screens/ForgotPassword';
@@ -104,7 +104,7 @@ const RootStack = () => {
                 <Stack.Screen name="StatusPage" component={StatusPage} />
                 <Stack.Screen name="SingleTransaction" component={SingleTransaction} />
                 <Stack.Screen name="Paystack" component={Paystack} />
-                {/* <Stack.Screen name="PaymentConfirmation" component={PaymentConfirmation} /> */}
+                <Stack.Screen name="PaymentConfirmation" component={PaymentConfirmation} />
                 <Stack.Screen name="BankTransfer" component={BankTransfer} />
                 <Stack.Screen name="DebitCardPayment" component={DebitCardPayment} />
                 <Stack.Screen name="NewDebitCardPayment" component={NewDebitCardPayment} />

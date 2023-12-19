@@ -314,14 +314,14 @@ export default class Profile extends Component {
                     <View style={styles.container}>
                         <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  /> 
                         <View style={styles.header}>
-                            <View style={{marginLeft:'40.5%', marginTop:'17%'}}>
+                            <View style={{marginLeft:'15%', marginTop:'17%'}}>
                                 {
                                     this.state.profilePicture != null ?
                                     <Image style={styles.profileImage} source={{uri:this.state.profilePicture}}/> 
                                     :
                                     <Image style={styles.profileImage} source={require('../../../assets/user.png')}/> 
                                 }
-                                <TouchableOpacity onPress={()=>{this.setState({modalVisible: true})}} style={{marginLeft:'44%', marginTop:'-15%'}}>
+                                <TouchableOpacity onPress={()=>{this.setState({modalVisible: true})}} style={{marginLeft:'40%', marginTop:'-15%'}}>
                                     <FontAwesome name={'camera'} size={18}  color={'#1e90ff'} style={{position: 'absolute'}} />
                                 </TouchableOpacity>
                                 <Text style={{fontSize:30, fontWeight: 'bold', color:'#fff', fontFamily: "SFUIDisplay-Medium", marginTop:'25%', marginLeft:'0%' }}>Profile</Text>
@@ -368,7 +368,6 @@ export default class Profile extends Component {
                                 <TouchableOpacity onPress={()=>{this.props.navigation.navigate("ForgotPassword")}} style={{marginLeft:'0%', flexDirection:'row'}}>
                                     <FontAwesome5 name={'lock'} color={'#120A47'} size={15} style={{marginTop:2}}/>
                                     <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>Change Password</Text>
-                                
                                     <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'24%'}}/> 
                                 </TouchableOpacity>
                             </View>

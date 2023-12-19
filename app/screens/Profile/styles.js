@@ -13,7 +13,8 @@ module.exports = StyleSheet.create({
         borderRadius:14,
         borderTopWidth: 0,
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        justifyContent: "center"
     },
 
     left: {
