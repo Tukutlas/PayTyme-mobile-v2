@@ -23,6 +23,20 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "blockedPermissions": [
+        "RECORD_AUDIO", 
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ],
+      "permissions": [
+        "CAMERA",
+        "CAMERA_ROLL",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "READ_CONTACTS",
+        "READ_EXTERNAL_STORAGE"
+      ],
       "package": "com.victorel.paytymemobileapp",
       "versionCode": 6
     },
@@ -33,6 +47,14 @@
       "eas": {
         "projectId": "024cfd22-e17c-45ce-b7dc-f648f7bc098d"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ]
+    ]
   }
 }

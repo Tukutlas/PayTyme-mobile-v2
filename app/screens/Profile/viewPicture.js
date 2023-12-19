@@ -105,14 +105,12 @@ export default class ViewPicture extends Component {
                         this.props.navigation.dispatch(
                             CommonActions.reset({
                                 routes: [
-                                    { name: 'Tabs', params: {screen: 'Profile'} }
+                                    { name: 'Tabs'}
                                 ],
-                            })
+                            })                            
                         );
-                        //{ name: 'TabName', params: { screen: 'ScreenName' } }
                     }else if(response_status == false){
                         alert("An error Occured");
-                        // this.props.navigation.navigate("Tabs", {screen : 'Profile'})
                     }else if(response_status == 'error'){
                         Alert.alert(
                             'Session Out',
@@ -156,7 +154,7 @@ export default class ViewPicture extends Component {
                     <Image style={{width:'80%', height:'70%', marginLeft:'10%', borderRadius:145}} source={{ uri: this.state.image}}/> 
                 </View>
                 <View style={{marginTop: '20%', flexDirection:'row', padding:1, width:'100%'}}>
-                    <TouchableOpacity style={{color: 'white', marginLeft: '15%'}} onPress={() => {this.backPressed()}}>
+                    <TouchableOpacity style={{color: 'white', marginLeft: '15%'}} onPress={() => {this.props.navigation.navigate('Tabs', 'Profile')}}>
                         <Text style={{color: 'white', fontSize: 15}}>Cancel</Text>
                     </TouchableOpacity>
                     

@@ -158,7 +158,7 @@ export default class Profile extends Component {
                 } else {
                     Alert.alert('Error', I18n.t('PERMISSION_ACCESS_FILE'));
         
-                  console.log('Camera permission denied');
+                //   console.log('Camera permission denied');
                     return false;
                 }
             } else {
@@ -236,26 +236,28 @@ export default class Profile extends Component {
     };
     
     uploadProfilePicture = async () => {
-        const result = await this.checkPermissions();
-        
-        if (result) {
-            try {
-                const result = await DocumentPicker.getDocumentAsync({
-                    type: ["image/*"], // all images files,
-                    // copyToCacheDirectory: false,
-                });
-                if (!result.cancelled && result != null) {
-                    this.props.navigation.navigate("ViewPicture",
-                    {
-                        image: result,
-                    }); 
-                } else {
-                    // console.log('User cancelled document picker');
-                }
-            } catch (err) {
-                // console.log('Document picker error:', err);
+        this.setState({modalVisible: false})
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: ["image/*"], // all images files,
+                // copyToCacheDirectory: false,
+            });
+            if (result.type != 'cancel' && result != null) {
+                this.props.navigation.navigate("ViewPicture",
+                {
+                    image: result,
+                }); 
+            } else {
+                // console.log('User cancelled document picker');
             }
+        } catch (err) {
+            // console.log('Document picker error:', err);
         }
+    }
+
+    goToCameraSection = async () => {
+        this.setState({modalVisible: false})
+        this.props.navigation.navigate("CameraSection")
     }
 
     handleRateButtonPress = async () => {
@@ -355,13 +357,13 @@ export default class Profile extends Component {
                         <View style={[styles.body,{}]}>
                             <View style={{flexDirection:'row', marginLeft: '2%'}}>
                                 <FontAwesome5 name={'user-alt'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
-                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%', width:'40%'}}>Name</Text>
-                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'7%'}}>{this.state.fullname}</Text>
+                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%', width:'30%'}}>Name</Text>
+                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', width:'60%', textAlign: 'center'}}>{this.state.fullname}</Text>
                             </View>
                             <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
                                 <FontAwesome5 name={'wallet'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
-                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%', width:'45%'}}>Wallet ID</Text>
-                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'10%'}}>{this.state.wallet_id}</Text>
+                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%', width:'30%'}}>Wallet ID</Text>
+                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'7%', width:'40%', textAlign: 'right'}}>{this.state.wallet_id}</Text>
                             </View>
                             
                             <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
@@ -374,14 +376,14 @@ export default class Profile extends Component {
                             
                             <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
                                 <FontAwesome5 name={'fingerprint'} color={'#120A47'} size={15} style={{marginTop:2}}/>
-                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%'}}>Biometric Login</Text>
+                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%',width:'40%'}}>Biometric Login</Text>
                                 <Switch
                                     trackColor={{ false: "", true: "#120A47" }}
                                     thumbColor={this.state.isEnabled ? "#f4f3f4" : "#f4f3f4"}
                                     ios_backgroundColor="#3e3e3e"
                                     onValueChange={(isEnabled)=>this.setBiometricEnability({isEnabled})}
                                     value={this.state.isEnabled}
-                                    style={{marginLeft:'30%', marginTop:'-4%'}}
+                                    style={{marginLeft:'25%', marginTop:'-4%'}}
                                 />
                             </View>
                                 
@@ -445,7 +447,9 @@ export default class Profile extends Component {
                                 <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end'}}>
                                     <View style={{ backgroundColor: 'white', padding: 0, width: '100%', height: '40%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
                                         <View style={{marginLeft: '5%', marginTop: '5%', alignItems: 'center', backgroundColor: '#0C0C54', width: '15%', height: '17%', borderRadius:10}}> 
-                                            <FontAwesome name={'camera'} size={29}  color={'#ffff'} style={{marginTop: '15%'}} />
+                                            <TouchableOpacity onPress={()=>{this.goToCameraSection()}}>
+                                                <FontAwesome name={'camera'} size={29}  color={'#ffff'} style={{marginTop: '15%'}} />
+                                            </TouchableOpacity>
                                         </View>
                                         <View 
                                             style={{

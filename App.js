@@ -36,6 +36,7 @@ import ResetPassword from './app/screens/ForgotPassword/ResetPassword';
 import Otp from './app/screens/ForgotPassword/Otp';
 import BankTransfer from './app/screens/BankTransfer';
 import FAQ from './app/screens/Profile/faq';
+import CameraSection from './app/screens/Profile/camera';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -114,6 +115,7 @@ const RootStack = () => {
                 <Stack.Screen name="ResetPassword" component={ResetPassword} />
                 <Stack.Screen name="Otp" component={Otp}/>
                 <Stack.Screen name="Faq" component={FAQ}/>
+                <Stack.Screen name="CameraSection" component={CameraSection}/>
                 <Stack.Screen name="Tabs" component={Tabs} />
             </Stack.Navigator>
         </NavigationContainer>
