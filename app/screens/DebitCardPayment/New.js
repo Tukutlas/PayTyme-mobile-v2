@@ -77,7 +77,7 @@ export default class NewDebitCardPayment extends Component {
                     .then((responseText) => {
                         let response = JSON.parse(responseText);
                         if(response.status == true){
-                            this.props.navigation.navigate("SuccessPage",
+                            this.props.navigation.navigate("StatusPage",
                             {
                                 transaction_id:response.data.transaction.id,
                             }); 

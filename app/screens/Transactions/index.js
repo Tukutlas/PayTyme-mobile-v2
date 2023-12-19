@@ -194,24 +194,27 @@ export default class Transactions extends Component {
         for (let transaction of this.state.transactions) {
             let status = transaction.status;
             transaction_list.push(
-                <View style={{marginTop: '2%', marginRight: '5%', borderWidth: 1, borderRadius: 10}} key={transaction.id}>
+                <View style={{marginTop: '2%', marginRight: '5%', borderWidth: 1, borderRadius: 10, borderColor: '#C4C4C4'}} key={transaction.id}>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={{fontSize:12, color:'#120A47', marginLeft:'3%', width:'69%', marginTop:'1%'}}>{transaction.description}</Text>
+                        <Text style={{fontSize:11, color:'#676767', marginLeft:'3%', width:'69%', marginTop:'1%'}}>{transaction.description}</Text>
                         {
                             status == 'successful' ?
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
-                                <Text style={{fontSize:13, color:'#fff', paddingBottom: '7%', color:'#0c0c54', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
+                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '3%', color:'#0c0c54', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
                             </View>
-                            :
+                            : status == 'processing' ? 
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
-                                <Text style={{fontSize:13, color:'#fff', paddingBottom: '7%', color:'#f03434'}}>{transaction.status}</Text>
+                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '3%', color:'#FFA500', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
+                            </View> 
+                            : <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
+                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '3%', color:'#f03434', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
                             </View>
                         }
                     </View>
                     <View 
                         style={{
                             marginTop: '0.3%',
-                            borderBottomColor: 'black',
+                            borderBottomColor: '#C4C4C4',
                             borderBottomWidth: 1,
                             marginRight: '2%',
                             marginLeft: '2%',
@@ -219,9 +222,9 @@ export default class Transactions extends Component {
                     >
                     </View>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={{fontSize:13, color:'#120A47', marginLeft:'4%', width:'60%', justifyContent:"center", marginTop: '1%'}}>{transaction.created_at}</Text>
+                        <Text style={{fontSize:10, color:'#C4C4C4', marginLeft:'4%', width:'60%', justifyContent:"center", marginTop: '1%'}}>{transaction.created_at}</Text>
                         <TouchableOpacity style={{marginLeft:'7%', width:'25%', alignItems: "center", marginTop: '1%', borderRadius: 7, backgroundColor: "#0c0c54", marginBottom: "2%"}} onPress={()=>{ this.viewTransactionDetails(transaction.id)}}>
-                            <Text style={{fontSize:13, paddingBottom: '2%', color:'#ffff'}}>View</Text>
+                            <Text style={{fontSize:10, paddingBottom: '1%', color:'#ffff'}}>View</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -250,7 +253,7 @@ export default class Transactions extends Component {
             <ScrollView style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'} /> 
                 <View style={styles.header}> 
-                    <View style={{marginLeft:'42.5%', marginTop:'15%'}}>
+                    <View style={{ marginTop:'15%', paddingBottom:'2%'}}>
                         {
                             this.state.profilePicture != null ? 
                             <Image style={styles.profileImage} source={{uri:this.state.profilePicture}}/> 

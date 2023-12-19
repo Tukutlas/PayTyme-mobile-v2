@@ -74,9 +74,21 @@ export default class Paystack extends Component {
                     const responseData = await response.json();
       
                     if (responseData.status) {
-                        this.props.navigation.navigate("SuccessPage", {
-                            transaction_id: responseData.data.transaction.id,
-                        });
+                        if(responseData.data.transaction.status == 'successful'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id: responseData.data.transaction.id,
+                                status: 'successful',
+                                Screen: this.props.route.params.screen
+                            }); 
+                        }else if(responseData.data.transaction.status == 'processing'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id: responseData.data.transaction.id,
+                                status: 'processing',
+                                Screen: this.props.route.params.screen
+                            }); 
+                        }
                     } else {
                         const responseMessage = responseData.message;
                         Alert.alert('Oops', responseMessage, [
@@ -115,9 +127,21 @@ export default class Paystack extends Component {
                     const responseData = await response.json();
       
                     if (responseData.status) {
-                        this.props.navigation.navigate("SuccessPage", {
-                            transaction_id: responseData.data.transaction.transaction_id,
-                        });
+                        if(responseData.data.transaction.status == 'successful'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id: responseData.data.transaction.id,
+                                status: 'successful',
+                                Screen: this.props.route.params.screen
+                            }); 
+                        }else if(responseData.data.transaction.status == 'processing'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id: responseData.data.transaction.id,
+                                status: 'processing',
+                                Screen: this.props.route.params.screen
+                            }); 
+                        }
                     } else {
                         const responseMessage = responseData.message;
                         Alert.alert('Oops', responseMessage, [

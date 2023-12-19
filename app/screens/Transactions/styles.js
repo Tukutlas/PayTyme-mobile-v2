@@ -14,7 +14,8 @@ module.exports = StyleSheet.create({
         borderTopWidth: 0,
         elevation: 0,
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        justifyContent: "center"
     },
 
     body:{

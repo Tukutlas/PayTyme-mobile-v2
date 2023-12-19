@@ -14,6 +14,7 @@ import ViewPicture from './app/screens/Profile/viewPicture';
 import AboutUs from './app/screens/Profile/aboutUs';
 import Transactions from './app/screens/Transactions';
 import SuccessPage from './app/screens/Transactions/success';
+import StatusPage from './app/screens/Transactions/statusPage';
 import SingleTransaction from './app/screens/Transactions/singleTransaction';
 import WalletTransfer from './app/screens/WalletTransfer';
 import WalletTopUp from './app/screens/WalletTopUp/index2';
@@ -100,6 +101,7 @@ const RootStack = () => {
                 <Stack.Screen name="WalletTopUp" component={WalletTopUp} />
                 <Stack.Screen name="Insurance" component={Insurance} />
                 <Stack.Screen name="SuccessPage" component={SuccessPage} />
+                <Stack.Screen name="StatusPage" component={StatusPage} />
                 <Stack.Screen name="SingleTransaction" component={SingleTransaction} />
                 <Stack.Screen name="Paystack" component={Paystack} />
                 {/* <Stack.Screen name="PaymentConfirmation" component={PaymentConfirmation} /> */}

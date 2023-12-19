@@ -17,32 +17,32 @@ export default class Data extends Component {
         this.state = {
             rating: 0,
             modalVisible: false,
-            mtn:false,
-            glo:false,
-            airtel:false,
-            etisalat:false,
-            auth_token:"",
-            purchasetype:'data',
-            bundleplan:"",
+            mtn: false,
+            glo: false,
+            airtel: false,
+            etisalat: false,
+            auth_token: "",
+            purchasetype: 'data',
+            bundleplan: "",
             bundlepackage: "",
-            amount:0,
-            phonenumber_value:"",
+            amount: 0,
+            phonenumber_value: "",
             // promoCode: "",
-            contact: [] ,
-            modalVisiblePaymentMethod:false,
-            bundles:[],
-            bundleLabel:"",
-            epayWalletChecked:true, 
-            payOnDelieveryChecked:false,
-            network:"",
+            contact: [],
+            modalVisiblePaymentMethod: false,
+            bundles: [],
+            bundleLabel: "",
+            epayWalletChecked: true,
+            payOnDelieveryChecked: false,
+            network: "",
 
             bundleOpen: false,
             bundleValue: null,
             bundleDisable: true,
             serviceProvider: '',
-            
-            isLoading:false,
-            transaction:false, 
+
+            isLoading: false,
+            transaction: false,
             there_cards: false,
             phoneError: false,
             phoneErrorMessage: '',
@@ -55,7 +55,7 @@ export default class Data extends Component {
         // this.showContactAsync();
         this.setState(
             {
-                auth_token:JSON.parse( 
+                auth_token: JSON.parse(
                     await AsyncStorage.getItem('login_response')
                 ).user.access_token
             }
@@ -87,7 +87,7 @@ export default class Data extends Component {
     }
 
     backPressed = () => {
-        if(this.state.transaction){
+        if (this.state.transaction) {
             this.props.navigation.dispatch(
                 CommonActions.reset({
                     routes: [
@@ -95,138 +95,137 @@ export default class Data extends Component {
                     ],
                 })
             );
-        }else{
+        } else {
             this.props.navigation.navigate('Tabs');
         }
-        return true;  
+        return true;
     };
 
     setModalVisible = (visible) => {
         this.setState({ modalVisible: visible });
     }
 
-    loadWalletBalance(){
-        fetch(GlobalVariables.apiURL+"/wallet/details",
-        { 
-            method: 'GET',
-            headers: new Headers({
-              'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-              'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-            }),
-            body:  ""         
-            // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => { 
-            this.setState({isLoading:false});
-            let response_status = JSON.parse(responseText).status;
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;  
-                let wallet = data;
-                this.setState({balance:parseInt(wallet.balance)});
-            }else if(response_status == false){
-                Alert.alert(
-                    'Session Out',
-                    'Your session has timed-out. Login and try again',
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => this.props.navigation.navigate('Signin'),
-                            style: 'cancel',
-                        }, 
-                    ],
-                    {cancelable: false},
-                );
-            }else if(response_status == 'error'){
-                Alert.alert(
-                'Session Out',
-                'Your session has timed-out. Login and try again',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => this.props.navigation.navigate('Signin'),
-                        style: 'cancel',
-                    }, 
-                ],
-                {cancelable: false},
-                );
-            }
-        })
-        .catch((error) => {
-            this.setState({isLoading:false});
-            alert("Network error. Please check your connection settings");
-        });        
-    }
-
-    getDataPlans(network){
-        if(network != ""){
-            this.setState({isLoading:true});
-            
-            fetch(GlobalVariables.apiURL+"/topup/data/bundles?network="+network,
-            { 
+    loadWalletBalance() {
+        fetch(GlobalVariables.apiURL + "/wallet/details",
+            {
                 method: 'GET',
                 headers: new Headers({
                     'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                    'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+                    'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
                 }),
-                body:  ""         
-            // <-- Post parameters
-            }) 
+                body: ""
+                // <-- Post parameters
+            })
             .then((response) => response.text())
-            .then((responseText) => 
-            { 
-                let response  = JSON.parse(responseText);
-                let bundlesplan = response.data;
-                let newArray = bundlesplan.map((item) => {
-                    return {label: item.bundle+" ₦"+this.numberFormat(item.amount), value: item.bundle+"#"+item.package+"#"+item.amount}
-                })
-                this.setState({serviceProvider: response.service_provider});
-                this.setState({bundles: newArray});
-                this.setState({isLoading:false, bundleDisable:false});
+            .then((responseText) => {
+                this.setState({ isLoading: false });
+                let response_status = JSON.parse(responseText).status;
+                if (response_status == true) {
+                    let data = JSON.parse(responseText).data;
+                    let wallet = data;
+                    this.setState({ balance: parseInt(wallet.balance) });
+                } else if (response_status == false) {
+                    Alert.alert(
+                        'Session Out',
+                        'Your session has timed-out. Login and try again',
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => this.props.navigation.navigate('Signin'),
+                                style: 'cancel',
+                            },
+                        ],
+                        { cancelable: false },
+                    );
+                } else if (response_status == 'error') {
+                    Alert.alert(
+                        'Session Out',
+                        'Your session has timed-out. Login and try again',
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => this.props.navigation.navigate('Signin'),
+                                style: 'cancel',
+                            },
+                        ],
+                        { cancelable: false },
+                    );
+                }
             })
             .catch((error) => {
-                this.setState({isLoading:false});
+                this.setState({ isLoading: false });
                 alert("Network error. Please check your connection settings");
-            });   
+            });
+    }
+
+    getDataPlans(network) {
+        if (network != "") {
+            this.setState({ isLoading: true });
+
+            fetch(GlobalVariables.apiURL + "/topup/data/bundles?network=" + network,
+                {
+                    method: 'GET',
+                    headers: new Headers({
+                        'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                        'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+                    }),
+                    body: ""
+                    // <-- Post parameters
+                })
+                .then((response) => response.text())
+                .then((responseText) => {
+                    let response = JSON.parse(responseText);
+                    let bundlesplan = response.data;
+                    let newArray = bundlesplan.map((item) => {
+                        return { label: item.bundle + " ₦" + this.numberFormat(item.amount), value: item.bundle + "#" + item.package + "#" + item.amount }
+                    })
+                    this.setState({ serviceProvider: response.service_provider });
+                    this.setState({ bundles: newArray });
+                    this.setState({ isLoading: false, bundleDisable: false });
+                })
+                .catch((error) => {
+                    this.setState({ isLoading: false });
+                    alert("Network error. Please check your connection settings");
+                });
         }
     }
 
-    renderItem = ({item}) => {
+    renderItem = ({ item }) => {
         return (
             <View style={styles.item}>
-                <Text button onPress  ={()=>{
+                <Text button onPress={() => {
                     this.setState({
-                        phonenumber_value:item.phoneNumbers && item.phoneNumbers[0] && item.phoneNumbers[0].number
+                        phonenumber_value: item.phoneNumbers && item.phoneNumbers[0] && item.phoneNumbers[0].number
                     });
-                    this.setState({modalVisible:false});
+                    this.setState({ modalVisible: false });
                 }}>
                     {item.name}
                 </Text>
-            </View> 
+            </View>
         );
     }
 
     async showContactAsync() {
-        
+
         // Ask for permission to query contacts.
         // const permission = await Permissions.askAsync(Permissions.CONTACTS);
         const { status } = await Contacts.requestPermissionsAsync();
-  
+
         if (status !== 'granted') {
-        // Permission was denied...
-            return; 
+            // Permission was denied...
+            return;
         }
         const { data } = await Contacts.getContactsAsync({
-        // fields: [Contacts.Fields.PHONE_NUMBERS],
+            // fields: [Contacts.Fields.PHONE_NUMBERS],
             fields: [
                 Contacts.PHONE_NUMBERS
             ],
         });
-   
- 
+
+
         if (data.length > 0) {
             const contact = data;
-            this.setState({contact:contact});
+            this.setState({ contact: contact });
         }
 
 
@@ -249,23 +248,23 @@ export default class Data extends Component {
         } 
         */
     }
-    
-    confirmPurchase(thetype){
+
+    confirmPurchase(thetype) {
         let bundleplan = this.state.bundleValue;
         let phonenumber_value = this.state.phonenumber_value;
         let error = 0;
 
-        if(phonenumber_value == ""){
-            this.setState({phoneError: true});
-            this.setState({phoneErrorMessage: 'Phone Number must be inputted'});
+        if (phonenumber_value == "") {
+            this.setState({ phoneError: true });
+            this.setState({ phoneErrorMessage: 'Phone Number must be inputted' });
             error++;
-        }if(bundleplan ==""){
-            this.setState({bundleError: true});
-            this.setState({bundleErrorMessage: 'Data bundle must be selected'});
+        } if (bundleplan == "") {
+            this.setState({ bundleError: true });
+            this.setState({ bundleErrorMessage: 'Data bundle must be selected' });
             error++;
         }
-        
-        if(error == 0){
+
+        if (error == 0) {
             let string = bundleplan.split("#");
 
             this.setState({
@@ -276,224 +275,233 @@ export default class Data extends Component {
 
             let bundlePlan = string[0];
 
-            let network ="";
+            let network = "";
 
-            if(this.state.mtn ==true){
-                network="mtn";
-            }else if(this.state.airtel == true){
-                network="airtel";
-            }else if(this.state.glo == true){
-                network="glo";
-            }else if(this.state.etisalat == true){
-                network="9MOBILE";
-            }else{
+            if (this.state.mtn == true) {
+                network = "mtn";
+            } else if (this.state.airtel == true) {
+                network = "airtel";
+            } else if (this.state.glo == true) {
+                network = "glo";
+            } else if (this.state.etisalat == true) {
+                network = "9MOBILE";
+            } else {
 
             }
 
-            let amount ="";
+            let amount = "";
 
-            let subtext="";
+            let subtext = "";
             //send api for data purchase
-            
-            bundleplan = "Data Bundle :  N"+bundlePlan;
-            subtext="data";
-            
-            if(thetype=="wallet"){
+
+            bundleplan = "Data Bundle :  N" + bundlePlan;
+            subtext = "data";
+
+            if (thetype == "wallet") {
                 Alert.alert(
                     'Confirm Purchase',
-                    'Do you want to recharge '+bundleplan+'('+network+') '+subtext+' on '+phonenumber_value+' ?\n',
+                    'Do you want to recharge ' + bundleplan + '(' + network + ') ' + subtext + ' on ' + phonenumber_value + ' ?\n',
                     [
-                        {  
+                        {
                             text: 'Cancel',
-                            onPress: () => {},
+                            onPress: () => { },
                             style: 'cancel',
                         },
                         {
                             text: 'Yes, Pay with Wallet',
-                            onPress: () => {this.buyData();},
+                            onPress: () => { this.buyData(); },
                             style: 'cancel',
                         },
                     ],
-                    {cancelable: false},
+                    { cancelable: false },
                 );
-            }else{
+            } else {
                 Alert.alert(
                     'Confirm Purchase',
-                    'Do you want to recharge '+amount+'('+network+') '+subtext+' on '+phonenumber_value+' ?\n',
+                    'Do you want to recharge ' + amount + '(' + network + ') ' + subtext + ' on ' + phonenumber_value + ' ?\n',
                     [
                         {
                             text: 'Cancel',
-                            onPress: () => {},
+                            onPress: () => { },
                             style: 'cancel',
                         },
                         {
-                            text: 'Yes, Pay with Card',  
-                            onPress: () => {this.buyDataWithCardPayment();},
+                            text: 'Yes, Pay with Card',
+                            onPress: () => { this.buyDataWithCardPayment(); },
                             style: 'cancel',
-                        }, 
+                        },
                     ],
-                    {cancelable: false},
+                    { cancelable: false },
                 );
             }
         }
     }
 
-    buyDataWithCardPayment(){
+    buyDataWithCardPayment() {
         let phonenumber_value = this.state.phonenumber_value;
-        let bundlePlan = this.state.bundleplan; 
+        let bundlePlan = this.state.bundleplan;
         let amount = this.state.amount;
         let bundlePackage = this.state.bundlepackage;
-        let network =""; 
+        let network = "";
         let serviceProvider = this.state.serviceProvider;
 
-        if(this.state.mtn ==true){
-            network="mtn";
-        }else if(this.state.airtel == true){
-            network="airtel";
-        }else if(this.state.glo == true){
-            network="glo";
-        }else if(this.state.etisalat == true){
-            network="9mobile";
-        }else{
-            
+        if (this.state.mtn == true) {
+            network = "mtn";
+        } else if (this.state.airtel == true) {
+            network = "airtel";
+        } else if (this.state.glo == true) {
+            network = "glo";
+        } else if (this.state.etisalat == true) {
+            network = "9mobile";
+        } else {
+
         }
-        
+
         this.props.navigation.navigate("DebitCardPayment",
-        {
-            transaction_type:"Data",
-            bundlePlan: bundlePlan,
-            bundlePackage:bundlePackage,
-            amount: amount,
-            phonenumber_value: phonenumber_value,
-            network: network,
-            serviceProvider: serviceProvider
-        });    
+            {
+                transaction_type: "Data",
+                bundlePlan: bundlePlan,
+                bundlePackage: bundlePackage,
+                amount: amount,
+                phonenumber_value: phonenumber_value,
+                network: network,
+                serviceProvider: serviceProvider
+            });
     }
-  
-    buyData(){
+
+    buyData() {
         let phonenumber_value = this.state.phonenumber_value;
-        let bundle_plan = this.state.bundleplan; 
+        let bundle_plan = this.state.bundleplan;
         let amount = this.state.amount;
         let bundlepackage = this.state.bundlepackage;
         let serviceProvider = this.state.serviceProvider;
 
-        let network =""; 
+        let network = "";
 
-        if(this.state.mtn ==true){
-            network="mtn";
-        }else if(this.state.airtel == true){
-            network="airtel";
-        }else if(this.state.glo == true){
-            network="glo";
-        }else if(this.state.etisalat == true){
-            network="9mobile";
-        }else{}
+        if (this.state.mtn == true) {
+            network = "mtn";
+        } else if (this.state.airtel == true) {
+            network = "airtel";
+        } else if (this.state.glo == true) {
+            network = "glo";
+        } else if (this.state.etisalat == true) {
+            network = "9mobile";
+        } else { }
 
-        if(phonenumber_value == "" || amount == ""){
+        if (phonenumber_value == "" || amount == "") {
             alert("Phone number and Amount must be inserted");
-        }else{
-            this.setState({isLoading:true});
-            let endpoint ="";  
+        } else {
+            this.setState({ isLoading: true });
+            let endpoint = "";
             //send api for data purchase
             endpoint = "/topup/data/bundles";
 
-            fetch(GlobalVariables.apiURL+endpoint,
-            { 
-                method: 'POST',
-                headers: new Headers({
-                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                    'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
-                }),
-                body:  "phone="+phonenumber_value
-                    +"&amount="+amount
-                    +"&bundle="+bundle_plan
-                    +"&package="+bundlepackage
-                    +"&network="+network
-                    +"&provider="+serviceProvider
-                    +"&channel=wallet"
-                // <-- Post parameters
-            }) 
-            .then((response) => response.text())
-            .then((responseText) =>    
-            {
-                let response = JSON.parse(responseText);
-                if(response.status == true) {
-                    this.props.navigation.navigate("SuccessPage",
-                    {
-                        transaction_id:response.data.transaction.id,
-                    }); 
-                    this.setState({isLoading:false});
-                }else if(response.status == false){
-                    this.setState({isLoading:false});
-                    Alert.alert(
-                        'Oops. Transaction Error',
-                        // 'You have insufficient funds. Top up your wallet to make this transaction',
-                        response.message,
-                        [
-                            {  
-                                text: 'Try Again',  
-                                onPress: () => {  
-                                    //this.props.navigation.navigate("CardTopUp");
+            fetch(GlobalVariables.apiURL + endpoint,
+                {
+                    method: 'POST',
+                    headers: new Headers({
+                        'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                        'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+                    }),
+                    body: "phone=" + phonenumber_value
+                        + "&amount=" + amount
+                        + "&bundle=" + bundle_plan
+                        + "&package=" + bundlepackage
+                        + "&network=" + network
+                        + "&provider=" + serviceProvider
+                        + "&channel=wallet"
+                    // <-- Post parameters
+                })
+                .then((response) => response.text())
+                .then((responseText) => {
+                    let response = JSON.parse(responseText);
+                    if (response.status == true) {
+                        if (response.data.transaction.status == 'successful') {
+                            this.props.navigation.navigate("StatusPage",
+                                {
+                                    transaction_id: response.data.transaction.id,
+                                    status: 'successful',
+                                    Screen: 'Data'
+                                });
+                        } else if (response.data.transaction.status == 'processing') {
+                            this.props.navigation.navigate("StatusPage",
+                                {
+                                    transaction_id: response.data.transaction.id,
+                                    status: 'processing',
+                                    Screen: 'Data'
+                                });
+                        }
+                    } else if (response.status == false) {
+                        this.setState({ isLoading: false });
+                        Alert.alert(
+                            'Oops. Transaction Error',
+                            // 'You have insufficient funds. Top up your wallet to make this transaction',
+                            response.message,
+                            [
+                                {
+                                    text: 'Try Again',
+                                    onPress: () => {
+                                        //this.props.navigation.navigate("CardTopUp");
+                                    },
+                                    style: 'cancel',
                                 },
-                                style: 'cancel',
-                            }, 
-                        ],
-                        {cancelable: false},
-                    );
-                }else{
-                    this.setState({isLoading:false});
+                            ],
+                            { cancelable: false },
+                        );
+                    } else {
+                        this.setState({ isLoading: false });
+                        Alert.alert(
+                            'Oops. Transaction Error',
+                            'Platform Error. Please try again',
+                            [
+                                {
+                                    text: 'Try Again',
+                                    onPress: () => {
+
+                                    },
+                                    style: 'cancel',
+                                },
+                            ],
+                            { cancelable: false },
+                        );
+                    }
+                })
+                .catch((error) => {
+                    this.setState({ isLoading: false });
                     Alert.alert(
-                        'Oops. Transaction Error',
-                        'Platform Error. Please try again',
+                        'Oops. Network Error',
+                        'Could not connect to server. Check your network and try again',
                         [
                             {
-                                text: 'Try Again', 
+                                text: 'Try Again',
                                 onPress: () => {
-                                    
+
                                 },
-                                style: 'cancel',
-                            }, 
-                        ],
-                        {cancelable: false},
-                    );
-                }
-            })
-            .catch((error) => {
-                this.setState({isLoading:false});
-                Alert.alert(
-                    'Oops. Network Error',
-                    'Could not connect to server. Check your network and try again',
-                    [
-                        {
-                            text: 'Try Again',
-                            onPress: () => {
-                            
+                                style: 'cancel'
                             },
-                            style: 'cancel'
-                        }, 
-                    ],
-                    {cancelable: false},
-                );
-            });
+                        ],
+                        { cancelable: false },
+                    );
+                });
             //end send API for data purchase
         }
     }
 
     setBundleOpen = (bundleOpen) => {
         this.setState({
-          bundleOpen
+            bundleOpen
         });
     }
 
     setBundleValue = (callback) => {
         this.setState(state => ({
-          bundleValue: callback(state.bundleValue)
+            bundleValue: callback(state.bundleValue)
         }));
     }
 
     setBundleItems = (callback) => {
         this.setState(state => ({
-          bundleItems: callback(state.bundleItems)
+            bundleItems: callback(state.bundleItems)
         }));
     }
 
@@ -501,8 +509,8 @@ export default class Data extends Component {
         this.setState({
             bundleValue: value
         })
-        if(value !== null){
-            this.setState({bundleError: false})
+        if (value !== null) {
+            this.setState({ bundleError: false })
         }
     }
 
@@ -510,10 +518,10 @@ export default class Data extends Component {
         this.setState({
             phonenumber_value: phone
         })
-        if(phone !== ''){
-            this.setState({phoneError: false})
-        }else if(phone == ''){
-            this.setState({phoneError: true, phoneErrorMessage: 'Recipient phone number must be inserted'})
+        if (phone !== '') {
+            this.setState({ phoneError: false })
+        } else if (phone == '') {
+            this.setState({ phoneError: true, phoneErrorMessage: 'Recipient phone number must be inserted' })
         }
     }
 
@@ -521,101 +529,101 @@ export default class Data extends Component {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#ffff", true);
+            StatusBar.setTranslucent(true);
         }
 
         return (
             <View style={styles.container}>
-                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
+                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'} />
                 <View style={styles.header}>
                     <View style={styles.left}>
-                        <TouchableOpacity onPress={() =>this.backPressed()}>
+                        <TouchableOpacity onPress={() => this.backPressed()}>
                             <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
                         </TouchableOpacity>
-                    </View> 
+                    </View>
                     <View style={styles.headerBody}>
                         <Text style={styles.body}>Buy Data</Text>
                         <Text style={styles.text}>Top up your mobile data</Text>
                     </View>
                     <View style={styles.right}>
-                        <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
-                    </View> 
+                        <Image style={styles.logo} source={require('../../../assets/logo.png')} />
+                    </View>
                 </View>
                 <View style={[styles.formLine]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Phone Number</Text>
                         <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setPhone(phonenumber_value)}  />
+                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon} />
+                            <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setPhone(phonenumber_value)} />
                         </View>
                         {this.state.phoneError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.phoneErrorMessage}</Text>}
                     </View>
                 </View>
-                <View style={[styles.formLine, {marginTop: '4%'}]}>
+                <View style={[styles.formLine, { marginTop: '4%' }]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Choose Your Network Provider</Text>
                     </View>
                 </View>
                 <View style={styles.grid}>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:3, borderColor:(this.state.mtn) ? "#0C0C54" : "#f5f5f5"}]} 
-                        onPress={()=>{
-                            this.setState({mtn:true});
-                            this.setState({glo:false});
-                            this.setState({airtel:false});
-                            this.setState({etisalat:false});
+                    <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC', borderWidth: 3, borderColor: (this.state.mtn) ? "#0C0C54" : "#f5f5f5" }]}
+                        onPress={() => {
+                            this.setState({ mtn: true });
+                            this.setState({ glo: false });
+                            this.setState({ airtel: false });
+                            this.setState({ etisalat: false });
                             this.getDataPlans('mtn');
                         }}
                     >
-                        <Image source={require('../../Images/mtn-logo.png')} style={{height:70, width:70, borderRadius:15}} />
+                        <Image source={require('../../Images/mtn-logo.png')} style={{ height: 70, width: 70, borderRadius: 15 }} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:3, borderColor:(this.state.glo) ? "#0C0C54" : "#f5f5f5"}]} 
-                        onPress={()=>{
-                            this.setState({mtn:false});
-                            this.setState({glo:true});
-                            this.setState({airtel:false});
-                            this.setState({etisalat:false});
+                    <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC', borderWidth: 3, borderColor: (this.state.glo) ? "#0C0C54" : "#f5f5f5" }]}
+                        onPress={() => {
+                            this.setState({ mtn: false });
+                            this.setState({ glo: true });
+                            this.setState({ airtel: false });
+                            this.setState({ etisalat: false });
                             this.getDataPlans('glo');
                         }}
                     >
-                        <Image source={require('../../Images/glo.png')} style={{height:55, width:55, borderRadius:10}} />
+                        <Image source={require('../../Images/glo.png')} style={{ height: 55, width: 55, borderRadius: 10 }} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:3, borderColor:(this.state.airtel) ? "#0C0C54" : "#f5f5f5"}]} 
-                        onPress={()=>{
-                            this.setState({mtn:false});
-                            this.setState({glo:false});
-                            this.setState({airtel:true});
-                            this.setState({etisalat:false});
+                    <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC', borderWidth: 3, borderColor: (this.state.airtel) ? "#0C0C54" : "#f5f5f5" }]}
+                        onPress={() => {
+                            this.setState({ mtn: false });
+                            this.setState({ glo: false });
+                            this.setState({ airtel: true });
+                            this.setState({ etisalat: false });
                             this.getDataPlans('airtel');
                         }}
                     >
-                        <Image source={require('../../Images/airtel-logo.png')} style={{height:50, width:50, borderRadius:10}} />
+                        <Image source={require('../../Images/airtel-logo.png')} style={{ height: 50, width: 50, borderRadius: 10 }} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#E0EBEC', borderWidth:3, borderColor:(this.state.etisalat) ? "#0C0C54" : "#f5f5f5"}]} 
-                        onPress={()=>{
-                            this.setState({mtn:false});
-                            this.setState({glo:false});
-                            this.setState({airtel:false});
-                            this.setState({etisalat:true});
+                    <TouchableOpacity style={[styles.flexx, { backgroundColor: '#E0EBEC', borderWidth: 3, borderColor: (this.state.etisalat) ? "#0C0C54" : "#f5f5f5" }]}
+                        onPress={() => {
+                            this.setState({ mtn: false });
+                            this.setState({ glo: false });
+                            this.setState({ airtel: false });
+                            this.setState({ etisalat: true });
                             this.getDataPlans('9mobile');
                         }}
                     >
-                        <Image source={require('../../Images/etisalat.jpg')} style={{height:50, width:50, borderRadius:10}} />
+                        <Image source={require('../../Images/etisalat.jpg')} style={{ height: 50, width: 50, borderRadius: 10 }} />
                     </TouchableOpacity>
                 </View>
                 <View>
-                    <View style={{justifyContent:'center'}}>
+                    <View style={{ justifyContent: 'center' }}>
                         <Text
                             style={{
                                 fontFamily: "SFUIDisplay-Medium",
-                                fontSize:14,
-                                marginTop:'5%',
-                                marginLeft:'3.5%'
+                                fontSize: 14,
+                                marginTop: '5%',
+                                marginLeft: '3.5%'
                             }}
                         >Select Bundle Plan</Text>
                     </View>
-                    
+
                     {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:40, zIndex:1000}}>
                         <DropDownPicker
                             placeholder={'Select Bundle Plan'}
@@ -631,7 +639,7 @@ export default class Data extends Component {
                             disabled={this.state.bundleDisable}
                         />
                     </View> */}
-                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                    <View style={{ width: '92.7%', marginLeft: '3.7%', backgroundColor: "#f6f6f6", height: 40, borderWidth: 1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center' }}>
                         <Picker
                             selectedValue={this.state.bundleValue}
                             onValueChange={(itemValue, itemIndex) =>
@@ -639,10 +647,10 @@ export default class Data extends Component {
                             }
                             enabled={this.state.bundleEnable}
                         >
-                            <Picker.Item label="Select Bundle Plan" value={null} style={{fontSize: 14}}/>
-                            
+                            <Picker.Item label="Select Bundle Plan" value={null} style={{ fontSize: 14 }} />
+
                             {this.state.bundles.map((plan, index) => (
-                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{ fontSize: 14 }} />
                             ))}
                         </Picker>
                     </View>
@@ -652,8 +660,8 @@ export default class Data extends Component {
                 {/* Card Option*/}
                 <View
                     style={{
-                        backgroundColor:'#fff',
-                        marginTop:'5%',
+                        backgroundColor: '#fff',
+                        marginTop: '5%',
                         marginLeft: '4%',
                         borderRadius: 30,
                         borderWidth: 1,
@@ -662,57 +670,57 @@ export default class Data extends Component {
                         elevation: 2
                     }}
                 >
-                    <View 
+                    <View
                         style={{
-                            paddingLeft:1,
-                            marginTop:'3%',
-                            marginLeft:'2%',
-                            marginRight:'4%'
+                            paddingLeft: 1,
+                            marginTop: '3%',
+                            marginLeft: '2%',
+                            marginRight: '4%'
                         }}
                     >
                         <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
-                                    <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
+                            <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => { this.setState({ epayWalletChecked: true, payOnDelieveryChecked: false }); }}>
+                                <TouchableOpacity style={[styles.circle, { marginTop: '7%' }]} onPress={() => { this.setState({ epayWalletChecked: true, payOnDelieveryChecked: false }); }} >
+                                    <View style={(this.state.epayWalletChecked) ? styles.checkedCircle : styles.circle} />
                                 </TouchableOpacity>
 
-                                <View style={{marginLeft:'1%', padding:7}}>
-                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
-                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
-                                    <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
+                                <View style={{ marginLeft: '1%', padding: 7 }}>
+                                    <Text style={{ fontSize: 13, marginLeft: '2%' }}>Pay from your wallet</Text>
+                                    <Text style={{ color: '#7a7a7a', fontSize: 13, marginLeft: '2%' }}>You pay directly from your paytyme wallet</Text>
+                                    <Image source={require('../../Images/logo.jpg')} style={{ width: 90, height: 40, marginLeft: -7, borderRadius: 20 }} />
                                 </View>
                             </TouchableOpacity>
-                        </View> 
-                        <View style={[styles.buttonContainer,{borderTopColor:'#f5f5f5', borderTopWidth:1}]}>
-                            <TouchableOpacity style={{flexDirection:'row'}} 
-                                onPress={()=>{
-                                    this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
+                        </View>
+                        <View style={[styles.buttonContainer, { borderTopColor: '#f5f5f5', borderTopWidth: 1 }]}>
+                            <TouchableOpacity style={{ flexDirection: 'row' }}
+                                onPress={() => {
+                                    this.setState({ epayWalletChecked: false, payOnDelieveryChecked: true });
                                 }}
-                            > 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
-                                    <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
+                            >
+                                <TouchableOpacity style={[styles.circle, { marginTop: '7%' }]} onPress={() => { this.setState({ epayWalletChecked: false, payOnDelieveryChecked: true }); }}>
+                                    <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle} />
                                 </TouchableOpacity>
 
-                                <View style={{marginLeft:'1%', padding:5}}>
-                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay with Card</Text>
-                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>Make Payment with your Debit/Credit Card </Text>
-                                    <Image source={require('../../Images/payment-terms.png')} style={{ width:270, height:50, marginLeft:-7, borderRadius:20 }}/>
+                                <View style={{ marginLeft: '1%', padding: 5 }}>
+                                    <Text style={{ fontSize: 13, marginLeft: '2%' }}>Pay with Card</Text>
+                                    <Text style={{ color: '#7a7a7a', fontSize: 13, marginLeft: '2%' }}>Make Payment with your Debit/Credit Card </Text>
+                                    <Image source={require('../../Images/payment-terms.png')} style={{ width: 270, height: 50, marginLeft: -7, borderRadius: 20 }} />
                                 </View>
                             </TouchableOpacity>
-                        </View> 
-                    </View>   
-                </View> 
+                        </View>
+                    </View>
+                </View>
 
                 {/* Card Option */}
 
                 <TouchableOpacity
                     info
-                    style={[styles.buttonPurchase,{marginBottom:'5%'}]}
+                    style={[styles.buttonPurchase, { marginBottom: '5%' }]}
                     onPress={() => {
                         (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
                     }}
                 >
-                    <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
+                    <Text autoCapitalize="words" style={[styles.purchaseButton, { color: '#fff', fontWeight: 'bold' }]}>
                         Confirm Purchase
                     </Text>
                 </TouchableOpacity>

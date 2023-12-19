@@ -213,12 +213,22 @@ export default class DebitCardPayment extends Component {
                 let data = JSON.parse(responseText).data;
                 if (data.payment_link) {
                     let payment_link = data.payment_link;
-                    this.props.navigation.navigate("Paystack", { payment_link, saveCard });
-                } else {
-                    this.props.navigation.navigate("SuccessPage",
-                        {
-                            transaction_id: response.data.transaction.id,
-                        });
+                    let screen = 'Airtime';
+                    this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen });
+                } else if(response.data.transaction.status == 'successful'){
+                    this.props.navigation.navigate("StatusPage",
+                    {
+                        transaction_id:response.data.transaction.id,
+                        status: 'successful',
+                        Screen: 'Airtime'
+                    }); 
+                }else if(response.data.transaction.status == 'processing'){
+                    this.props.navigation.navigate("StatusPage",
+                    {
+                        transaction_id:response.data.transaction.id,
+                        status: 'processing',
+                        Screen: 'Airtime'
+                    }); 
                 }
             } else if (response.message == "Insufficient funds") {
                 this.setState({ isLoading: false });
@@ -308,12 +318,22 @@ export default class DebitCardPayment extends Component {
                     let data = JSON.parse(responseText).data;
                     if (data.payment_link) {
                         let payment_link = data.payment_link;
-                        this.props.navigation.navigate("Paystack", { payment_link, saveCard });
-                    } else {
-                        this.props.navigation.navigate("SuccessPage",
-                            {
-                                transaction_id: response.data.transaction.id,
-                            });
+                        let screen = 'Data';
+                        this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
+                    } else if(response.data.transaction.status == 'successful'){
+                        this.props.navigation.navigate("StatusPage",
+                        {
+                            transaction_id:response.data.transaction.id,
+                            status: 'successful',
+                            Screen: 'Data'
+                        }); 
+                    }else if(response.data.transaction.status == 'processing'){
+                        this.props.navigation.navigate("StatusPage",
+                        {
+                            transaction_id:response.data.transaction.id,
+                            status: 'processing',
+                            Screen: 'Data'
+                        }); 
                     }
                 } else if (response.status == false) {
                     this.setState({ isLoading: false });
@@ -401,12 +421,22 @@ export default class DebitCardPayment extends Component {
                     let data = JSON.parse(responseText).data;
                     if (data.payment_link) {
                         let payment_link = data.payment_link;
-                        this.props.navigation.navigate("Paystack", { payment_link, saveCard });
-                    } else {
-                        this.props.navigation.navigate("SuccessPage",
-                            {
-                                transaction_id: response.data.transaction.id,
-                            });
+                        let screen = 'Betting';
+                        this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
+                    } else if(response.data.transaction.status == 'successful'){
+                        this.props.navigation.navigate("StatusPage",
+                        {
+                            transaction_id:response.data.transaction.id,
+                            status: 'successful',
+                            Screen: 'Betting'
+                        }); 
+                    }else if(response.data.transaction.status == 'processing'){
+                        this.props.navigation.navigate("StatusPage",
+                        {
+                            transaction_id:response.data.transaction.id,
+                            status: 'processing',
+                            Screen: 'Betting'
+                        }); 
                     }
                 } else if (response.status == false) {
                     this.setState({ isLoading: false });
@@ -498,12 +528,22 @@ export default class DebitCardPayment extends Component {
                         let data = JSON.parse(responseText).data;
                         if (data.payment_link) {
                             let payment_link = data.payment_link;
-                            this.props.navigation.navigate("Paystack", { payment_link, saveCard });
-                        } else {
-                            this.props.navigation.navigate("SuccessPage",
-                                {
-                                    transaction_id: response.data.transaction.id,
-                                });
+                            let screen = 'Education';
+                            this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
+                        } else if(response.data.transaction.status == 'successful'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id:response.data.transaction.id,
+                                status: 'successful',
+                                Screen: 'Education'
+                            }); 
+                        }else if(response.data.transaction.status == 'processing'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id:response.data.transaction.id,
+                                status: 'processing',
+                                Screen: 'Education'
+                            }); 
                         }
                     } else if (response.status == false) {
                         this.setState({ isLoading: false });
@@ -584,19 +624,28 @@ export default class DebitCardPayment extends Component {
                 })
                 .then((response) => response.text())
                 .then((responseText) => {
-                    console.log(responseText)
                     this.setState({ isLoading: false });
                     let response = JSON.parse(responseText);
                     if (response.status == true) {
                         let data = JSON.parse(responseText).data;
                         if (data.payment_link) {
                             let payment_link = data.payment_link;
-                            this.props.navigation.navigate("Paystack", { payment_link, saveCard });
-                        } else {
-                            this.props.navigation.navigate("SuccessPage",
-                                {
-                                    transaction_id: response.data.transaction.id,
-                                });
+                            let screen = 'Education';
+                            this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
+                        } else if(response.data.transaction.status == 'successful'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id:response.data.transaction.id,
+                                status: 'successful',
+                                Screen: 'Education'
+                            }); 
+                        }else if(response.data.transaction.status == 'processing'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id:response.data.transaction.id,
+                                status: 'processing',
+                                Screen: 'Education'
+                            }); 
                         }
                     } else if (response.status == false) {
                         this.setState({ isLoading: false });
@@ -633,7 +682,7 @@ export default class DebitCardPayment extends Component {
                     }
                 })
                 .catch((error) => {
-                    console.log(error)
+                    // console.log(error)
                     // this.setState({isLoading:false});
                     // Alert.alert(
                     //     'Oops. Network Error',
@@ -699,18 +748,21 @@ export default class DebitCardPayment extends Component {
                     let data = JSON.parse(responseText).data;
                     if (data.payment_link) {
                         let payment_link = data.payment_link;
-                        this.props.navigation.navigate("Paystack", { payment_link, saveCard });
+                        let screen = 'TvSubscription';
+                        this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
                     }else if(data.transaction.status == 'successful'){
-                        this.props.navigation.navigate("SuccessPage",
+                        this.props.navigation.navigate("StatusPage",
                         {
                             transaction_id: data.transaction.id,
-                            status: 'successful'
+                            status: 'successful',
+                            Screen: 'TvSubscription'
                         }); 
                     }else if(data.transaction.status == 'processing'){
-                        this.props.navigation.navigate("SuccessPage",
+                        this.props.navigation.navigate("StatusPage",
                         {
                             transaction_id: data.transaction.id,
-                            status: 'processing'
+                            status: 'processing',
+                            Screen: 'TvSubscription'
                         }); 
                     }
                     this.setState({ isLoading: false });
@@ -757,25 +809,26 @@ export default class DebitCardPayment extends Component {
                 console.log(result)
                 //go on
                 let resultjson = JSON.parse(result);
-                console.log(resultjson);
-
                 if (resultjson.status == true) {
                     this.setState({ isLoading: false });
                     let data = JSON.parse(result).data;
                     if (data.payment_link) {
                         let payment_link = data.payment_link;
-                        this.props.navigation.navigate("Paystack", { payment_link, saveCard });
+                        let screen = 'TvSubscription';
+                        this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
                     }else if(data.transaction.status == 'successful'){
-                        this.props.navigation.navigate("SuccessPage",
+                        this.props.navigation.navigate("StatusPage",
                         {
                             transaction_id: data.transaction.id,
-                            status: 'successful'
+                            status: 'successful',
+                            Screen: 'TvSubscription'
                         }); 
                     }else if(data.transaction.status == 'processing'){
-                        this.props.navigation.navigate("SuccessPage",
+                        this.props.navigation.navigate("StatusPage",
                         {
                             transaction_id: data.transaction.id,
-                            status: 'processing'
+                            status: 'processing',
+                            Screen: 'TvSubscription'
                         }); 
                     }
                     this.setState({ isLoading: false });
@@ -925,12 +978,22 @@ export default class DebitCardPayment extends Component {
                 let data = JSON.parse(responseText).data;
                 if (data.payment_link) {
                     let payment_link = data.payment_link;
-                    this.props.navigation.navigate("Paystack", { payment_link, saveCard });
-                } else {
-                    this.props.navigation.navigate("SuccessPage",
+                    let screen = 'WalletTopUp';
+                    this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
+                }else if(response.data.transaction.status == 'successful'){
+                    this.props.navigation.navigate("StatusPage",
                     {
-                        transaction_id: response.data.transaction.id,
-                    });
+                        transaction_id:response.data.transaction.id,
+                        status: 'successful',
+                        Screen: 'WalletTopUp'
+                    }); 
+                }else if(response.data.transaction.status == 'processing'){
+                    this.props.navigation.navigate("StatusPage",
+                    {
+                        transaction_id:response.data.transaction.id,
+                        status: 'processing',
+                        Screen: 'WalletTopUp'
+                    }); 
                 }
             } else if (response.status == false) {
                 this.setState({ isLoading: false });
@@ -999,11 +1062,14 @@ export default class DebitCardPayment extends Component {
                 let data = JSON.parse(responseText).data;
                 if (data.payment_link) {
                     let payment_link = data.payment_link;
-                    this.props.navigation.navigate("Paystack", { payment_link, saveCard });
+                    let screen = 'WalletTransfer';
+                    this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
                 } else {
-                    this.props.navigation.navigate("SuccessPage",
+                    this.props.navigation.navigate("StatusPage",
                     {
                         transaction_id: response.data.transaction.id,
+                        status: 'successful',
+                        Screen: 'WalletTransfer'
                     });
                 }
             }else if(response.status == false){
@@ -1055,7 +1121,6 @@ export default class DebitCardPayment extends Component {
     }
 
     payElectricityBill(amount, phone_number, meter_no, meter_type, company, card, serviceProvider, saveCard) {
-        // console.log(amount, phone_number, meter_no, meter_type, company, card, serviceProvider, saveCard)
         this.setState({ isLoading: true });
         let myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + this.state.auth_token);
@@ -1105,15 +1170,25 @@ export default class DebitCardPayment extends Component {
                     let data = JSON.parse(result).data;
                     if (data.payment_link) {
                         let payment_link = data.payment_link;
-                        this.props.navigation.navigate("Paystack", { payment_link, saveCard });
+                        let screen = 'Electricity';
+                        this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen });
                     } else {
                         let transaction = data.transaction;
                         let status = transaction.status;
 
                         if(status == 'successful'){
-                            this.props.navigation.navigate("SuccessPage",
+                            this.props.navigation.navigate("StatusPage",
                             {
-                                transaction_id:resultjson.data.transaction.id,
+                                transaction_id:data.transaction.id,
+                                status: 'successful',
+                                Screen: 'Electricity'
+                            }); 
+                        }else if(status == 'processing'){
+                            this.props.navigation.navigate("StatusPage",
+                            {
+                                transaction_id:data.transaction.id,
+                                status: 'processing',
+                                Screen: 'Electricity'
                             }); 
                         }else{
                             this.setState({isLoading:false});
@@ -1130,10 +1205,7 @@ export default class DebitCardPayment extends Component {
                             );
                         }
                     }
-
-                    
                 }
-            
             })
             .catch((error) => {
                 console.log(error)
@@ -1198,15 +1270,25 @@ export default class DebitCardPayment extends Component {
                 let data = JSON.parse(responseText).data;
                 if (data.payment_link) {
                     let payment_link = data.payment_link;
-                    this.props.navigation.navigate("Paystack", { payment_link, saveCard });
+                    let screen = 'Insurance';
+                    this.props.navigation.navigate("Paystack", { payment_link, saveCard, screen});
                 } else {
                     let transaction = data.transaction;
                     let status = transaction.status;
 
                     if(status == 'successful'){
-                        this.props.navigation.navigate("SuccessPage",
+                        this.props.navigation.navigate("StatusPage",
                         {
-                            transaction_id:resultjson.data.transaction.id,
+                            transaction_id:transaction.id,
+                            status: 'successful',
+                            Screen: 'Insurance'
+                        }); 
+                    }else if(status == 'processing'){
+                        this.props.navigation.navigate("StatusPage",
+                        {
+                            transaction_id:transaction.id,
+                            status: 'processing',
+                            Screen: 'Insurance'
                         }); 
                     }else{
                         this.setState({isLoading:false});

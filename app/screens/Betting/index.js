@@ -329,9 +329,10 @@ export default class Airtime extends Component {
                 this.setState({isLoading:true});
                 let response = JSON.parse(responseText);
                 if(response.status == true) { 
-                    this.props.navigation.navigate("SuccessPage",
+                    this.props.navigation.navigate("StatusPage",
                     {
                         transaction_id:response.data.transaction.id,
+                        Screen: 'Betting'
                     }); 
                 }else if(response.status == false){
                     this.setState({isLoading:false});

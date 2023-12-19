@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StatusBar, TouchableOpacity, Image, Alert, View, Text, Platform} from 'react-native';
+import {StatusBar, TouchableOpacity, Image, Alert, View, Text, Platform, BackHandler} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import styles from "./transaction_styles";
@@ -59,6 +59,7 @@ export default class SingleTransaction extends Component {
             'Lato-Regular': require('../../Fonts/Lato-Regular.ttf')
         });
         this.setState({ fontLoaded: true });
+        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
     }
 
     backPressed = () => {
@@ -362,7 +363,7 @@ export default class SingleTransaction extends Component {
                 </View>
                 {
                     this.props.route.params.route == 'home'? 
-                    <View style={{marginTop:'80%', marginBottom:'0%'}}>
+                    <View style={{marginTop:'60%', marginBottom:'0%'}}>
                         <TouchableOpacity info style={[styles.buttonPurchase, {backgroundColor:'linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), #FFFFFF'}]} onPress={() => {
                             this.props.navigation.dispatch(
                                 CommonActions.reset({
@@ -378,7 +379,7 @@ export default class SingleTransaction extends Component {
                         </TouchableOpacity>
                     </View>
                     :
-                    <View style={{marginTop:'80%', marginBottom:'0%'}}>
+                    <View style={{marginTop:'60%', marginBottom:'0%'}}>
                         <Text style={{marginTop:'80%', marginBottom:'0%'}}></Text>
                     </View>
                 }

@@ -160,10 +160,12 @@ export default class Home extends Component {
         let transaction_list = [];
         for (let transaction of this.state.transactions) {
             let status = transaction.status;
+            description_length = transaction.description.length;
+            font_size = description_length > 40 ? 9 : 10;
             transaction_list.push(
                 <View style={{marginTop: '2%', marginRight: '0%', borderWidth: 1, borderRadius: 10, borderColor: '#C4C4C4', height:'20%', alignSelf:'center', width:'90%', backgroundColor: '#FFFFFF'}} key={transaction.id}>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={{fontSize:10, color:'#120A47', marginLeft:'3%', width:'69%', marginTop:'0.4%'}}>{transaction.description}</Text>
+                        <Text style={{fontSize:font_size, color:'#120A47', marginLeft:'3%', width:'70%', marginTop:'0.4%'}}>{transaction.description}</Text>
                         {
                             status == 'successful' ?
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.4%', justifyContent: "center"}}>
@@ -329,7 +331,7 @@ export default class Home extends Component {
                         <FontAwesome5 name={'mobile-alt'} color={'#34A853'} size={30} />
                         <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Data Purchase</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("TVSubscription") }}>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("TvSubscription") }}>
                         <FontAwesome5 name={'tv'} color={'#DD92D8'} size={28} />
                         <Text style={[styles.menutext, { paddingTop: 5, fontSize: 9}]}>Tv Subscription</Text>
                     </TouchableOpacity>

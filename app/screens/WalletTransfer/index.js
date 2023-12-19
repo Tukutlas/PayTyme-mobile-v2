@@ -25,7 +25,6 @@ export default class WalletTransfer extends Component {
         this.state = {
             modalVisible: false,
             auth_token:"",
-            
             epayWalletChecked:true, 
             payOnDelieveryChecked:false,
             balance: 0,
@@ -74,9 +73,9 @@ export default class WalletTransfer extends Component {
         if(this.state.transaction){
             this.props.navigation.dispatch(
                 CommonActions.reset({
-                routes: [
-                    { name: 'Tabs' }
-                ],
+                    routes: [
+                        { name: 'Tabs' }
+                    ],
                 })
             );
         }else{
@@ -260,9 +259,10 @@ export default class WalletTransfer extends Component {
             this.setState({isLoading:true});
             let response = JSON.parse(responseText);
             if(response.status == true) {
-                this.props.navigation.navigate("SuccessPage",
+                this.props.navigation.navigate("StatusPage",
                 {
                     transaction_id:response.data.transaction.id,
+                    Screen: 'WalletTransfer'
                 });
             }else if(response.status == false){
                 this.setState({isLoading:false});

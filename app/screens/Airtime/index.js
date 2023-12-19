@@ -355,11 +355,21 @@ export default class Airtime extends Component {
                 this.setState({isLoading:true});
                 let response = JSON.parse(responseText);
                 if(response.status == true) { 
-                    this.props.navigation.navigate("SuccessPage",
-                    {
-                        transaction_id:response.data.transaction.id,
-                    }); 
-
+                    if(response.data.transaction.status == 'successful'){
+                        this.props.navigation.navigate("StatusPage",
+                        {
+                            transaction_id:response.data.transaction.id,
+                            status: 'successful',
+                            Screen: 'Airtime'
+                        }); 
+                    }else if(response.data.transaction.status == 'processing'){
+                        this.props.navigation.navigate("StatusPage",
+                        {
+                            transaction_id:response.data.transaction.id,
+                            status: 'processing',
+                            Screen: 'Airtime'
+                        }); 
+                    }
                 }else if(response.status == false){
                     this.setState({isLoading:false});
                     Alert.alert(

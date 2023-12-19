@@ -454,9 +454,10 @@ export default class Education extends Component {
                 if(response.status == true) { 
                     this.setState({isLoading:false});
                     console.log(response.data.transaction.id);
-                    this.props.navigation.navigate("SuccessPage",
+                    this.props.navigation.navigate("StatusPage",
                     {
                         transaction_id:response.data.transaction.id,
+                        Screen: 'Education'
                     }); 
                 }else if(response.status == false){
                     this.setState({isLoading:false});
@@ -541,9 +542,10 @@ export default class Education extends Component {
                 let response = JSON.parse(responseText);
                 if(response.status == true) { 
                     console.log(response.data.transaction.id);
-                    this.props.navigation.navigate("SuccessPage",
+                    this.props.navigation.navigate("StatusPage",
                     {
                         transaction_id:response.data.transaction.id,
+                        Screen: 'Education'
                     }); 
                 }else if(response.status == false){
                     this.setState({isLoading:false});

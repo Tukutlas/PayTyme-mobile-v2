@@ -565,9 +565,10 @@ export default class Insurance extends Component {
                     );  
                     
                 }else if(resultjson.status == true){
-                    this.props.navigation.navigate("SuccessPage",
+                    this.props.navigation.navigate("StatusPage",
                     {
                         transaction_id:resultjson.data.transaction.id,
+                        Screen: 'Insurance'
                     }); 
                 }
             })

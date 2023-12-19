@@ -278,9 +278,10 @@ export default class Electricity extends Component {
                     let transaction = resultjson.data.transaction;
                     let status = transaction.status;
                     if(status == 'successful'){
-                        this.props.navigation.navigate("SuccessPage",
+                        this.props.navigation.navigate("StatusPage",
                         {
                             transaction_id:resultjson.data.transaction.id,
+                            Screen: 'Electricity'
                         }); 
                     }else{
                         this.setState({isLoading:false});

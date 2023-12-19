@@ -397,16 +397,18 @@ export default class TvSubscription extends Component {
                     if(resultjson.status == true){
                         this.setState({isLoading:false});
                         if(resultjson.data.transaction.status == 'successful'){
-                             this.props.navigation.navigate("SuccessPage",
+                             this.props.navigation.navigate("StatusPage",
                             {
                                 transaction_id:resultjson.data.transaction.id,
-                                status: 'successful'
+                                status: 'successful',
+                                Screen: 'TvSubscription'
                             }); 
                         }else if(resultjson.data.transaction.status == 'processing'){
-                            this.props.navigation.navigate("SuccessPage",
+                            this.props.navigation.navigate("StatusPage",
                            {
                                transaction_id:resultjson.data.transaction.id,
-                               status: 'processing'
+                               status: 'processing',
+                               Screen: 'TvSubscription'
                            }); 
                         }else{
                             Alert.alert(
@@ -477,16 +479,18 @@ export default class TvSubscription extends Component {
                     if(resultjson.status == true){
                         this.setState({isLoading:false});
                         if(resultjson.data.transaction.status == 'successful'){
-                             this.props.navigation.navigate("SuccessPage",
+                             this.props.navigation.navigate("StatusPage",
                             {
                                 transaction_id:resultjson.data.transaction.id,
-                                status: 'successful'
+                                status: 'successful',
+                                Screen: 'TvSubscription'
                             }); 
                         }else if(resultjson.data.transaction.status == 'processing'){
-                            this.props.navigation.navigate("SuccessPage",
+                            this.props.navigation.navigate("StatusPage",
                            {
                                transaction_id:resultjson.data.transaction.id,
-                               status: 'processing'
+                               status: 'processing',
+                               Screen: 'TvSubscription'
                            }); 
                         }else{
                             Alert.alert(
