@@ -200,14 +200,14 @@ export default class Transactions extends Component {
                         {
                             status == 'successful' ?
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
-                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '3%', color:'#0c0c54', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
+                                <Text style={{fontSize:11, paddingBottom: '3%', color:'#0c0c54', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
                             </View>
                             : status == 'processing' ? 
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
-                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '3%', color:'#FFA500', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
+                                <Text style={{fontSize:11, paddingBottom: '3%', color:'#FFA500', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
                             </View> 
                             : <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.7%', justifyContent: "center"}}>
-                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '3%', color:'#f03434', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
+                                <Text style={{fontSize:11, paddingBottom: '3%', color:'#f03434', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
                             </View>
                         }
                     </View>

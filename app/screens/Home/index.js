@@ -169,11 +169,11 @@ export default class Home extends Component {
                         {
                             status == 'successful' ?
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.4%', justifyContent: "center"}}>
-                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '4%', color:'#0c0c54', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
+                                <Text style={{fontSize:11, paddingBottom: '4%', color:'#0c0c54', fontFamily: 'Lato-Regular'}}>{transaction.status}</Text>
                             </View>
                             :
                             <View style={{marginLeft:'0%', width:'20%', alignItems: "center", marginTop: '0.4%', justifyContent: "center"}}>
-                                <Text style={{fontSize:11, color:'#fff', paddingBottom: '4%', color:'#f03434'}}>{transaction.status}</Text>
+                                <Text style={{fontSize:11, paddingBottom: '4%', color:'#f03434'}}>{transaction.status}</Text>
                             </View>
                         }
                     </View>
