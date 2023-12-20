@@ -352,7 +352,7 @@ export default class Airtime extends Component {
             .then((response) => response.text())
             .then((responseText) =>    
             {
-                this.setState({isLoading:true});
+                this.setState({isLoading:false});
                 let response = JSON.parse(responseText);
                 if(response.status == true) { 
                     if(response.data.transaction.status == 'successful'){
