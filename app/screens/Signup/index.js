@@ -57,7 +57,6 @@ export default class Signup extends Component {
         this.setState({ isLoading: false });
     }
 
-
     async removeItemValue(key) {
         try {
             await AsyncStorage.removeItem(key);
@@ -212,7 +211,6 @@ export default class Signup extends Component {
                     dis.closeProgressbar();
                     let api_response = JSON.parse(responseText);
                     let response_status = JSON.parse(responseText).status;
-                    console.log(api_response)
                     dis.closeProgressbar();
 
                     this.setState({ isProgress: false });
@@ -294,7 +292,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>First Name</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your first name" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="firstname" onChangeText={(firstname) => this.setState({ firstname })} value={this.state.firstname} />
+                                <TextInput placeholder="Enter your first name" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="firstname" onChangeText={(firstname) => this.setState({ firstname })} />
                             </View>
                         </View>
                     </View>
@@ -304,7 +302,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Last Name</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your last name" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="lastname" onChangeText={(lastname) => this.setState({ lastname })} value={this.state.lastname} />
+                                <TextInput placeholder="Enter your last name" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="lastname" onChangeText={(lastname) => this.setState({ lastname })} />
                             </View>
                         </View>
                     </View>
@@ -324,7 +322,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Phone</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="+234" style={styles.input} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" ref="phone" onChangeText={(phone) => this.setState({ phone })} value={this.state.phone} />
+                                <TextInput placeholder="+234" style={styles.input} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" ref="phone" onChangeText={(phone) => this.setState({ phone })} />
                             </View>
                         </View>
                     </View>
@@ -334,7 +332,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Username</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Input a preferred username" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="username" onChangeText={(username) => this.setState({ username })} value={this.state.username} />
+                                <TextInput placeholder="Input a preferred username" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="username" onChangeText={(username) => this.setState({ username })} />
                             </View>
                         </View>
                     </View>
@@ -344,7 +342,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Password</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter Password" secureTextEntry={this.state.hidePassword} style={styles.input} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })} value={this.state.password} />
+                                <TextInput placeholder="Enter Password" secureTextEntry={this.state.hidePassword} style={styles.input} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })}/>
                                 <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
                                     <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                                 </TouchableOpacity>
@@ -357,7 +355,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Confirm Password</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Confirm Password" secureTextEntry={this.state.hideConfirmPassword} style={styles.input} placeholderTextColor={"#A9A9A9"} ref="confirm_password" onChangeText={(confirm_password) => this.setState({ confirm_password })} value={this.state.confirm_password} />
+                                <TextInput placeholder="Confirm Password" secureTextEntry={this.state.hideConfirmPassword} style={styles.input} placeholderTextColor={"#A9A9A9"} ref="confirm_password" onChangeText={(confirm_password) => this.setState({ confirm_password })}/>
                                 <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setConfirmPasswordVisibility}>
                                     <Image source={(this.state.hideConfirmPassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                                 </TouchableOpacity>

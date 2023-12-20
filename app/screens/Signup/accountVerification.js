@@ -98,8 +98,7 @@ export default class AccountVerification extends Component {
         this.setState({isLoading:true});
         let phone = this.state.phone;
         let otp = this.state.otp;
-        console.log(phone)
-        console.log(otp)
+
         if (otp == '') {
             this.setState({otpError: true, otpErrorMessage: 'Please Kindly insert the verification code'})
         }else if(otp != ''){ 
@@ -180,7 +179,7 @@ export default class AccountVerification extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                <View style={[styles.formline]}>
+                <View style={[styles.formLine]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter OTP</Text>
                         {/* <View roundedc style={styles.inputitem}>

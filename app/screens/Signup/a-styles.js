@@ -64,13 +64,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     backgroundColor: '#fff',
     width: '100%',
-    // paddingTop:0
-    paddingTop: Metrics.HEIGHT * 0.00001,
-  },
+    paddingTop: 0,
+},
 
   formCenter: {
-    paddingLeft: Metrics.WIDTH * 0.0421,
-    width: Metrics.WIDTH * 1.05
+    marginLeft: '4%', // Adjust the padding according to your requirement
+    width: '92%',
   },
 
   inputitem: {

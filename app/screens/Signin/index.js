@@ -109,11 +109,7 @@ export default class Signin extends Component {
                 this.setState({ email: email });
                 this.setState({ password: password });
                 this.signInUser(this);
-            } else {
-                // setup the user's fingerprint 
-                alert("Invalid Finger Print");
-                // this.scanFingerprint();
-            }
+            } 
         } catch (error) {
             Alert.alert('error', error.toString());
         }
