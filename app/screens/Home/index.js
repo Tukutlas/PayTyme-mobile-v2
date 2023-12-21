@@ -20,7 +20,7 @@ export default class Home extends Component {
             tier: "",
             view: false,
             profilePicture: null,
-            isLoading: true,
+            isLoading: false,
             transactions: [],
             transaction_list: [],
         };
@@ -31,9 +31,6 @@ export default class Home extends Component {
     }
 
     async componentDidMount() {
-        //Here is the Trick
-        const { navigation } = this.props;
-
         this.setState({
             auth_token: JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token,
             username: JSON.parse(await AsyncStorage.getItem('login_response')).user.username,
@@ -46,7 +43,6 @@ export default class Home extends Component {
 
         this.loadWalletBalance();
         this.getTransactionHistory();
-
         this.checkIfUserHasVirtualAccount();
 
         let walletVisibility = await AsyncStorage.getItem('walletVisibility');
@@ -71,6 +67,12 @@ export default class Home extends Component {
         });
 
         this.setState({ fontLoaded: true });
+
+        this.props.navigation.addListener('focus', () => {
+            this.loadWalletBalance();
+            this.getTransactionHistory();
+            this.checkIfUserHasVirtualAccount();
+        });
     }
 
     loadWalletBalance() {
@@ -108,6 +110,7 @@ export default class Home extends Component {
             }
         })
         .catch((error) => {
+            this.setState({isLoading:false});
             // alert("Network error. Please check your connection settings");
             // console.log(error)
         });
@@ -152,8 +155,8 @@ export default class Home extends Component {
         .catch((error) => {
             // console.log(error)
             alert("Network error. Please check your connection settings");
+            this.setState({isLoading:false});
         });
-        
     }
 
     transactions(){

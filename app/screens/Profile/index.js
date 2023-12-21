@@ -72,6 +72,10 @@ export default class Profile extends Component {
             'Lato-Regular': require('../../Fonts/Lato-Regular.ttf'),
         });
         this.setState({ fontLoaded: true });
+
+        this.props.navigation.addListener('focus', () => {
+            this.loadWalletBalance();
+        });
     }
 
     checkDeviceForHardware = async () => {

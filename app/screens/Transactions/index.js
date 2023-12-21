@@ -55,7 +55,13 @@ export default class Transactions extends Component {
         if(JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null){
             this.setState({profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image})
         }
+        
         this.loadWalletBalance();
+
+        this.props.navigation.addListener('focus', () => {
+            this.loadWalletBalance();
+            this.getTransactionHistory();
+        });
         this.setState({ fontLoaded: true });
     }
       
