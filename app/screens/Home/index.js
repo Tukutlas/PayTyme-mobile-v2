@@ -71,8 +71,17 @@ export default class Home extends Component {
         this.props.navigation.addListener('focus', () => {
             this.loadWalletBalance();
             this.getTransactionHistory();
-            this.checkIfUserHasVirtualAccount();
         });
+        
+        this.reloadInterval = setInterval(() => {
+            this.loadWalletBalance();
+            this.reloadTransactionHistory();
+        }, 120000); // 2 minutes interval
+    }
+
+    componentWillUnmount() {
+        // Clear the interval when the component is unmounted to avoid memory leaks
+        clearInterval(this.reloadInterval);
     }
 
     loadWalletBalance() {
@@ -88,7 +97,7 @@ export default class Home extends Component {
         })
         .then((response) => response.text())
         .then((responseText) => {
-            this.setState({ isLoading: false });
+            // this.setState({ isLoading: false });
             let response_status = JSON.parse(responseText).status;
             if (response_status == true) {
                 let data = JSON.parse(responseText).data;
@@ -110,8 +119,8 @@ export default class Home extends Component {
             }
         })
         .catch((error) => {
-            this.setState({isLoading:false});
-            // alert("Network error. Please check your connection settings");
+            // this.setState({isLoading:false});
+            // alert("Unable to load wallet balance");
             // console.log(error)
         });
     }
@@ -156,6 +165,49 @@ export default class Home extends Component {
             // console.log(error)
             alert("Network error. Please check your connection settings");
             this.setState({isLoading:false});
+        });
+    }
+
+    reloadTransactionHistory(){
+        // this.setState({isLoading:true});   
+        fetch(GlobalVariables.apiURL+"/transactions?perpage=3",
+        { 
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body:  ""         
+            // <-- Post parameters
+        }) 
+        .then((response) => response.text())
+        .then((responseText) => { 
+            // this.setState({isLoading:false});
+            let response_status = JSON.parse(responseText).status;
+            if(response_status == true){
+                let data = JSON.parse(responseText).data.data;  
+                this.setState({transactions:data});
+                this.transactions();
+            }else if(response_status == false){
+                Alert.alert(
+                    'Oops',
+                    'An error occured',
+                    [
+                        {
+                            text: 'OK',
+                            // onPress: () => this.props.navigation.navigate('Signin'),
+                            onPress: () => {},
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }
+        })
+        .catch((error) => {
+            // console.log(error)
+            alert("Network error. Please check your connection settings");
+            // this.setState({isLoading:false});
         });
     }
 
