@@ -70,7 +70,7 @@ export default class Home extends Component {
 
         this.props.navigation.addListener('focus', () => {
             this.loadWalletBalance();
-            this.getTransactionHistory();
+            this.reloadTransactionHistory();
         });
         
         this.reloadInterval = setInterval(() => {
