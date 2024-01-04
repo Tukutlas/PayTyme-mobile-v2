@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         marginTop: Metrics.HEIGHT * 0.01,
         marginLeft: Metrics.WIDTH * 0.0550,
         marginRight: Metrics.WIDTH * 0.01,
-        width: 235
+        width: 250
     },
 
     body:{

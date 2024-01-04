@@ -60,7 +60,7 @@ export default class VirtualAccount extends Component {
     };
 
     copyAccountNumber(){
-        Clipboard.setStringAsync('1024141760');
+        Clipboard.setStringAsync(this.state.account_number);
         ToastAndroid.show('Paytyme Account Number Copied', ToastAndroid.SHORT);
     }
 
