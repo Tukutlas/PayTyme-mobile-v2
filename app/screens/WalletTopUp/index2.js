@@ -291,7 +291,7 @@ const WalletTopUp = ({ navigation }) => {
             </View>
             {channelError && <Text style={{ marginTop: '7%', marginLeft: '3%', color: 'red' }}>Please select a payment channel</Text>}
             {/* {displayCards && <Text style={{ marginTop: '7%', marginLeft: '3%', color: 'red' }}>Please select a payment channel</Text>} */}
-            <View style={[styles.tcview, { marginTop:'30%', marginLeft:'30%' }]}>
+            <View style={[styles.tcview, { marginTop:'15%', marginLeft:'30%' }]}>
                 <View style={styles.tandcView}>
                     <TouchableOpacity onPress={() => navigation.navigate("PaymentConfirmation")}>
                     {/* <TouchableOpacity onPress={() => { alert("Coming Soon"); }} > */}
@@ -301,7 +301,7 @@ const WalletTopUp = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <View style={{ marginTop: '50%', marginBottom: '45%' }}>
+            <View style={{ marginTop: '20%', marginBottom: '45%' }}>
                 <TouchableOpacity style={styles.buttonPurchase} onPress={checkPaymentChannel}>
                     <Text style={{ color: 'white', alignSelf: 'center' }}>Next</Text>
                 </TouchableOpacity>

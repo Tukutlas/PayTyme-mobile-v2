@@ -1,7 +1,7 @@
 import React, { Component} from "react";
 import { Platform, StatusBar, View, ScrollView, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import DropDownPicker from 'react-native-dropdown-picker';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Picker } from "@react-native-picker/picker";
 import styles from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -721,7 +721,7 @@ export default class Education extends Component {
         }
     
         return (
-            <ScrollView style={styles.container}>
+            <KeyboardAwareScrollView  style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                 <View style={styles.header}>
                     <View style={styles.left}>
@@ -974,7 +974,7 @@ export default class Education extends Component {
                     </Text>
                 </TouchableOpacity>
 
-            </ScrollView>
+            </KeyboardAwareScrollView >
         );
     }
 }

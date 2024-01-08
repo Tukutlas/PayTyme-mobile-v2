@@ -14,7 +14,7 @@ module.exports = StyleSheet.create({
         borderTopWidth: 0,
         elevation: 0,
         alignItems: 'center',
-        height: "28%"
+        height: "25%"
         // flexDirection: 'row',
         // flexWrap: 'wrap',
         // justifyContent: 'center',

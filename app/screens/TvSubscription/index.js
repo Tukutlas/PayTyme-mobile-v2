@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -835,7 +836,7 @@ export default class TvSubscription extends Component {
         }
 
         return (
-            <View style={styles.container}>
+            <KeyboardAwareScrollView  style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                 <View style={styles.header}>
                     <View style={styles.left}>
@@ -1059,7 +1060,7 @@ export default class TvSubscription extends Component {
                         Confirm Purchase (₦{this.state.amount})
                     </Text>
                 </TouchableOpacity>
-            </View>
+            </KeyboardAwareScrollView >
         );
     }
 }

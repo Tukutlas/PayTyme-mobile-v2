@@ -10,6 +10,7 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -434,7 +435,7 @@ export default class Airtime extends Component {
         }
     
         return (
-            <View style={styles.container}>
+            <KeyboardAwareScrollView  style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>  
                 <View style={styles.header}>
                     <View style={styles.left}>
@@ -596,7 +597,7 @@ export default class Airtime extends Component {
                         Confirm Purchase
                     </Text>
                 </TouchableOpacity>
-            </View>
+            </KeyboardAwareScrollView >
         );
     }
 }

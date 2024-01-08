@@ -10,6 +10,7 @@ import {
   TextInput,
   Alert
 } from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -340,7 +341,7 @@ export default class WalletTransfer extends Component {
         }
     
         return (
-            <View style={styles.container}>
+            <KeyboardAwareScrollView  style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                 <View style={styles.header}>
                     <View style={styles.headerBody}>
@@ -457,7 +458,7 @@ export default class WalletTransfer extends Component {
                         </Text>
                    }
                 </TouchableOpacity>
-            </View>
+            </KeyboardAwareScrollView>
         );
     }
 }

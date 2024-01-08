@@ -183,7 +183,7 @@ export default class OTP extends Component {
                     </View>
                 </View>
                 
-                <View style={{marginTop:'95%'}}>
+                <View style={{marginTop:'40%'}}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => {this.verifyCode();}}>
                         <Text autoCapitalize="words" style={{color:'white'}}>
                             Next

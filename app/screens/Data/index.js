@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
-// import DropDownPicker from 'react-native-dropdown-picker';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
@@ -534,7 +534,7 @@ export default class Data extends Component {
         }
 
         return (
-            <View style={styles.container}>
+            <KeyboardAwareScrollView  style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'} />
                 <View style={styles.header}>
                     <View style={styles.left}>
@@ -724,7 +724,7 @@ export default class Data extends Component {
                         Confirm Purchase
                     </Text>
                 </TouchableOpacity>
-            </View>
+            </KeyboardAwareScrollView>
         );
     }
 }

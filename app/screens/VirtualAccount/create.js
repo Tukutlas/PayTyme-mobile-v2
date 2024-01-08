@@ -387,12 +387,12 @@ export default class CreateVirtualAccount extends Component {
         StatusBar.setBarStyle("light-content", true);  
     
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#445cc4", true);
+          StatusBar.setBackgroundColor("#120A47", true);
           StatusBar.setTranslucent(true);
         }
 
         return (
-            <ScrollView style={styles.container}>
+            <View style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={this.state.spinnerText} color={'blue'} textStyle={{fontStyle:"italic", color:'white', fontSize: 16, fontWeight:'normal'}} /> 
                 <View style={styles.header}> 
                     <View style={{marginLeft:'0%', marginTop:'15%'}}>
@@ -460,7 +460,7 @@ export default class CreateVirtualAccount extends Component {
                     }
                     {
                         this.state.input ? 
-                        <View style={{ marginTop: '50%', marginBottom: '45%', height:'30%' }}>
+                        <View style={{ marginTop: '40%', marginBottom: '45%', height:'30%' }}>
                             <TouchableOpacity style={styles.buttonPurchase} onPress={() => {this.verifyBVN()}}>
                                 <Text style={{ color: 'white', alignSelf: 'center' }}>Continue</Text>
                             </TouchableOpacity>
@@ -469,7 +469,7 @@ export default class CreateVirtualAccount extends Component {
                     }
                     {
                         this.state.verify ? 
-                        <View style={{ marginTop: '50%', marginBottom: '45%', height:'30%' }}>
+                        <View style={{ marginTop: '40%', marginBottom: '45%', height:'30%' }}>
                             <TouchableOpacity style={styles.buttonPurchase} onPress={() => {this.verifyBVNOtp()}}>
                                 <Text style={{ color: 'white', alignSelf: 'center' }}>Continue</Text>
                             </TouchableOpacity>
@@ -477,7 +477,7 @@ export default class CreateVirtualAccount extends Component {
                         :''
                     }
                 </View>
-            </ScrollView>
+            </View>
         );
     }
 }
