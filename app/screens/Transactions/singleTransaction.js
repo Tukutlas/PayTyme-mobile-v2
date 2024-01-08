@@ -86,7 +86,7 @@ export default class SingleTransaction extends Component {
         .then((response) => response.text())
         .then((responseText) => { 
             let response_status = JSON.parse(responseText).status;
-            console.log(responseText)
+            // console.log(responseText)
             if(response_status == true){
                 let data = JSON.parse(responseText).data;
                 let transaction = data.transaction_info;
