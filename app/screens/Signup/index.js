@@ -97,7 +97,6 @@ export default class Signup extends Component {
         this.setState({ hideConfirmPassword: !this.state.hideConfirmPassword });
     }
 
-
     signUpUser = (dis) => {
         let phone = this.state.phone.replace(/^\s+|\s+$/g, "");
         let username = this.state.username.replace(/^\s+|\s+$/g, "");
@@ -207,7 +206,6 @@ export default class Signup extends Component {
             })
                 .then((response) => response.text())
                 .then((responseText) => {
-
                     dis.closeProgressbar();
                     let api_response = JSON.parse(responseText);
                     let response_status = JSON.parse(responseText).status;

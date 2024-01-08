@@ -149,7 +149,8 @@ export default class SingleTransaction extends Component {
                     this.setState({
                         transaction_type: transaction.type,
                         amount: this.numberFormat(transaction.amount), 
-                        wallet_id: data.wallet_id
+                        wallet_id: data.wallet_id,
+                        other_details: transaction.description
                     });
                 }else if(transaction.type == 'fund_wallet'){
                     this.setState({
@@ -238,23 +239,23 @@ export default class SingleTransaction extends Component {
                 </View>
                 <View style={[styles.body,{}]}>
                     <View style={{flexDirection:'row'}}>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Transaction Date:</Text>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.transactionDate}</Text>
+                        <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Transaction Date:</Text>
+                        <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.transactionDate}</Text>
                     </View>
                     <View style={{flexDirection:'row', marginTop: '4%'}}>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Transaction Type:</Text>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.transaction_type}</Text>
+                        <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Transaction Type:</Text>
+                        <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.transaction_type}</Text>
                     </View>
                     {
                         this.state.transaction_type == 'Airtime' || this.state.transaction_type == 'Data' || this.state.transaction_type == 'Airtime Recharge' || this.state.transaction_type == 'Data Services' ?
                         <>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Network Provider:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.network}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Network Provider:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.network}</Text>
                             </View>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Recipient:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.recipient}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Recipient:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.recipient}</Text>
                             </View>
                         </>
                         : ''
@@ -263,12 +264,12 @@ export default class SingleTransaction extends Component {
                         this.state.transaction_type == 'Betting' ? 
                         <>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Bet wallet ID:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.bet_wallet_id}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Bet wallet ID:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.bet_wallet_id}</Text>
                             </View>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Betting Platform:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.betting_platform}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Betting Platform:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.betting_platform}</Text>
                             </View>
                         </>: ''
                     }
@@ -276,16 +277,16 @@ export default class SingleTransaction extends Component {
                         this.state.transaction_type == 'TV Subscription'?
                         <>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>TV Type:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.tv_type}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>TV Type:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.tv_type}</Text>
                             </View>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Package Name:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.package_name}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Package Name:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.package_name}</Text>
                             </View>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Card No:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.card_no}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Card No:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.card_no}</Text>
                             </View>
                         </>: ''
                     }
@@ -293,12 +294,12 @@ export default class SingleTransaction extends Component {
                         this.state.transaction_type=='Electricity Bill'?
                         <>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Distribution Company:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.disco}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Distribution Company:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.disco}</Text>
                             </View>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Metre No:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.metre_no}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Metre No:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.metre_no}</Text>
                             </View>
                         </>: ''
                     }
@@ -306,59 +307,59 @@ export default class SingleTransaction extends Component {
                         this.state.transaction_type=='Insurance'?
                         <>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Vehicle Type:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.vehicle_make}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Vehicle Type:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.vehicle_make}</Text>
                             </View>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Vehicle Model:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.vehicle_model}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Vehicle Model:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.vehicle_model}</Text>
                             </View>
                             <View style={{flexDirection:'row', marginTop: '4%'}}>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Plate Number:</Text>
-                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777' }}>{this.state.plate_number}</Text>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Plate Number:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777' }}>{this.state.plate_number}</Text>
                             </View>
                         </>:''
                     }
                     {
                         this.state.transaction_type=='WAEC'?
                         <View style={{flexDirection:'row', marginTop: '4%'}}>
-                            <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>No of Pins:</Text>
-                            <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.no_of_pins}</Text>
+                            <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>No of Pins:</Text>
+                            <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.no_of_pins}</Text>
                         </View>
                         : ''
                     }
                     {
                         this.state.transaction_type=='JAMB'?
                         <View style={{flexDirection:'row', marginTop: '4%'}}>
-                            <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Profile code:</Text>
-                            <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.profile_code}</Text>
+                            <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Profile code:</Text>
+                            <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.profile_code}</Text>
                         </View>
                         : ''
                     }
                     {
                         this.state.transaction_type=='TRANSFER'?
                         <View style={{flexDirection:'row', marginTop: '4%'}}>
-                            <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Wallet ID:</Text>
-                            <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.wallet_id}</Text>
+                            <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Wallet ID:</Text>
+                            <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.wallet_id}</Text>
                         </View>
                         : ''
                     }
                     
                     <View style={{flexDirection:'row', marginTop: '4%'}}>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Amount:</Text>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>₦{this.state.amount}</Text>
+                        <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Amount:</Text>
+                        <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>₦{this.state.amount}</Text>
                     </View>
                     <View style={{flexDirection:'row', marginTop: '4%'}}>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Payment Channel:</Text>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.payment_channel}</Text>
+                        <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Payment Channel:</Text>
+                        <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.payment_channel}</Text>
                     </View>
                     <View style={{flexDirection:'row', marginTop: '4%'}}>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Status:</Text>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.status}</Text>
+                        <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Status:</Text>
+                        <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.status}</Text>
                     </View>
                     <View style={{flexDirection:'row', marginTop: '4%'}}>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Other Details:</Text>
-                        <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.other_details}</Text>
+                        <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Other Details:</Text>
+                        <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.other_details}</Text>
                     </View>
                 </View>
                 {

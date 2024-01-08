@@ -266,7 +266,7 @@ export default class Transactions extends Component {
                             :
                             <Image style={styles.profileImage} source={require('../../../assets/user.png')}/> 
                         }
-                        <Text style={{fontSize:25, fontWeight: 'bold', color:'#fff', fontFamily: "SFUIDisplay-Medium", marginTop:'4%', marginLeft:'-1%' }}>History</Text>
+                        <Text style={{fontSize:25, fontWeight: 'bold', color:'#fff', fontFamily: "SFUIDisplay-Medium", marginTop:'4%', marginLeft:'-2%' }}>History</Text>
                     </View>
                 </View>
                 <View style={{backgroundColor:'#120A47', borderRadius:10, width:'100%', elevation:50, 

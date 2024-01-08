@@ -415,7 +415,7 @@ export default class Data extends Component {
                 .then((response) => response.text())
                 .then((responseText) => {
                     let response = JSON.parse(responseText);
-                    if (response.status == false) {
+                    if (response.status == true) {
                         if (response.data.transaction.status == 'successful') {
                             this.props.navigation.navigate("StatusPage",
                                 {

@@ -16,7 +16,12 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.victorel.paytymemobileapp"
+      "bundleIdentifier": "com.victorel.paytymemobileapp",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to take pictures.",
+        "NSDocumentPickerUsageDescription": "This app requires access to documents for file selection.",
+        "NSTouchIDUsageDescription": "We use Touch ID to secure your data."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -38,7 +43,7 @@
         "READ_EXTERNAL_STORAGE"
       ],
       "package": "com.victorel.paytymemobileapp",
-      "versionCode": 6
+      "versionCode": 7
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -52,7 +57,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+          "cameraPermission": "Allow PayTyme to access your camera."
         }
       ]
     ]

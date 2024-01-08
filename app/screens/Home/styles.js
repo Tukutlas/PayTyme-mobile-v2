@@ -16,9 +16,9 @@ module.exports = StyleSheet.create({
     },
     
     headerButtom:{
-        height:'15%', 
+        height:'16.5%', 
         width:'100%', 
-        marginTop:'-5%',
+        marginTop:'-4%',
         borderRadius:15,
         backgroundColor:'#120A47',
         elevation:50,
@@ -82,7 +82,7 @@ module.exports = StyleSheet.create({
         flexDirection:'row',
         padding:1,
         width:'100%',
-        marginTop: '5%',
+        marginTop: '2%',
     },
 
     gridb:{
