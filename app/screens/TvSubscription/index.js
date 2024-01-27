@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
+import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Picker } from "@react-native-picker/picker";
@@ -319,7 +319,7 @@ export default class TvSubscription extends Component {
         this.setState({cardnumber: cardnumber, verifyNumber: false});
     }
 
-    GetValueFunction = (cardnumber) =>{
+    getValueFunction = (cardnumber) =>{
         var value = cardnumber.length.toString();
    
         this.setState({cardnumber: cardnumber});
@@ -827,241 +827,246 @@ export default class TvSubscription extends Component {
         }));
     }
 
+    // Function to dismiss the keyboard
+    dismissKeyboard = () => {
+        Keyboard.dismiss();
+    };
+
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#ffff", true);
+            StatusBar.setTranslucent(true);
         }
 
         return (
-            <KeyboardAwareScrollView  style={styles.container}>
-                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
-                <View style={styles.header}>
-                    <View style={styles.left}>
-                        <TouchableOpacity onPress={() =>this.backPressed()}>
-                            <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
-                        </TouchableOpacity>
-                    </View> 
-                    <View style={styles.headerBody}>
-                        <Text style={styles.body}>TV Subscription</Text>
-                        <Text style={styles.text}>Never run out of TV shows</Text>
+            <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
+                <KeyboardAwareScrollView style={styles.container}>
+                    <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
+                    <View style={styles.header}>
+                        <View style={styles.left}>
+                            <TouchableOpacity onPress={() =>this.backPressed()}>
+                                <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
+                            </TouchableOpacity>
+                        </View> 
+                        <View style={styles.headerBody}>
+                            <Text style={styles.body}>TV Subscription</Text>
+                            <Text style={styles.text}>Never run out of TV shows</Text>
+                        </View>
+                        <View style={styles.right}>
+                            <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
+                        </View> 
                     </View>
-                    <View style={styles.right}>
-                        <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
-                    </View> 
-                </View>
-                {/* <View style={[styles.formLine, {marginTop:'0%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Select Cable Tv Service Provider</Text>
-                    </View>
-                </View> */}
-                <View style={{justifyContent:'center'}}>
-                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Select Cable TV Service Provider</Text>
-                </View>
-                
-                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor: '#F6F6F6', zIndex:1000}}>
-                    <DropDownPicker
-                        placeholder={'Select Cable Tv Provider'}
-                        open={this.state.providerOpen}
-                        value={this.state.providerValue}
-                        style={[styles.dropdown]}
-                        items={this.state.providers}
-                        setOpen={this.setProviderOpen}
-                        setValue={this.setProviderValue}
-                        setItems={this.setProviderItems}
-                        searchable={false}
-                        onSelectItem={(item) => {
-                            this.getCableBouquetOptions(item.value);
-                        }}
-                        onClose={() => {
-                            this.setBundleContainer()
-                        }}
-                        dropDownContainerStyle={{
-                            width:'97%',
-                            marginLeft:'1.5%',
-                            // position: 'relative',
-                            // top: 0
-                        }}  
-                    />    
-                </View>
-                {this.state.providerError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.providerErrorMessage}</Text>}
-
-                <View style={{justifyContent:'center'}}>
-                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Select Bouquet Plan</Text>
-                </View>
-                {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
-                    <DropDownPicker
-                        placeholder={'Select your subscription plan'}
-                        open={this.state.bouquetOpen}
-                        value={this.state.bouquetValue}
-                        style={[styles.dropdown]}
-                        items={this.state.bouquetdata}
-                        setOpen={this.setBouquetOpen}
-                        setValue={this.setBouquetValue}
-                        setItems={this.setBouquetItems}
-                        listMode="MODAL"  
-                        searchable={false}
-                        disabled={this.state.bouquetDisable}
-                        onSelectItem={(item) => {
-                            if(this.state.dstv){
-                                this.getDstvBouquetAddons(item.value);
-                            }else{
-                                this.planvariable(item.value)
-                            }
-                        }}
-                    />
-                </View> */}
-                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
-                    <Picker
-                        selectedValue={this.state.bouquetValue}
-                        onValueChange={(itemValue, itemIndex) =>
-                            this.setBouquet(itemValue)
-                        }
-                        enabled={this.state.bouquetEnable}
-                        style={{height: '100%', width: '100%'}}
-                    >
-                        <Picker.Item label="Select any Subscription Plan" value={null} style={{fontSize: 14}}/>
-                        
-                        {this.state.bouquetdata.map((plan, index) => (
-                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
-                        ))}
-                    </Picker>
-                </View>
-                {this.state.bouquetError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.bouquetErrorMessage}</Text>}
-
-                {
-                    this.state.dstv ?
+                    {/* <View style={[styles.formLine, {marginTop:'0%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Select Cable Tv Service Provider</Text>
+                        </View>
+                    </View> */}
                     <View style={{justifyContent:'center'}}>
-                        <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'10%',marginLeft:'3.5%'}}>DSTV Addons</Text>
+                        <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Select Cable TV Service Provider</Text>
                     </View>
-                    : <View></View>
-                }
-                {
-                    this.state.dstv ?
-                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
+                    
+                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor: '#F6F6F6', zIndex:1000}}>
                         <DropDownPicker
-                            placeholder={'Select DSTV Addon Bouquet'}
-                            open={this.state.dstvBouquetOpen}
-                            value={this.state.dstvBouquetValue}
+                            placeholder={'Select Cable Tv Provider'}
+                            open={this.state.providerOpen}
+                            value={this.state.providerValue}
                             style={[styles.dropdown]}
-                            items={this.state.addondata}
-                            setOpen={this.setDstvBouquetOpen}
-                            setValue={this.setDstvBouquetValue}
-                            setItems={this.setDstvBouquetItems}
+                            items={this.state.providers}
+                            setOpen={this.setProviderOpen}
+                            setValue={this.setProviderValue}
+                            setItems={this.setProviderItems}
+                            searchable={false}
+                            onSelectItem={(item) => {
+                                this.getCableBouquetOptions(item.value);
+                            }}
+                            onClose={() => {
+                                this.setBundleContainer()
+                            }}
+                            dropDownContainerStyle={{
+                                width:'97%',
+                                marginLeft:'1.5%',
+                            }}  
+                        />    
+                    </View>
+                    {this.state.providerError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.providerErrorMessage}</Text>}
+
+                    <View style={{justifyContent:'center'}}>
+                        <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Select Bouquet Plan</Text>
+                    </View>
+                    {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
+                        <DropDownPicker
+                            placeholder={'Select your subscription plan'}
+                            open={this.state.bouquetOpen}
+                            value={this.state.bouquetValue}
+                            style={[styles.dropdown]}
+                            items={this.state.bouquetdata}
+                            setOpen={this.setBouquetOpen}
+                            setValue={this.setBouquetValue}
+                            setItems={this.setBouquetItems}
                             listMode="MODAL"  
                             searchable={false}
-                            disabled={this.state.dstvBouquetDisable}
+                            disabled={this.state.bouquetDisable}
                             onSelectItem={(item) => {
-                                this.addonvariable(item.value)
+                                if(this.state.dstv){
+                                    this.getDstvBouquetAddons(item.value);
+                                }else{
+                                    this.planvariable(item.value)
+                                }
                             }}
                         />
-                    </View>
-                    : <View></View>
-                }
-
-                <View style={[styles.formLine, {marginTop:'1%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Enter {this.state.providerValue == 'showmax' ? 'Phone Number' : 'Card Number'}</Text>
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'credit-card'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            {/* <TextInput placeholder="Type your smart card number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={cardnumber => this.GetValueFunction(cardnumber)} value={this.state.cardnumber}/> */}
-                            <TextInput placeholder={this.state.providerValue == 'showmax' ?"Type your phone number": "Type your smart card number"} style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={(cardnumber) => this.setCardNo(cardnumber)}/>
-                            {
-                                this.state.providerValue == 'showmax' 
-                                ? <></> 
-                                : 
-                                <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
-                                    <Text style={styles.verifyButtonText}>Verify</Text>
-                                </TouchableOpacity>
+                    </View> */}
+                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                        <Picker
+                            selectedValue={this.state.bouquetValue}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this.setBouquet(itemValue)
                             }
-                        </View>
-                        {this.state.cardError && <Text style={{ color: 'red' }}>{this.state.cardErrorMessage}</Text>}
+                            enabled={this.state.bouquetEnable}
+                            style={{height: '100%', width: '100%'}}
+                        >
+                            <Picker.Item label="Select any Subscription Plan" value={null} style={{fontSize: 14}}/>
+                            
+                            {this.state.bouquetdata.map((plan, index) => (
+                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                            ))}
+                        </Picker>
                     </View>
-                </View>
-                {
-                    this.state.providerValue == 'showmax' 
-                    ? <></> 
-                    : 
-                    <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                    {this.state.bouquetError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.bouquetErrorMessage}</Text>}
+
+                    {
+                        this.state.dstv ?
+                        <View style={{justifyContent:'center'}}>
+                            <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'10%',marginLeft:'3.5%'}}>DSTV Addons</Text>
+                        </View>
+                        : <View></View>
+                    }
+                    {
+                        this.state.dstv ?
+                        <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
+                            <DropDownPicker
+                                placeholder={'Select DSTV Addon Bouquet'}
+                                open={this.state.dstvBouquetOpen}
+                                value={this.state.dstvBouquetValue}
+                                style={[styles.dropdown]}
+                                items={this.state.addondata}
+                                setOpen={this.setDstvBouquetOpen}
+                                setValue={this.setDstvBouquetValue}
+                                setItems={this.setDstvBouquetItems}
+                                listMode="MODAL"  
+                                searchable={false}
+                                disabled={this.state.dstvBouquetDisable}
+                                onSelectItem={(item) => {
+                                    this.addonvariable(item.value)
+                                }}
+                            />
+                        </View>
+                        : <View></View>
+                    }
+
+                    <View style={[styles.formLine, {marginTop:'1%'}]}>
                         <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Customer Name</Text>
-                            <View roundedc style={[styles.inputitem, {height:40}]}>
-                                <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6'}}>{this.state.customerName}</Text>
+                            <Text style={styles.labeltext}>Enter {this.state.providerValue == 'showmax' ? 'Phone Number' : 'Card Number'}</Text>
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'credit-card'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                {/* <TextInput placeholder="Type your smart card number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={cardnumber => this.getValueFunction(cardnumber)} value={this.state.cardnumber}/> */}
+                                <TextInput placeholder={this.state.providerValue == 'showmax' ?"Type your phone number": "Type your smart card number"} style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={(cardnumber) => this.setCardNo(cardnumber)}/>
+                                {
+                                    this.state.providerValue == 'showmax' 
+                                    ? <></> 
+                                    : 
+                                    <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
+                                        <Text style={styles.verifyButtonText}>Verify</Text>
+                                    </TouchableOpacity>
+                                }
+                            </View>
+                            {this.state.cardError && <Text style={{ color: 'red' }}>{this.state.cardErrorMessage}</Text>}
+                        </View>
+                    </View>
+                    {
+                        this.state.providerValue == 'showmax' 
+                        ? <></> 
+                        : 
+                        <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                            <View style={styles.formCenter}>
+                                <Text style={styles.labeltext}>Customer Name</Text>
+                                <View roundedc style={[styles.inputitem, {height:40}]}>
+                                    <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                    <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6'}}>{this.state.customerName}</Text>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                }
+                    }
 
-                {/* Card Option*/}
-                <View
-                    style={{
-                        backgroundColor:'#fff',
-                        marginTop:'5%',
-                        marginLeft: '4%',
-                        borderRadius: 30,
-                        borderWidth: 1,
-                        marginRight: '4%',
-                        borderColor: 'transparent',
-                        elevation: 10
-                    }}
-                >
-                    <View 
+                    {/* Card Option*/}
+                    <View
                         style={{
-                            paddingLeft:1,
-                            marginTop:'0.5%',
-                            marginLeft:'1%',
-                            marginRight:'6%'
+                            backgroundColor:'#fff',
+                            marginTop:'5%',
+                            marginLeft: '4%',
+                            borderRadius: 30,
+                            borderWidth: 1,
+                            marginRight: '4%',
+                            borderColor: 'transparent',
+                            elevation: 10
                         }}
                     >
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
-                                    <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
+                        <View 
+                            style={{
+                                paddingLeft:1,
+                                marginTop:'0.5%',
+                                marginLeft:'1%',
+                                marginRight:'6%'
+                            }}
+                        >
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
+                                    <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
+                                        <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
+                                    </TouchableOpacity>
+
+                                    <View style={{marginLeft:'1%', padding:7}}>
+                                        <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
+                                        <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
+                                        <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
+                                    </View>
                                 </TouchableOpacity>
+                            </View> 
+                            <View style={[styles.buttonContainer,{borderTopColor:'#f5f5f5', borderTopWidth:1}]}>
+                                <TouchableOpacity style={{flexDirection:'row'}} 
+                                    onPress={()=>{
+                                        this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
+                                    }}
+                                > 
+                                    <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
+                                        <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
+                                    </TouchableOpacity>
 
-                                <View style={{marginLeft:'1%', padding:7}}>
-                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
-                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
-                                    <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
-                                </View>
-                            </TouchableOpacity>
-                        </View> 
-                        <View style={[styles.buttonContainer,{borderTopColor:'#f5f5f5', borderTopWidth:1}]}>
-                            <TouchableOpacity style={{flexDirection:'row'}} 
-                                onPress={()=>{
-                                    this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
-                                }}
-                            > 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
-                                    <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
+                                    <View style={{marginLeft:'1%', padding:5}}>
+                                        <Text style={{fontSize:13, marginLeft:'2%'}}>Pay with Card</Text>
+                                        <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>Make Payment with your Debit/Credit Card </Text>
+                                        <Image source={require('../../Images/payment-terms.png')} style={{ width:270, height:50, marginLeft:-7, borderRadius:20 }}/>
+                                    </View>
                                 </TouchableOpacity>
+                            </View> 
+                        </View>   
+                    </View> 
 
-                                <View style={{marginLeft:'1%', padding:5}}>
-                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay with Card</Text>
-                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>Make Payment with your Debit/Credit Card </Text>
-                                    <Image source={require('../../Images/payment-terms.png')} style={{ width:270, height:50, marginLeft:-7, borderRadius:20 }}/>
-                                </View>
-                            </TouchableOpacity>
-                        </View> 
-                    </View>   
-                </View> 
+                    {/* Card Option */}
 
-                {/* Card Option */}
-
-                <TouchableOpacity
-                    info style={[styles.buttonPurchase,{marginBottom:'10%'}]}
-                    onPress={() => {
-                        (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
-                    }}
-                >
-                    <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
-                        Confirm Purchase (₦{this.state.amount})
-                    </Text>
-                </TouchableOpacity>
-            </KeyboardAwareScrollView >
+                    <TouchableOpacity
+                        info style={[styles.buttonPurchase,{marginBottom:'10%'}]}
+                        onPress={() => {
+                            (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
+                        }}
+                    >
+                        <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
+                            Confirm Purchase (₦{this.state.amount})
+                        </Text>
+                    </TouchableOpacity>
+                </KeyboardAwareScrollView>
+            </TouchableWithoutFeedback>
         );
     }
 }
