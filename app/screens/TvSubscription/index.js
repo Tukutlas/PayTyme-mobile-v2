@@ -920,6 +920,7 @@ export default class TvSubscription extends Component {
                             this.setBouquet(itemValue)
                         }
                         enabled={this.state.bouquetEnable}
+                        style={{height: '100%', width: '100%'}}
                     >
                         <Picker.Item label="Select any Subscription Plan" value={null} style={{fontSize: 14}}/>
                         

@@ -78,6 +78,7 @@ export default class Electricity extends Component {
     }
 
     loadWalletBalance(){
+        console.log(Platform.OS)
         fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
             method: 'GET',
@@ -536,39 +537,43 @@ export default class Electricity extends Component {
                 <View style={{justifyContent:'center', marginTop: '1.2%'}}>
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1.2%',marginLeft:'3.5%'}}>Meter Type</Text>
                 </View>
-                {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
-                    <DropDownPicker
-                        placeholder={'Select Meter Type'}
-                        open={this.state.typeOpen}
-                        value={this.state.typeValue}
-                        items={this.state.meterTypes}
-                        style={[styles.dropdown]}
-                        setOpen={this.setTypeOpen}
-                        setValue={this.setTypeValue}
-                        setItems={this.setTypeItems}
-                        onSelectItem={(item) => {
-                            this.setState({meterTypeError: false})
-                        }}
-                        dropDownContainerStyle={{
-                            width:'97%',
-                            marginLeft:'1.5%'
-                        }}  
-                    />
-                </View> */}
-                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
-                    <Picker
-                        selectedValue={this.state.typeValue}
-                        onValueChange={(itemValue, itemIndex) =>
-                            this.setMeterType(itemValue)
-                        }
-                    >
-                        <Picker.Item label="Select Meter Type" value={null} style={{fontSize: 14}}/>
-                        
-                        {this.state.meterTypes.map((plan, index) => (
-                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
-                        ))}
-                    </Picker>
-                </View>
+                { 
+                    Platform.OS === "ios" ?
+                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
+                        <DropDownPicker
+                            placeholder={'Select Meter Type'}
+                            open={this.state.typeOpen}
+                            value={this.state.typeValue}
+                            items={this.state.meterTypes}
+                            style={[styles.dropdown]}
+                            setOpen={this.setTypeOpen}
+                            setValue={this.setTypeValue}
+                            setItems={this.setTypeItems}
+                            onSelectItem={(item) => {
+                                this.setState({meterTypeError: false})
+                            }}
+                            dropDownContainerStyle={{
+                                width:'97%',
+                                marginLeft:'1.5%'
+                            }}  
+                        />
+                    </View> :
+                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center', marginTop: '1%'}}>
+                        <Picker
+                            selectedValue={this.state.typeValue}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this.setMeterType(itemValue)
+                            }
+                            style={{height: '100%', width: '100%'}}
+                        >
+                            <Picker.Item label="Select Meter Type" value={null} style={{fontSize: 14}}/>
+                            
+                            {this.state.meterTypes.map((plan, index) => (
+                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                            ))}
+                        </Picker> 
+                    </View>
+                }
                 {this.state.meterTypeError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select the meter type</Text>}
                 <View style={[styles.formLine, {marginTop:'1.2%'}]}>
                     <View style={styles.formCenter}>

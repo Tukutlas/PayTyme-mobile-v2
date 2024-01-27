@@ -474,7 +474,7 @@ export default class Airtime extends Component {
                 </View>
                 <View style={styles.grid}>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>NairaBet</Text>
+                        <Text style={{width:60}}>NairaBet</Text>
                         <Image source={require('../../Images/Betting/nairabet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} 
                             onPress={()=>{
@@ -497,7 +497,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>BetNaija</Text>
+                        <Text style={{width:55}}>BetNaija</Text>
                         <Image source={require('../../Images/Betting/bet9ja.png')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -519,7 +519,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50.5}}>SupaBets</Text>
+                        <Text style={{width:60}}>SupaBets</Text>
                         <Image source={require('../../Images/Betting/supabet.jpg')} style={[styles.betIcon2]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -541,7 +541,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>CloudBet</Text>
+                        <Text style={{width:60}}>CloudBet</Text>
                         <Image source={require('../../Images/Betting/cloudbet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -563,7 +563,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>BangBet</Text>
+                        <Text style={{width:55}}>BangBet</Text>
                         <Image source={require('../../Images/Betting/bangbet.png')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -587,7 +587,7 @@ export default class Airtime extends Component {
                 </View>
                 <View style={[styles.grid, {marginTop:'2%'}]}>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:45}}>BetLion</Text>
+                        <Text style={{width:50}}>BetLion</Text>
                         <Image source={require('../../Images/Betting/betlion.png')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -631,7 +631,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>MerryBet</Text>
+                        <Text style={{width:55}}>MerryBet</Text>
                         <Image source={require('../../Images/Betting/merrybet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -675,7 +675,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>BetLand</Text>
+                        <Text style={{width:55}}>BetLand</Text>
                         <Image source={require('../../Images/Betting/betland.jpeg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -704,7 +704,7 @@ export default class Airtime extends Component {
                         
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>BetKing</Text>
+                        <Text style={{width:55}}>BetKing</Text>
                         <Image source={require('../../Images/Betting/betking.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -726,7 +726,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:80}}>LiveScoreBet</Text>
+                        <Text style={{width:100}}>LiveScoreBet</Text>
                         <Image source={require('../../Images/Betting/livescorebet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -748,7 +748,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:50}}>NaijaBet</Text>
+                        <Text style={{width:55}}>NaijaBet</Text>
                         <Image source={require('../../Images/Betting/naijabet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -770,7 +770,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={[styles.formLine,{marginTop:'0%'}]}>
+                <View style={[styles.formLine,{marginTop:'1%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Amount</Text>
                     </View>

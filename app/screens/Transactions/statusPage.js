@@ -104,7 +104,7 @@ export default class StatusPage extends Component {
                 }{
                     this.props.route.params.status == 'progress' ?
                     <View style={{backgroundColor: '#0C0C54', borderRadius: 50, width: 51, height: 51, alignSelf:'center', alignItems: 'center', justifyContent:'center', marginTop:'0%'}}>
-                        <FontAwesome5 name={'check'} color={'#ffff'} size={25}  style={{width: 25.5, height: 23, }}/>
+                        <FontAwesome5 name={'clock'} color={'#ffff'} size={25}  style={{width: 25.5, height: 23, }}/>
                     </View> : <></>
                 }
                 <View style={{backgrouncColor:'black', marginBottom:'0%', marginTop:'3%', alignSelf: "center"}}>

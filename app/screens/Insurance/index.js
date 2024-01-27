@@ -682,6 +682,7 @@ export default class Insurance extends Component {
                             this.publishAmount(itemValue)
 
                         }}
+                        style={{height: '100%', width: '100%'}}
                     >
                         <Picker.Item label="Select your vehicle type" value={null} style={{fontSize: 14}}/>
                         
@@ -727,6 +728,7 @@ export default class Insurance extends Component {
                             this.setYear(itemValue)
 
                         }}
+                        style={{height: '100%', width: '100%'}}
                     >
                         <Picker.Item label="Select your vehicle year" value={null} style={{fontSize: 14}}/>
                         
@@ -761,6 +763,7 @@ export default class Insurance extends Component {
                         onValueChange={(itemValue, itemIndex) =>{
                             this.setColor(itemValue)
                         }}
+                        style={{height: '100%', width: '100%'}}
                     >
                         <Picker.Item label="Select your vehicle color" value={null} style={{fontSize: 14}}/>
                         

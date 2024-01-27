@@ -304,6 +304,7 @@ export default class PaymentConfirmation extends Component {
                             this.setBank(itemValue)
                         }
                         enabled={this.state.bankEnable}
+                        style={{height: '100%', width: '100%'}}
                     >
                         <Picker.Item label="Select Bank" value={null} style={{ fontSize: 14 }} />
 

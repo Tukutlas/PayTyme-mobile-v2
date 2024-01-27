@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -107,6 +108,62 @@ export default class Data extends Component {
 
     loadWalletBalance() {
         fetch(GlobalVariables.apiURL + "/wallet/details",
+        {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body: ""
+            // <-- Post parameters
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            this.setState({ isLoading: false });
+            let response_status = JSON.parse(responseText).status;
+            if (response_status == true) {
+                let data = JSON.parse(responseText).data;
+                let wallet = data;
+                this.setState({ balance: parseInt(wallet.balance) });
+            } else if (response_status == false) {
+                Alert.alert(
+                    'Session Out',
+                    'Your session has timed-out. Login and try again',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => this.props.navigation.navigate('Signin'),
+                            style: 'cancel',
+                        },
+                    ],
+                    { cancelable: false },
+                );
+            } else if (response_status == 'error') {
+                Alert.alert(
+                    'Session Out',
+                    'Your session has timed-out. Login and try again',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => this.props.navigation.navigate('Signin'),
+                            style: 'cancel',
+                        },
+                    ],
+                    { cancelable: false },
+                );
+            }
+        })
+        .catch((error) => {
+            this.setState({ isLoading: false });
+            alert("Network error. Please check your connection settings");
+        });
+    }
+
+    getDataPlans(network) {
+        if (network != "") {
+            this.setState({ isLoading: true });
+
+            fetch(GlobalVariables.apiURL + "/topup/data/bundles?network=" + network,
             {
                 method: 'GET',
                 headers: new Headers({
@@ -118,75 +175,19 @@ export default class Data extends Component {
             })
             .then((response) => response.text())
             .then((responseText) => {
-                this.setState({ isLoading: false });
-                let response_status = JSON.parse(responseText).status;
-                if (response_status == true) {
-                    let data = JSON.parse(responseText).data;
-                    let wallet = data;
-                    this.setState({ balance: parseInt(wallet.balance) });
-                } else if (response_status == false) {
-                    Alert.alert(
-                        'Session Out',
-                        'Your session has timed-out. Login and try again',
-                        [
-                            {
-                                text: 'OK',
-                                onPress: () => this.props.navigation.navigate('Signin'),
-                                style: 'cancel',
-                            },
-                        ],
-                        { cancelable: false },
-                    );
-                } else if (response_status == 'error') {
-                    Alert.alert(
-                        'Session Out',
-                        'Your session has timed-out. Login and try again',
-                        [
-                            {
-                                text: 'OK',
-                                onPress: () => this.props.navigation.navigate('Signin'),
-                                style: 'cancel',
-                            },
-                        ],
-                        { cancelable: false },
-                    );
-                }
+                let response = JSON.parse(responseText);
+                let bundlesplan = response.data;
+                let newArray = bundlesplan.map((item) => {
+                    return { label: item.bundle + " ₦" + this.numberFormat(item.amount), value: item.bundle + "#" + item.package + "#" + item.amount }
+                })
+                this.setState({ serviceProvider: response.service_provider });
+                this.setState({ bundles: newArray });
+                this.setState({ isLoading: false, bundleDisable: false });
             })
             .catch((error) => {
                 this.setState({ isLoading: false });
                 alert("Network error. Please check your connection settings");
             });
-    }
-
-    getDataPlans(network) {
-        if (network != "") {
-            this.setState({ isLoading: true });
-
-            fetch(GlobalVariables.apiURL + "/topup/data/bundles?network=" + network,
-                {
-                    method: 'GET',
-                    headers: new Headers({
-                        'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                        'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
-                    }),
-                    body: ""
-                    // <-- Post parameters
-                })
-                .then((response) => response.text())
-                .then((responseText) => {
-                    let response = JSON.parse(responseText);
-                    let bundlesplan = response.data;
-                    let newArray = bundlesplan.map((item) => {
-                        return { label: item.bundle + " ₦" + this.numberFormat(item.amount), value: item.bundle + "#" + item.package + "#" + item.amount }
-                    })
-                    this.setState({ serviceProvider: response.service_provider });
-                    this.setState({ bundles: newArray });
-                    this.setState({ isLoading: false, bundleDisable: false });
-                })
-                .catch((error) => {
-                    this.setState({ isLoading: false });
-                    alert("Network error. Please check your connection settings");
-                });
         }
     }
 
@@ -616,44 +617,50 @@ export default class Data extends Component {
                     <View style={{ justifyContent: 'center' }}>
                         <Text
                             style={{
-                                fontFamily: "SFUIDisplay-Medium",
+                                fontFamily: "Roboto-Medium",
                                 fontSize: 14,
                                 marginTop: '5%',
                                 marginLeft: '3.5%'
                             }}
                         >Select Bundle Plan</Text>
                     </View>
+                    {
+                        Platform.OS == 'ios' ?
+                        <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:40, zIndex:1000}}>
+                            <DropDownPicker
+                                placeholder={'Select Bundle Plan'}
+                                open={this.state.bundleOpen}
+                                value={this.state.bundleValue}
+                                style={[styles.dropdown]}
+                                items={this.state.bundles}
+                                setOpen={this.setBundleOpen}
+                                setValue={this.setBundleValue}
+                                setItems={this.setBundleItems}
+                                onSelectItem={(item) => {
+                                    this.setState({bundleError: false})
+                                }}
+                                listMode="MODAL"  
+                                searchable={false}
+                                disabled={this.state.bundleDisable}
+                            />
+                        </View> :
+                        <View style={{ width: '92.7%', marginLeft: '3.7%', backgroundColor: "#f6f6f6", height: 40, borderWidth: 1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center' }}>                    
+                            <Picker
+                                selectedValue={this.state.bundleValue}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    this.setBundle(itemValue)
+                                }
+                                enabled={this.state.bundleEnable}
+                                style={{height: '100%', width: '100%'}}
+                            >
+                                <Picker.Item label="Select Bundle Plan" value={null} style={{ fontSize: 14 }} />
 
-                    {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:40, zIndex:1000}}>
-                        <DropDownPicker
-                            placeholder={'Select Bundle Plan'}
-                            open={this.state.bundleOpen}
-                            value={this.state.bundleValue}
-                            style={[styles.dropdown]}
-                            items={this.state.bundles}
-                            setOpen={this.setBundleOpen}
-                            setValue={this.setBundleValue}
-                            setItems={this.setBundleItems}
-                            listMode="MODAL"  
-                            searchable={false}
-                            disabled={this.state.bundleDisable}
-                        />
-                    </View> */}
-                    <View style={{ width: '92.7%', marginLeft: '3.7%', backgroundColor: "#f6f6f6", height: 40, borderWidth: 1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center' }}>
-                        <Picker
-                            selectedValue={this.state.bundleValue}
-                            onValueChange={(itemValue, itemIndex) =>
-                                this.setBundle(itemValue)
-                            }
-                            enabled={this.state.bundleEnable}
-                        >
-                            <Picker.Item label="Select Bundle Plan" value={null} style={{ fontSize: 14 }} />
-
-                            {this.state.bundles.map((plan, index) => (
-                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{ fontSize: 14 }} />
-                            ))}
-                        </Picker>
-                    </View>
+                                {this.state.bundles.map((plan, index) => (
+                                    <Picker.Item key={index} label={plan.label} value={plan.value} style={{ fontSize: 14 }} />
+                                ))}
+                            </Picker>
+                        </View>
+                    }
                     {this.state.bundleError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.bundleErrorMessage}</Text>}
                 </View>
 

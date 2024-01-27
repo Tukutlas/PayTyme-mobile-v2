@@ -163,7 +163,7 @@ export default class WalletTransfer extends Component {
         .then((response) => response.text())
         .then((responseText) => { 
             
-            console.log(responseText);
+            // console.log(responseText);
             let response = JSON.parse(responseText);
             if(response.status == true){
                 let data = response.data;  
@@ -184,14 +184,19 @@ export default class WalletTransfer extends Component {
         let amount = this.state.amount;
         let account_id = this.state.account_id;
         let error = 0;
-        if(amount == ""){
+        if(amount == "" || amount == 0){
             error++;
-            this.setState({amountError: true, amountErrorMessage: 'Amount must be inserted'})
+            this.setState({amountError: true, amountErrorMessage: 'Amount must be inserted'});
+        }else if (amount < 500 || amount > 30000) {
+            error++;
+            this.setState({amountError: true, amountErrorMessage: 'Amount must be between ₦500 and ₦30,000'});
         }
+
         if(account_id == ""){
             error++;
             this.setState({receiverError: true, receiverErrorMessage: 'Wallet Id must be inserted'})
         }
+
         if(error == 0){
             if(type=='wallet'){
                 Alert.alert(
@@ -336,8 +341,8 @@ export default class WalletTransfer extends Component {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#ffff", true);
+            StatusBar.setTranslucent(true);
         }
     
         return (

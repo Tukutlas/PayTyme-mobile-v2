@@ -2,7 +2,7 @@ import React, { Component} from "react";
 import { Platform, StatusBar, View, ScrollView, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Picker } from "@react-native-picker/picker";
+import { Picker, PickerIOS } from "@react-native-picker/picker";
 import styles from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
@@ -272,9 +272,9 @@ export default class Education extends Component {
             this.setState({phoneError: true, phoneErrorMessage: 'Recipient phone number must be inserted'});
         }
 
-        if(exam_body == 'waec' && quantity == 0){
+        if(exam_body == 'waec' && quantity <= 0){
             error++;
-            this.setState({quantityError: true, quantityErrorMessage: 'Quantity must be inserted'});
+            this.setState({quantityError: true, quantityErrorMessage: 'Quantity must be inserted and greater than zero'});
         }
 
         if(exam_body == 'jamb' && profile_code ==''){
@@ -716,8 +716,8 @@ export default class Education extends Component {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#ffff", true);
+            StatusBar.setTranslucent(true);
         }
     
         return (
@@ -815,19 +815,51 @@ export default class Education extends Component {
                     </View>
                 </View>
                 <View style={{width:'94%', marginLeft:'3.0%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
-                    <Picker
+                    {
+                        Platform.OS === "android" ? 
+                        <Picker
+                            selectedValue={this.state.typeValue}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this.setPinType(itemValue)
+                            }
+                            enabled={this.state.pinDropdownEnable}
+                            style={{height: '100%', width: '100%'}}
+                        >
+                            <Picker.Item label="Select Pin Types" value={null} style={{fontSize: 14}}/>
+                            
+                            {this.state.pinTypes.map((type, index) => (
+                                <Picker.Item key={index} label={type.label} value={type.value} style={{fontSize: 14}} />
+                            ))}
+                        </Picker> : 
+                        <PickerIOS
+                            selectedValue={this.state.typeValue}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this.setPinType(itemValue)
+                            }
+                            enabled={this.state.pinDropdownEnable}
+                            style={{height: '100%', width: '100%'}}
+                        >
+                            <Picker.Item label="Select Pin Types" value={null} style={{fontSize: 14}}/>
+                            
+                            {this.state.pinTypes.map((type, index) => (
+                                <Picker.Item key={index} label={type.label} value={type.value} style={{fontSize: 14}} />
+                            ))}
+                        </PickerIOS>
+                    }
+                    {/* <Picker
                         selectedValue={this.state.typeValue}
                         onValueChange={(itemValue, itemIndex) =>
                             this.setPinType(itemValue)
                         }
                         enabled={this.state.pinDropdownEnable}
+                        style={{height: '100%', width: '100%'}}
                     >
                         <Picker.Item label="Select Pin Types" value={null} style={{fontSize: 14}}/>
                         
                         {this.state.pinTypes.map((type, index) => (
                             <Picker.Item key={index} label={type.label} value={type.value} style={{fontSize: 14}} />
                         ))}
-                    </Picker>
+                    </Picker> */}
                 </View>
                 {this.state.typeError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.typeErrorMessage}</Text>}
                     {/* </>

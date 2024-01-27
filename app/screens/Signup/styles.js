@@ -11,9 +11,9 @@ const styles = StyleSheet.create({
 
     header: {
         backgroundColor: Colors.transparent,
-        height: '10%',
+        height: '7%',
         borderBottomWidth: 0,
-        marginTop: '13%',
+        marginTop: '11%',
         elevation: 0,
         flexDirection: 'row',
         flexWrap: 'wrap'
@@ -63,12 +63,12 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingTop: 0,
     },
-    
+
     formCenter: {
         marginLeft: '4%', // Adjust the padding according to your requirement
         width: '92%',
     },
-    
+
     inputitem: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -79,14 +79,14 @@ const styles = StyleSheet.create({
         marginTop: '1%',
         backgroundColor: '#F6F6F6',
     },
-    
+
     labeltext: {
         color: '#222222',
         marginTop: '1%',
         fontSize: 14,
         fontFamily: 'Roboto-Medium',
     },
-    
+
     textBox: {
         fontSize: 13,
         flex: 1,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         borderRadius: 2,
         backgroundColor: '#F6F6F6',
     },
-    
+
     inputIcon: {
         marginHorizontal: 10, // Adjust the margin according to your requirement
     },
@@ -202,7 +202,19 @@ const styles = StyleSheet.create({
         alignSelf: "center"
     },
 
-    itemstyle: { width: Metrics.WIDTH }
+    itemstyle: { width: Metrics.WIDTH },
+
+    verifyButton: {
+        backgroundColor: '#0C0C54',
+        padding: 5,
+        borderRadius: 25,
+        marginLeft: 10,
+    },
+    
+    verifyButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
 });
 
 export default styles;
