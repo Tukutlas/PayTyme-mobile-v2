@@ -1409,7 +1409,7 @@ export default class DebitCardPayment extends Component {
                 <View style={styles.header}>
                     <View style={styles.left}>
                         <TouchableOpacity onPress={() => this.backPressed()}>
-                            <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
+                            <FontAwesome5 name={'arrow-left'} size={22} color={'#0C0C54'} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.headerBody}>
@@ -1527,7 +1527,7 @@ export default class DebitCardPayment extends Component {
 
                 <View style={{ marginTop: '90%' }}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => { this.saveCardOption() }}>
-                        <Text autoCapitalize="words" style={[styles.purchaseButton, { color: '#fff', fontWeight: 'bold' }]}>
+                        <Text autoCapitalize="words" style={[styles.purchaseButton]}>
                             Next
                         </Text>
                     </TouchableOpacity>

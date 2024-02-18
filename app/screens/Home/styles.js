@@ -111,21 +111,15 @@ module.exports = StyleSheet.create({
         alignItems:'center',
         margin:'4%',
         elevation:8,
-        shadowOpacity: 8,
+        shadowOpacity: 3,
         flex:3,
         borderRadius:10,
-        backgroundColor:'#E0EBEC'
-    },
-
-    flext:{
-        height:100,
-        justifyContent:'center',
-        alignItems:'center',
-        margin:'4%',
-        elevation:0,
-        flex:3,
-        borderRadius:10,
-        backgroundColor:'#fff'
+        backgroundColor:'#E0EBEC',
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        shadowRadius: 2,
     },
 
     menutext:{

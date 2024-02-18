@@ -7,7 +7,10 @@ import {
     TouchableOpacity,
     Alert,
     Text,
-    TextInput
+    TextInput,
+    Keyboard,
+    TouchableWithoutFeedback, 
+    Linking
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Screen Styles
@@ -16,7 +19,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons} from "@expo/vector-icons";
 export default class Signin extends Component {
     constructor(props) {
         super(props)
@@ -40,17 +43,25 @@ export default class Signin extends Component {
             biometricEnabled: false,
             result: '',
             expoToken: "",
-            hidePassword: true
+            hidePassword: true,
+            isKeyboardOpen: false,
         }
     }
 
     async componentDidMount() {
-
         this.checkDeviceForHardware();
         this.checkIfBiometricIsEnabled();
         // this.checkForFingerprints();
         // let hasfingerprint = await LocalAuthentication.isEnrolledAsync();
         // this.setState({ hasfingerprint });
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this.handleKeyboardDidShow
+        );
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this.handleKeyboardDidHide
+        );
     }
 
     checkIfBiometricIsEnabled = async () => {
@@ -75,7 +86,7 @@ export default class Signin extends Component {
         let fingerprints = await LocalAuthentication.isEnrolledAsync();
         this.setState({ fingerprints });
 
-        if (!fingerprints) {
+        if (!fingerprints & Platform.OS == 'android') {
             Alert.alert(
                 'No Biometrics Found',
                 'Please ensure you have set up biometrics in your OS settings.',
@@ -93,26 +104,74 @@ export default class Signin extends Component {
                     },
                 ]
             );
-        } else {
+        } else if(!fingerprints & Platform.OS == 'ios') {
+            Alert.alert(
+                'No Biometrics Found',
+                'Please ensure you have set up biometrics in your OS settings.',
+                [
+                    {
+                        text: 'Go to Settings',
+                        onPress: () => {
+                            // Linking.openSettings();
+                            Linking.openURL('App-Prefs:root=FACEID_PASSCODE');
+                            // Linking.openURL('app-settings://settings/faceid');
+                        },
+                    },
+                    {
+                        text: 'Cancel',
+                        onPress: () => { },
+                        style: 'cancel',
+                    },
+                ]
+            );
+        }else {
             this.scanFingerprint();
         }
     };
 
     scanFingerprint = async () => {
         try {
-            let result = await LocalAuthentication.authenticateAsync(
-                { promptMessage: 'Scan your fingerprint.' }
-            );
-            if (result.success) {
-                let email = await AsyncStorage.getItem('email');
-                let password = await AsyncStorage.getItem('password');
-                this.setState({ email: email });
-                this.setState({ password: password });
-                this.signInUser(this);
-            } 
+            if(Platform.OS == 'android'){
+                let result = await LocalAuthentication.authenticateAsync(
+                    { promptMessage: 'Scan your fingerprint.' }
+                );
+
+                if (result.success) {
+                    let email = await AsyncStorage.getItem('email');
+                    let password = await AsyncStorage.getItem('password');
+                    this.setState({ email: email });
+                    this.setState({ password: password });
+                    this.signInUser(this);
+                }   
+            }else if(Platform.OS == 'ios'){
+                let result = await LocalAuthentication.authenticateAsync(
+                    { promptMessage: 'Scan your biometrics (TOuch ID or Face ID).' }
+                );
+
+                if (result.success) {
+                    let email = await AsyncStorage.getItem('email');
+                    let password = await AsyncStorage.getItem('password');
+                    this.setState({ email: email });
+                    this.setState({ password: password });
+                    this.signInUser(this);
+                } 
+            }
         } catch (error) {
             Alert.alert('error', error.toString());
         }
+    };
+
+    handleKeyboardDidShow = () => {
+        this.setState({ isKeyboardOpen: true });
+    };
+    
+    handleKeyboardDidHide = () => {
+        this.setState({ isKeyboardOpen: false });
+    };
+
+    // Function to dismiss the keyboard
+    dismissKeyboard = () => {
+        Keyboard.dismiss();
     };
 
     showAndroidAlert = () => {
@@ -457,84 +516,93 @@ export default class Signin extends Component {
             return <View></View>;
         }
         return (
-            <View style={styles.container}>
-                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>
-                <View style={styles.header}>
-                    <View style={styles.left}>
-                        <Text style={styles.login}>Login</Text>
-                        <Text style={styles.text}>Login to use our services</Text>
-                    </View>
-                    <View style={styles.right}>
-                        <Image style={styles.profileImage} source={require('../../../assets/logo.png')} />
-                    </View>
-                </View>
-                <View style={[styles.formLine, { paddingTop: 10 }]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Email-Address</Text>
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'envelope'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Enter your email-address" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="email" onChangeText={(email) => this.setState({ email })}/>
+            <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
+                <View style={styles.container}>
+                    <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>
+                    <View style={styles.header}>
+                        <View style={styles.left}>
+                            <Text style={styles.login}>Login</Text>
+                            <Text style={styles.text}>Login to use our services</Text>
+                        </View>
+                        <View style={styles.right}>
+                            <Image style={styles.profileImage} source={require('../../../assets/logo.png')} />
                         </View>
                     </View>
-                </View>
-                <View style={[styles.formLine, { paddingTop: 10 }]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Password</Text>
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Enter your password" secureTextEntry={this.state.hidePassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })}/>
-                            <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
-                                <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
+                    <View style={[styles.formLine, { paddingTop: 10 }]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Email-Address</Text>
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'envelope'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Enter your email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="email" onChangeText={(email) => this.setState({ email })}/>
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={20} style={[styles.keyboardIcon, {}]}/>
+                                    </TouchableOpacity> : ''
+                                }
+                            </View>
+                        </View>
+                    </View>
+                    <View style={[styles.formLine, { paddingTop: 10 }]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Password</Text>
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Enter your password" secureTextEntry={this.state.hidePassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })}/>
+                                <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
+                                    <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={[styles.tcview, { marginTop: 20 }]}>
+                        <View style={styles.tandcView}>
+                            <TouchableOpacity onPress={() => { this.props.navigation.navigate("ForgotPassword") }}>
+                                <Text style={[styles.textTermsCondition, { marginTop: '2%', color: '#1D59E1' }]}>
+                                    Forgot Password?
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
-                <View style={[styles.tcview, { marginTop: 20 }]}>
-                    <View style={styles.tandcView}>
-                        <TouchableOpacity onPress={() => { this.props.navigation.navigate("ForgotPassword") }}>
-                            <Text style={[styles.textTermsCondition, { marginTop: '2%', color: '#1D59E1' }]}>
-                                Forgot Password?
+                    <View>
+                        <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.signInUser(this); this.setState({ isProcessing: true }); }}>
+                            <Text autoCapitalize="words" style={styles.loginbutton}>
+                                Login
                             </Text>
                         </TouchableOpacity>
                     </View>
-                </View>
-                <View>
-                    <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.signInUser(this); this.setState({ isProcessing: true }); }}>
-                        <Text autoCapitalize="words" style={styles.loginbutton}>
-                            Login
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-                <View>
-                    
-                </View>
-                <View style={{ flexDirection: 'row', marginTop: '4%', marginBottom: '4%', justifyContent: 'center' }}>
-                    <TouchableOpacity>
-                        <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14 }]}>
-                            New To Paytyme?
-                        </Text>
-                    </TouchableOpacity>
+                    <View>
+                        
+                    </View>
+                    <View style={{ flexDirection: 'row', marginTop: '4%', marginBottom: '4%', justifyContent: 'center' }}>
+                        <TouchableOpacity>
+                            <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14 }]}>
+                                New To Paytyme?
+                            </Text>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => { this.props.navigation.navigate("Signup") }}>
-                        <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14, color: '#1D59E1', fontWeight: 'bold', marginLeft: '2%' }]}>
-                            Create Account
-                        </Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.props.navigation.navigate("Signup") }}>
+                            <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14, color: '#1D59E1', fontWeight: 'bold', marginLeft: '2%' }]}>
+                                Create Account
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    {this.state.compatible
+                        ?
+                        (
+                            this.state.biometricEnabled ? 
+                            <View styles={{ backgroundColor: 'white' }}>
+                                <TouchableOpacity onPress={() => { this.checkForFingerprints() }} style={{ flexDirection: 'row', paddingTop: '4%', justifyContent: 'center', backgroundColor: 'white' }}>
+                                    <Image source={require('../../Images/fingerprint.png')} style={[styles.fingerprint, { marginTop: '5%', alignItems: 'center' }]} />
+                                </TouchableOpacity>
+                            </View>
+                            :
+                            <View></View>
+                        ): ''
+                    }
                 </View>
-                {this.state.compatible
-                    ?
-                    (
-                        this.state.biometricEnabled ? 
-                        <View styles={{ backgroundColor: 'white' }}>
-                            <TouchableOpacity onPress={() => { this.checkForFingerprints() }} style={{ flexDirection: 'row', paddingTop: '4%', justifyContent: 'center', backgroundColor: 'white' }}>
-                                <Image source={require('../../Images/fingerprint.png')} style={[styles.fingerprint, { marginTop: '5%', alignItems: 'center' }]} />
-                            </TouchableOpacity>
-                        </View>
-                        :
-                        <View></View>
-                    ): ''
-                }
-            </View>
+            </TouchableWithoutFeedback>
         );
     }
 }

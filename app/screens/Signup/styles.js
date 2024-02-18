@@ -104,10 +104,15 @@ const styles = StyleSheet.create({
     touchableButton: {
         position: 'absolute',
         right: 3,
-        top: 3,
+        // top: 3,
         height: 20,
         width: 35,
         padding: 2
+    },
+
+    keyboardIcon: {
+        height: '100%',
+        width: '100%'
     },
 
     buttonImage: {

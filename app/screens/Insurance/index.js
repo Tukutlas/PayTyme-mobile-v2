@@ -893,7 +893,13 @@ export default class Insurance extends Component {
                         borderWidth: 1,
                         marginRight: '4%',
                         borderColor: 'transparent',
-                        elevation: 10
+                        elevation: 10,
+                        shadowOpacity: 10,
+                        shadowOffset: {
+                            width: 0,
+                            height: -2,
+                        },
+                        shadowRadius: 3.84
                     }}
                 >
                     <View 

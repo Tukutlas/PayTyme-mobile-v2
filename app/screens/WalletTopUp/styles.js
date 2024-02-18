@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: Colors.transparent,
-    height: Metrics.HEIGHT * 0.09,
+    height: Metrics.HEIGHT * 0.07,
     borderBottomWidth: 0,
     marginTop: Metrics.HEIGHT * 0.0714,
     elevation: 0,
@@ -126,10 +126,7 @@ inputIcon: {
     borderColor: "#8493d5",
     backgroundColor: "#0C0C54",
     alignSelf: "flex-end",
-    // paddingLeft: 0,
-    // paddingRight: 40,
-    paddingTop: 11.5,
-    paddingBottom: 15,
+    justifyContent: "center",
     marginTop: 30,
     marginRight: 5,
     borderRadius: 4,

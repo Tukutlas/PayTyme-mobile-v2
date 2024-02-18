@@ -3,13 +3,13 @@ import { Platform, StatusBar, View, ScrollView, Text, TouchableOpacity, BackHand
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Picker, PickerIOS } from "@react-native-picker/picker";
+import DropDownPicker from 'react-native-dropdown-picker';
 import styles from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
-
 
 export default class Education extends Component {
     constructor(props) {
@@ -50,6 +50,8 @@ export default class Education extends Component {
             charge: 0,
             transaction:false,
             there_cards: false,
+            pinDropdownOpen: false,
+            pinDropdownDisable: true,
             pinDropdownEnable: false,
             typeError: false,
             typeErrorMessage: '',
@@ -110,22 +112,37 @@ export default class Education extends Component {
         this.setState({ modalVisible: visible });
     }
 
-    setJambTypeOpen = (jambTypeOpen) => {
+    setPinDropDownOpen = (pinDropdownOpen) => {
         this.setState({
-            jambTypeOpen
+            pinDropdownOpen
         });
     }
 
-    setJambTypeValue = (callback) => {
+    setPinDropDownValue = (callback) => {
+        // Update the state using the callback function
         this.setState(state => ({
-            jambTypeValue: callback(state.jambTypeValue)
-        }));
-        this.getPricing('jamb')
-    }
+            typeValue: callback(state.typeValue)
+        }), () => {
+            // Perform additional actions after the state has been updated
+            const { typeValue } = this.state;
+    
+            if (callback !== null) {
+                const value = callback(typeValue);
+                this.setState({ typeError: false });
+                const string = value.split("#");
+    
+                this.setState({
+                    name: string[0],
+                    code: string[1],
+                    amount: parseInt(string[2])
+                });
+            }
+        });
+    }    
 
-    setJambTypeItems = (callback) => {
+    setPinDropDownItems = (callback) => {
         this.setState(state => ({
-          jambTypeItems: callback(state.jambTypeItems)
+          pinTypeItems: callback(state.pinTypeItems)
         }));
     }
 
@@ -194,16 +211,14 @@ export default class Education extends Component {
             // <-- Post parameters
         }) 
         .then((response) => response.text())
-        .then((responseText) => { 
-            console.log(responseText)
-            this.setState({isLoading:false});
+        .then((responseText) => {
             let response = JSON.parse(responseText);
             if(response.status == true){
                 let products = response.data.items;  
                 let newArray = products.map((item) => {
                     return {label: item.name+" - ₦"+this.numberFormat(item.amount), value: item.name+"#"+item.code+"#"+item.amount}
                 })
-                this.setState({pinTypes: newArray, pinDropdownEnable: true, serviceProvider:response.data.provider});
+                this.setState({pinTypes: newArray, pinDropdownEnable: true, pinDropdownDisable: false, serviceProvider:response.data.provider});
             }else if(response.status == false){
                 Alert.alert(
                     'Error',
@@ -218,6 +233,7 @@ export default class Education extends Component {
                     {cancelable: false},
                 );
             }
+            this.setState({isLoading:false});
         })
         .catch((error) => {
             this.setState({isLoading:false});
@@ -745,7 +761,7 @@ export default class Education extends Component {
                 <View style={[styles.grid,{marginTop:'-3%'}]}>
                     <TouchableOpacity style={[styles.flexb]}>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:1.4, borderColor:(this.state.waec) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.waec) ? "#445cc4" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({waec:true});
                             this.setState({jamb:false});
@@ -756,7 +772,7 @@ export default class Education extends Component {
                     >
                         <Image source={require('../../Images/Education/waec.png')} style={{height:57, width:57, borderRadius:10}} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:1.4, borderColor:(this.state.jamb) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.jamb) ? "#445cc4" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({waec:false});
                             this.setState({jamb:true});
@@ -770,28 +786,7 @@ export default class Education extends Component {
                     <TouchableOpacity style={[styles.flexb]}>
                     </TouchableOpacity>
                 </View>
-                {/* {
-                    this.state.jamb ?
-                    <View style={[styles.formLine, {marginTop:'-1%'}]}>
-                        <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Select Options</Text>
-                        </View>
-                    </View>
-                    :
-                    <View></View> 
-                }
-                {
-                    this.state.waec ?
-                    <View style={[styles.formLine, {marginTop:'-1%'}]}>
-                        <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Waec Options</Text>
-                        </View>
-                    </View>
-                    :
-                    <View></View> 
-                } */}
-
-
+                
                 {/* {
                     this.state.jamb ? 
                     // <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', height:30, zIndex:1000, marginTop:'2%'}}>
@@ -801,22 +796,22 @@ export default class Education extends Component {
                     //         value={this.state.jambTypeValue}
                     //         style={[styles.dropdown, {flexDirection: 'row', height: 15}]}
                     //         items={this.state.jambTypes}
-                    //         setOpen={this.setJambTypeOpen}
-                    //         setValue={this.setJambTypeValue}
-                    //         setItems={this.setJambTypeItems}
+                    //         setOpen={this.setPinDropDownOpen}
+                    //         setValue={this.setPinDropDownValue}
+                    //         setItems={this.setPinDropDownItems}
                     //         searchable={false}
                     //         disabled={this.state.jambTypeDisable}
                     //     />    
                     // </View>
                     <>*/}
-                <View style={[styles.formLine, {marginTop:'-2%'}]}>
+                <View style={[styles.formLine, {marginTop: '0.5%', marginLeft: '0.5%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Select Options</Text>
                     </View>
                 </View>
-                <View style={{width:'94%', marginLeft:'3.0%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
-                    {
-                        Platform.OS === "android" ? 
+                {
+                    Platform.OS === "android" ? 
+                    <View style={{width:'94%', marginLeft:'3.0%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
                         <Picker
                             selectedValue={this.state.typeValue}
                             onValueChange={(itemValue, itemIndex) =>
@@ -830,42 +825,31 @@ export default class Education extends Component {
                             {this.state.pinTypes.map((type, index) => (
                                 <Picker.Item key={index} label={type.label} value={type.value} style={{fontSize: 14}} />
                             ))}
-                        </Picker> : 
-                        <PickerIOS
-                            selectedValue={this.state.typeValue}
-                            onValueChange={(itemValue, itemIndex) =>
-                                this.setPinType(itemValue)
-                            }
-                            enabled={this.state.pinDropdownEnable}
-                            style={{height: '100%', width: '100%'}}
-                        >
-                            <Picker.Item label="Select Pin Types" value={null} style={{fontSize: 14}}/>
-                            
-                            {this.state.pinTypes.map((type, index) => (
-                                <Picker.Item key={index} label={type.label} value={type.value} style={{fontSize: 14}} />
-                            ))}
-                        </PickerIOS>
-                    }
-                    {/* <Picker
-                        selectedValue={this.state.typeValue}
-                        onValueChange={(itemValue, itemIndex) =>
-                            this.setPinType(itemValue)
-                        }
-                        enabled={this.state.pinDropdownEnable}
-                        style={{height: '100%', width: '100%'}}
-                    >
-                        <Picker.Item label="Select Pin Types" value={null} style={{fontSize: 14}}/>
-                        
-                        {this.state.pinTypes.map((type, index) => (
-                            <Picker.Item key={index} label={type.label} value={type.value} style={{fontSize: 14}} />
-                        ))}
-                    </Picker> */}
-                </View>
+                        </Picker> 
+                    </View>:
+                    <View style={{width:'97%', marginLeft:'1.5%', backgroundColor: '#fff', zIndex:1000}}>
+                        <DropDownPicker
+                            placeholder={'Select Pin Types'}
+                            open={this.state.pinDropdownOpen}
+                            value={this.state.typeValue}
+                            style={[styles.dropdown]}
+                            setOpen={this.setPinDropDownOpen}
+                            setValue={this.setPinDropDownValue}
+                            setItems={this.setPinDropDownItems}
+                            items={this.state.pinTypes}
+                            labelStyle={{ fontSize: 14 }}
+                            searchable={false}
+                            disabled={this.state.pinDropdownDisable}
+                            dropDownContainerStyle={{
+                                width:'97%',
+                                marginLeft:'1.5%'
+                            }}  
+                        />
+                    </View>
+                } 
+                
                 {this.state.typeError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.typeErrorMessage}</Text>}
-                    {/* </>
-                    :
-                    <View></View> 
-                } */}
+                    
                 
                 <View style={[styles.formLine, {marginTop:'1.2%'}]}>
                     <View style={styles.formCenter}>
@@ -950,7 +934,13 @@ export default class Education extends Component {
                         borderWidth: 1,
                         marginRight: '4%',
                         borderColor: 'transparent',
-                        elevation: 20
+                        elevation: 20,
+                        shadowOpacity: 10,
+                        shadowOffset: {
+                            width: 0,
+                            height: -2,
+                        },
+                        shadowRadius: 3.84
                     }}>
                     <View 
                         style={{

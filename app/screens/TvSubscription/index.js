@@ -143,7 +143,6 @@ export default class TvSubscription extends Component {
         .then((response) => response.text())
         .then((responseText) => { 
             this.setState({isLoading:false});
-      
             let response_status = JSON.parse(responseText).status;
             if(response_status == true){
                 let wallet = JSON.parse(responseText).data;  
@@ -594,8 +593,10 @@ export default class TvSubscription extends Component {
         .then(response => response.text())
         .then(result => {
             response = JSON.parse(result);
-            // console.log(response);
-            // return;
+
+            if(response.status == false){
+                alert(response.message);
+            }
             if(response.service_provider == 'vtpass'){
                 if(tv_type=='startimes'){
                     let data_parsed = JSON.parse(result).data;
@@ -895,44 +896,47 @@ export default class TvSubscription extends Component {
                     <View style={{justifyContent:'center'}}>
                         <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Select Bouquet Plan</Text>
                     </View>
-                    {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
-                        <DropDownPicker
-                            placeholder={'Select your subscription plan'}
-                            open={this.state.bouquetOpen}
-                            value={this.state.bouquetValue}
-                            style={[styles.dropdown]}
-                            items={this.state.bouquetdata}
-                            setOpen={this.setBouquetOpen}
-                            setValue={this.setBouquetValue}
-                            setItems={this.setBouquetItems}
-                            listMode="MODAL"  
-                            searchable={false}
-                            disabled={this.state.bouquetDisable}
-                            onSelectItem={(item) => {
-                                if(this.state.dstv){
-                                    this.getDstvBouquetAddons(item.value);
-                                }else{
-                                    this.planvariable(item.value)
+                    {
+                        Platform.OS == 'ios' ?
+                        <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
+                            <DropDownPicker
+                                placeholder={'Select your subscription plan'}
+                                open={this.state.bouquetOpen}
+                                value={this.state.bouquetValue}
+                                style={[styles.dropdown]}
+                                items={this.state.bouquetdata}
+                                setOpen={this.setBouquetOpen}
+                                setValue={this.setBouquetValue}
+                                setItems={this.setBouquetItems}
+                                listMode="MODAL"  
+                                searchable={false}
+                                disabled={this.state.bouquetDisable}
+                                onSelectItem={(item) => {
+                                    if(this.state.dstv){
+                                        this.getDstvBouquetAddons(item.value);
+                                    }else{
+                                        this.planvariable(item.value)
+                                    }
+                                }}
+                            />
+                        </View> :
+                        <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                            <Picker
+                                selectedValue={this.state.bouquetValue}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    this.setBouquet(itemValue)
                                 }
-                            }}
-                        />
-                    </View> */}
-                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
-                        <Picker
-                            selectedValue={this.state.bouquetValue}
-                            onValueChange={(itemValue, itemIndex) =>
-                                this.setBouquet(itemValue)
-                            }
-                            enabled={this.state.bouquetEnable}
-                            style={{height: '100%', width: '100%'}}
-                        >
-                            <Picker.Item label="Select any Subscription Plan" value={null} style={{fontSize: 14}}/>
-                            
-                            {this.state.bouquetdata.map((plan, index) => (
-                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
-                            ))}
-                        </Picker>
-                    </View>
+                                enabled={this.state.bouquetEnable}
+                                style={{height: '100%', width: '100%'}}
+                            >
+                                <Picker.Item label="Select any Subscription Plan" value={null} style={{fontSize: 14}}/>
+                                
+                                {this.state.bouquetdata.map((plan, index) => (
+                                    <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                                ))}
+                            </Picker>
+                        </View> 
+                    }
                     {this.state.bouquetError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.bouquetErrorMessage}</Text>}
 
                     {
@@ -1009,7 +1013,13 @@ export default class TvSubscription extends Component {
                             borderWidth: 1,
                             marginRight: '4%',
                             borderColor: 'transparent',
-                            elevation: 10
+                            elevation: 10,
+                            shadowOpacity: 10,
+                            shadowOffset: {
+                                width: 0,
+                                height: 0,
+                            },
+                            shadowRadius: 3.84
                         }}
                     >
                         <View 
@@ -1056,12 +1066,12 @@ export default class TvSubscription extends Component {
                     {/* Card Option */}
 
                     <TouchableOpacity
-                        info style={[styles.buttonPurchase,{marginBottom:'10%'}]}
+                        info style={[styles.buttonPurchase]}
                         onPress={() => {
                             (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
                         }}
                     >
-                        <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
+                        <Text autoCapitalize="words" style={[styles.purchaseButton]}>
                             Confirm Purchase (₦{this.state.amount})
                         </Text>
                     </TouchableOpacity>

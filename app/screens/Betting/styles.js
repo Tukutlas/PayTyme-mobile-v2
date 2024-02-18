@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     color: "black",
     fontSize: 14,
+    fontWeight: 'bold'
   },
 
   right: {
@@ -90,6 +91,12 @@ const styles = StyleSheet.create({
 
   inputIcon: {
     marginHorizontal: 10, // Adjust the margin according to your requirement
+  },
+
+  touchableButton: {
+    padding: 5,
+    borderRadius: 25,
+    marginLeft: 10,
   },
 
   betIcon: {

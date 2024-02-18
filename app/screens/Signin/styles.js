@@ -132,6 +132,11 @@ const styles = StyleSheet.create({
         width: '100%'
     },
 
+    keyboardIcon: {
+        height: '100%',
+        width: '100%'
+    },
+
     fingerprint: {
         resizeMode: 'contain',
         height: '200%',

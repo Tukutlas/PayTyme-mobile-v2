@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto-Regular",
         color: "black",
         fontSize: 14,
+        fontWeight: 'bold'
     },
 
     right: {
@@ -102,24 +103,29 @@ const styles = StyleSheet.create({
         marginHorizontal: 10, // Adjust the margin according to your requirement
     },
 
+    touchableButton: {
+        padding: 5,
+        borderRadius: 25,
+        marginLeft: 10,
+    },
+
     buttonPurchase: {
         borderWidth: 1,
         borderColor: "#8493d5",
         backgroundColor: "#0C0C54",
         alignSelf: "center",
-        paddingLeft: 40,
-        paddingRight: 40,
-        paddingTop: 15,
-        paddingBottom: 15,
-        marginTop: 30,
-        borderRadius: 4,
-        width: Metrics.WIDTH * 0.91
+        justifyContent: "center",
+        marginTop: '6%',
+        borderRadius: 15,
+        width: '91%',
+        height: '6%'
     },
-
+    
     purchaseButton: {
-        fontFamily: 'Roboto-Medium',
+        fontFamily: Fonts.type.RobotoMedium,
         color: "#fff",
-        alignSelf: "center"
+        alignSelf: "center",
+        fontWeight: 'bold' 
     },
 
     input: {

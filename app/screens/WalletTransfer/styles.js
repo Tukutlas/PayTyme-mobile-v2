@@ -9,14 +9,25 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: Colors.transparent,
-    height: Metrics.HEIGHT * 0.15,
+    height: Metrics.HEIGHT * 0.12,
     borderBottomWidth: 0,
-    paddingTop: Metrics.HEIGHT * 0.0354,
+    // paddingTop: Metrics.HEIGHT * 0.0354,
     marginTop: Metrics.HEIGHT * 0.0314,
     elevation: 0,
     flexDirection: 'row',
     flexWrap: 'wrap'
   },
+
+  header: {
+    backgroundColor: Colors.transparent,
+    height: '12%',
+    borderBottomWidth: 0,
+    // paddingTop: Metrics.HEIGHT * 0.0354,
+    marginTop: '15%',
+    elevation: 0,
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+},
 
   left: {
     alignSelf: "flex-start",
@@ -25,9 +36,9 @@ const styles = StyleSheet.create({
   },
 
   headerBody: {
-    paddingLeft: Metrics.WIDTH * 0.0550,
-    paddingRight: Metrics.WIDTH * 0.01,
-    width: 220,
+    marginLeft: '5%',
+    // paddingRight: Metrics.WIDTH * 0.01,
+    width: '75%',
   },
 
   body:{
@@ -57,17 +68,15 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     backgroundColor:'#fff'
   },
-
-  
   formLine: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     backgroundColor: '#fff',
     width: '97%',
     paddingTop: 0,
-},
+  },
 
-formCenter: {
+  formCenter: {
     marginLeft: '4%', // Adjust the padding according to your requirement
     width: '95%',
   },
@@ -95,21 +104,19 @@ formCenter: {
     borderColor: "#8493d5",
     backgroundColor: "#0C0C54",
     alignSelf: "flex-end",
-    paddingLeft: 6,
-    // paddingRight: 40,
-    paddingTop: 11.5,
-    paddingBottom: 15,
-    marginTop: 30,
-    marginRight: 5,
+    justifyContent: "center",
+    marginTop: '7%',
+    marginRight: '4%',
     borderRadius: 4,
-    width: Metrics.WIDTH * 0.35,
+    width: '35%',
     height: Metrics.HEIGHT * 0.06
   },
 
   purchaseButton: {
     fontFamily: Fonts.type.robotoMedium,
     color: "#fff",
-    alignSelf: "center"
+    alignSelf: "center",
+    fontWeight:'bold'
   },
 
   input:{
@@ -129,6 +136,12 @@ formCenter: {
   inputIcon: {
       marginHorizontal: 10, // Adjust the margin according to your requirement
   },
+
+  touchableButton: {
+    padding: 5,
+    borderRadius: 25,
+    marginLeft: 10,
+},
 
   buttonImage: {
     resizeMode: 'contain',

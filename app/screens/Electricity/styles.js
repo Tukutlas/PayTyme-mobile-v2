@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: Colors.transparent,
-    height: Metrics.HEIGHT * 0.08,
+    height: '7.5%',
     borderBottomWidth: 0,
     marginTop: Metrics.HEIGHT * 0.06,
     elevation: 0,
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   right: {
     alignSelf: "flex-end",
     marginLeft: Metrics.WIDTH * 0.85,
-    marginTop: Metrics.HEIGHT * -0.090,
+    marginTop: Metrics.HEIGHT * -0.070,
     width: 79,
   },
 
@@ -108,9 +108,17 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginLeft: 10,
   },
+
   verifyButtonText: {
       color: '#fff',
       fontWeight: 'bold',
+  },
+
+  touchableButton: {
+    backgroundColor: '#0C0C54',
+    padding: 5,
+    borderRadius: 25,
+    marginLeft: 10,
   },
 
   buttonPurchase: {
@@ -118,19 +126,18 @@ const styles = StyleSheet.create({
     borderColor: "#8493d5",
     backgroundColor: "#0C0C54",
     alignSelf: "center",
-    paddingLeft: 40,
-    paddingRight: 40,
-    paddingTop: 15,
-    paddingBottom: 15,
-    marginTop: '4%',
-    borderRadius: 4,
-    width: Metrics.WIDTH * 0.91
+    justifyContent: "center",
+    marginTop: '6%',
+    borderRadius: 15,
+    width: '91%',
+    height: '7%'
   },
 
   purchaseButton: {
     fontFamily: Fonts.type.robotoMedium,
     color: "#fff",
-    alignSelf: "center"
+    alignSelf: "center",
+    fontWeight:'bold'
   },
 
   input:{

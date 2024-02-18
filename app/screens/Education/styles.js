@@ -11,8 +11,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.transparent,
     height: Metrics.HEIGHT * 0.07,
     borderBottomWidth: 0,
-    marginTop: Metrics.HEIGHT * 0.065,
-    elevation: 0,
+    marginTop: Metrics.HEIGHT * 0.055,
     flexDirection: 'row',
     flexWrap: 'wrap'
   },
@@ -106,6 +105,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 10, // Adjust the margin according to your requirement
   },
 
+  dropdown: {
+    minHeight: 40,
+    backgroundColor: "#f6f6f6",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    width: '97%',
+    marginLeft: '1.5%'
+  },
+
   buttonPurchase: {
     borderWidth: 1,
     borderColor: "#8493d5",
@@ -147,7 +156,13 @@ const styles = StyleSheet.create({
     elevation:8,
     flex:3,
     borderRadius:10,
-    backgroundColor:'#E0EBEC'
+    backgroundColor:'#E0EBEC',
+    shadowOpacity: 10,
+    shadowOffset: {
+        width: 0,
+        height: -2,
+    },
+    shadowRadius: 3.84
   },
   flexb:{
     height:60,

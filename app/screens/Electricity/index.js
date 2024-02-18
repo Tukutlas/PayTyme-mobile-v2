@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, ScrollView } from "react-native";
+import { Platform, StatusBar, View, Text, TouchableOpacity, TouchableWithoutFeedback, BackHandler, Image, TextInput, Alert, ScrollView, Keyboard } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 
@@ -75,10 +75,18 @@ export default class Electricity extends Component {
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
         });
         this.setState({ fontLoaded: true });
+
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this.handleKeyboardDidShow
+        );
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this.handleKeyboardDidHide
+        );
     }
 
     loadWalletBalance(){
-        console.log(Platform.OS)
         fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
             method: 'GET',
@@ -162,6 +170,7 @@ export default class Electricity extends Component {
         meter_no = this.state.meterno;
         type = this.state.typeValue;
         company = this.state.discoValue
+        this.dismissKeyboard
         this.validateMeter(meter_no, type, company)
     }
 
@@ -234,7 +243,7 @@ export default class Electricity extends Component {
     payPower(){
         this.setState({isLoading:true});
   
-        if(Math.floor(this.state.amount) < Math.floor(this.state.balance)){
+        if(Math.floor(this.state.amount) <= Math.floor(this.state.balance)){
             let myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
             myHeaders.append("Content-Type", "application/json");
@@ -477,6 +486,19 @@ export default class Electricity extends Component {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
 
+    handleKeyboardDidShow = () => {
+        this.setState({ isKeyboardOpen: true });
+    };
+    
+    handleKeyboardDidHide = () => {
+        this.setState({ isKeyboardOpen: false });
+    };
+
+    // Function to dismiss the keyboard
+    dismissKeyboard = () => {
+        Keyboard.dismiss();
+    };
+
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
@@ -486,208 +508,230 @@ export default class Electricity extends Component {
         }
 
         return (
-            <ScrollView style={styles.container}>
-                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
-                <View style={styles.header}>
-                    <View style={styles.left}>
-                        <TouchableOpacity onPress={() =>this.backPressed()}>
-                            <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
-                        </TouchableOpacity>
-                    </View> 
-                    <View style={styles.headerBody}>
-                        <Text style={styles.body}>Electricity</Text>
-                        <Text style={styles.text}>Pay bills easily</Text>
+            <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
+                <ScrollView style={styles.container}>
+                    <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
+                    <View style={styles.header}>
+                        <View style={styles.left}>
+                            <TouchableOpacity onPress={() =>this.backPressed()}>
+                                <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
+                            </TouchableOpacity>
+                        </View> 
+                        <View style={styles.headerBody}>
+                            <Text style={styles.body}>Electricity</Text>
+                            <Text style={styles.text}>Pay bills easily</Text>
+                        </View>
+                        <View style={styles.right}>
+                            <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
+                        </View> 
                     </View>
-                    <View style={styles.right}>
-                        <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
-                    </View> 
-                </View>
-                <View style={[styles.formLine]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Select Disco</Text>
+                    <View style={[styles.formLine]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Select Disco</Text>
+                        </View>
                     </View>
-                </View>
-                <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
-                    <DropDownPicker
-                        placeholder={'Select Distribution Company'}
-                        open={this.state.discoOpen}
-                        value={this.state.discoValue}
-                        style={[styles.dropdown]}
-                        items={this.state.discos}
-                        setOpen={this.setDiscoOpen}
-                        setValue={this.setDiscoValue}
-                        setItems={this.setDiscoItems}
-                        onSelectItem={(item) => {
-                            this.setState({discoError: false})
-                        }}
-                        listMode="SCROLLVIEW"
-                        scrollViewProps={{
-                            nestedScrollEnabled: true,
-                            persistentScrollbar: true,
-                        }}
-                        dropDownContainerStyle={{
-                            width:'97%',
-                            marginLeft:'1.5%',
-                            position: 'relative',
-                            top: 0
-                        }}           
-                    />
-                </View>
-                {this.state.discoError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select a distribution company</Text>}
-                <View style={{justifyContent:'center', marginTop: '1.2%'}}>
-                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1.2%',marginLeft:'3.5%'}}>Meter Type</Text>
-                </View>
-                { 
-                    Platform.OS === "ios" ?
-                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
+                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
                         <DropDownPicker
-                            placeholder={'Select Meter Type'}
-                            open={this.state.typeOpen}
-                            value={this.state.typeValue}
-                            items={this.state.meterTypes}
+                            placeholder={'Select Distribution Company'}
+                            open={this.state.discoOpen}
+                            value={this.state.discoValue}
                             style={[styles.dropdown]}
-                            setOpen={this.setTypeOpen}
-                            setValue={this.setTypeValue}
-                            setItems={this.setTypeItems}
+                            items={this.state.discos}
+                            setOpen={this.setDiscoOpen}
+                            setValue={this.setDiscoValue}
+                            setItems={this.setDiscoItems}
                             onSelectItem={(item) => {
-                                this.setState({meterTypeError: false})
+                                this.setState({discoError: false})
+                            }}
+                            listMode="SCROLLVIEW"
+                            scrollViewProps={{
+                                nestedScrollEnabled: true,
+                                persistentScrollbar: true,
                             }}
                             dropDownContainerStyle={{
                                 width:'97%',
-                                marginLeft:'1.5%'
-                            }}  
+                                marginLeft:'1.5%',
+                                position: 'relative',
+                                top: 0
+                            }}           
                         />
-                    </View> :
-                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center', marginTop: '1%'}}>
-                        <Picker
-                            selectedValue={this.state.typeValue}
-                            onValueChange={(itemValue, itemIndex) =>
-                                this.setMeterType(itemValue)
-                            }
-                            style={{height: '100%', width: '100%'}}
-                        >
-                            <Picker.Item label="Select Meter Type" value={null} style={{fontSize: 14}}/>
-                            
-                            {this.state.meterTypes.map((plan, index) => (
-                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
-                            ))}
-                        </Picker> 
                     </View>
-                }
-                {this.state.meterTypeError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select the meter type</Text>}
-                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Enter Meter Number</Text>
-                        <View roundedc style={[styles.inputitem]}>
-                            <FontAwesome5 name={'tachometer-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/>
-                            <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
-                                <Text style={styles.verifyButtonText}>Verify</Text>
-                            </TouchableOpacity>
+                    {this.state.discoError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select a distribution company</Text>}
+                    <View style={{justifyContent:'center', marginTop: '1.2%'}}>
+                        <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1.2%',marginLeft:'3.5%'}}>Meter Type</Text>
+                    </View>
+                    { 
+                        Platform.OS === "ios" ?
+                        <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', zIndex:5, marginTop: '1%'}}>
+                            <DropDownPicker
+                                placeholder={'Select Meter Type'}
+                                open={this.state.typeOpen}
+                                value={this.state.typeValue}
+                                items={this.state.meterTypes}
+                                style={[styles.dropdown]}
+                                setOpen={this.setTypeOpen}
+                                setValue={this.setTypeValue}
+                                setItems={this.setTypeItems}
+                                onSelectItem={(item) => {
+                                    this.setState({meterTypeError: false})
+                                }}
+                                dropDownContainerStyle={{
+                                    width:'97%',
+                                    marginLeft:'1.5%'
+                                }}  
+                            />
+                        </View> :
+                        <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center', marginTop: '1%'}}>
+                            <Picker
+                                selectedValue={this.state.typeValue}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    this.setMeterType(itemValue)
+                                }
+                                style={{height: '100%', width: '100%'}}
+                            >
+                                <Picker.Item label="Select Meter Type" value={null} style={{fontSize: 14}}/>
+                                
+                                {this.state.meterTypes.map((plan, index) => (
+                                    <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                                ))}
+                            </Picker> 
                         </View>
-                        {this.state.meterError && <Text style={{ color: 'red' }}>{this.state.meterErrorMessage}</Text>}
+                    }
+                    {this.state.meterTypeError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select the meter type</Text>}
+                    <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Enter Meter Number</Text>
+                            <View roundedc style={[styles.inputitem]}>
+                                <FontAwesome5 name={'tachometer-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/>
+                                <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
+                                    <Text style={styles.verifyButtonText}>Verify</Text>
+                                </TouchableOpacity>
+                            </View>
+                            {this.state.meterError && <Text style={{ color: 'red' }}>{this.state.meterErrorMessage}</Text>}
+                        </View>
                     </View>
-                </View>
 
-                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Customer Name</Text>
-                        <View roundedc style={[styles.inputitem, {height:30}]}>
-                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.customerName}</Text>
+                    <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Customer Name</Text>
+                            <View roundedc style={[styles.inputitem, {height:30}]}>
+                                <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.customerName}</Text>
+                            </View>
                         </View>
                     </View>
-                </View>
 
-                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Customer Phone Number</Text>
-                        <View roundedc style={[styles.inputitem]}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
+                    <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Customer Phone Number</Text>
+                            <View roundedc style={[styles.inputitem]}>
+                                <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
+                            </View>
+                            {this.state.phoneError && <Text style={{fontSize:13, color:'red', backgroundColor:'#F6F6F6', height:20}}>{this.state.phoneNoErrorMessage}</Text>}
                         </View>
-                        {this.state.phoneError && <Text style={{fontSize:13, color:'red', backgroundColor:'#F6F6F6', height:20}}>{this.state.phoneNoErrorMessage}</Text>}
                     </View>
-                </View>
 
-                <View style={[styles.formLine, {marginTop:'1.2%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Amount</Text>
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in the token amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
+                    <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Amount</Text>
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Type in the token amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
+                            </View>
+                            {this.state.amountError && <Text style={{fontSize:13, color:'red', backgroundColor:'#F6F6F6', height:20}}>{this.state.amountErrorMessage}</Text>}
                         </View>
-                        {this.state.amountError && <Text style={{fontSize:13, color:'red', backgroundColor:'#F6F6F6', height:20}}>{this.state.amountErrorMessage}</Text>}
                     </View>
-                </View>
-                {/* Card Option*/}
-                <View
-                    style={{
-                        backgroundColor:'#fff',
-                        marginTop:'3%',
-                        marginLeft: '4%',
-                        borderRadius: 30,
-                        borderWidth: 1,
-                        marginRight: '4%',
-                        borderColor: 'transparent',
-                        elevation: 10
-                    }}
-                >
-                    <View 
+                    {/* Card Option*/}
+                    <View
                         style={{
-                            paddingLeft:1,
-                            marginTop:'0.5%',
-                            marginLeft:'3%',
-                            marginRight:'6%'
+                            backgroundColor:'#fff',
+                            marginTop:'3%',
+                            marginLeft: '4%',
+                            borderRadius: 30,
+                            borderWidth: 1,
+                            marginRight: '4%',
+                            borderColor: 'transparent',
+                            elevation: 10,
+                            shadowOpacity: 10,
+                            shadowOffset: {
+                                width: 0,
+                                height: 0,
+                            },
+                            shadowRadius: 3.84,
                         }}
                     >
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
-                                    <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
+                        <View 
+                            style={{
+                                paddingLeft:1,
+                                marginTop:'0.5%',
+                                marginLeft:'3%',
+                                marginRight:'6%'
+                            }}
+                        >
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
+                                    <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
+                                        <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
+                                    </TouchableOpacity>
+
+                                    <View style={{marginLeft:'1%', padding:7}}>
+                                        <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
+                                        <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
+                                        <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
+                                    </View>
                                 </TouchableOpacity>
+                            </View> 
+                            <View style={[styles.buttonContainer,{borderTopColor:'#f5f5f5', borderTopWidth:1}]}>
+                                <TouchableOpacity style={{flexDirection:'row'}} 
+                                    onPress={()=>{
+                                        this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
+                                    }}
+                                > 
+                                    <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
+                                        <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
+                                    </TouchableOpacity>
 
-                                <View style={{marginLeft:'1%', padding:7}}>
-                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
-                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
-                                    <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
-                                </View>
-                            </TouchableOpacity>
-                        </View> 
-                        <View style={[styles.buttonContainer,{borderTopColor:'#f5f5f5', borderTopWidth:1}]}>
-                            <TouchableOpacity style={{flexDirection:'row'}} 
-                                onPress={()=>{
-                                    this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
-                                }}
-                            > 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
-                                    <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
+                                    <View style={{marginLeft:'1%', padding:5}}>
+                                        <Text style={{fontSize:13, marginLeft:'2%'}}>Pay with Card</Text>
+                                        <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>Make Payment with your Debit/Credit Card </Text>
+                                        <Image source={require('../../Images/payment-terms.png')} style={{ width:270, height:50, marginLeft:-7, borderRadius:20 }}/>
+                                    </View>
                                 </TouchableOpacity>
+                            </View> 
+                        </View>   
+                    </View> 
 
-                                <View style={{marginLeft:'1%', padding:5}}>
-                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay with Card</Text>
-                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>Make Payment with your Debit/Credit Card </Text>
-                                    <Image source={require('../../Images/payment-terms.png')} style={{ width:270, height:50, marginLeft:-7, borderRadius:20 }}/>
-                                </View>
-                            </TouchableOpacity>
-                        </View> 
-                    </View>   
-                </View> 
+                    {/* Card Option */}
 
-                {/* Card Option */}
-
-                <TouchableOpacity
-                    info
-                    style={[styles.buttonPurchase,{marginBottom:'10%'}]}
-                    onPress={() => {
-                        (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
-                    }}
-                >
-                    <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
-                        Confirm Purchase
-                    </Text>
-                </TouchableOpacity>
-            </ScrollView>
+                    <TouchableOpacity
+                        info
+                        style={[styles.buttonPurchase]}
+                        onPress={() => {
+                            (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
+                        }}
+                    >
+                        <Text autoCapitalize="words" style={[styles.purchaseButton]}>
+                            Confirm Purchase
+                        </Text>
+                    </TouchableOpacity>
+                </ScrollView>
+            </TouchableWithoutFeedback>
         );
     }
 }

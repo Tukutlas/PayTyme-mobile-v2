@@ -9,11 +9,14 @@ import {
   Image,
   TextInput,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+// import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
@@ -50,7 +53,8 @@ export default class Airtime extends Component {
             balance: 0,
             isLoading:false,
             transaction: false,
-            there_cards: false
+            there_cards: false,
+            isKeyboardOpen: false
         };
     }
 
@@ -81,6 +85,15 @@ export default class Airtime extends Component {
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
         });
         this.setState({ fontLoaded: true });
+
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this.handleKeyboardDidShow
+        );
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this.handleKeyboardDidHide
+        );
     }
 
     backPressed = () => {
@@ -426,6 +439,19 @@ export default class Airtime extends Component {
         }
     }
 
+    handleKeyboardDidShow = () => {
+        this.setState({ isKeyboardOpen: true });
+    };
+    
+    handleKeyboardDidHide = () => {
+        this.setState({ isKeyboardOpen: false });
+    };
+
+    // Function to dismiss the keyboard
+    dismissKeyboard = () => {
+        Keyboard.dismiss();
+    };
+
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
@@ -435,169 +461,191 @@ export default class Airtime extends Component {
         }
     
         return (
-            <KeyboardAwareScrollView  style={styles.container}>
-                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>  
-                <View style={styles.header}>
-                    <View style={styles.left}>
-                        <TouchableOpacity onPress={() =>this.backPressed()}>
-                            <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
+            <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
+                <View style={styles.container}>
+                    <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>  
+                    <View style={styles.header}>
+                        <View style={styles.left}>
+                            <TouchableOpacity onPress={() =>this.backPressed()}>
+                                <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
+                            </TouchableOpacity>
+                        </View> 
+                        <View style={styles.headerBody}>
+                            <Text style={styles.body}>Top up Airtime</Text>
+                            <Text style={styles.text}>Buy airtime of your choice here!!!</Text>
+                        </View>
+                        <View style={styles.right}>
+                            <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
+                        </View> 
+                    </View>
+                    <View style={[styles.formLine]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Enter Phone Number</Text>
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setState({phonenumber_value})} value={this.state.phonenumber_value}  />
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.grid}>
+                        <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.mtn) ? "#0C0C54" : "#f5f5f5"}]} 
+                            onPress={()=>{
+                                this.setState({mtn:true});
+                                this.setState({glo:false});
+                                this.setState({airtel:false});
+                                this.setState({etisalat:false});
+                            }}
+                        >
+                            <Image source={require('../../Images/mtn-logo.png')} style={{height:70, width:70, borderRadius:15}} />
                         </TouchableOpacity>
-                    </View> 
-                    <View style={styles.headerBody}>
-                        <Text style={styles.body}>Top up Airtime</Text>
-                        <Text style={styles.text}>Buy airtime of your choice here!!!</Text>
+                        <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.glo) ? "#0C0C54" : "#f5f5f5"}]} 
+                            onPress={()=>{
+                                this.setState({mtn:false});
+                                this.setState({glo:true});
+                                this.setState({airtel:false});
+                                this.setState({etisalat:false});
+                            }}
+                        >
+                            <Image source={require('../../Images/glo.png')} style={{height:55, width:55, borderRadius:15}} />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.airtel) ? "#0C0C54" : "#f5f5f5"}]} 
+                            onPress={()=>{
+                                this.setState({mtn:false});
+                                this.setState({glo:false});
+                                this.setState({airtel:true});
+                                this.setState({etisalat:false});
+                            }}
+                        >
+                            <Image source={require('../../Images/airtel-logo.png')} style={{height:50, width:50, borderRadius:10}} />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.etisalat) ? "#0C0C54" : "#f5f5f5"}]} 
+                            onPress={()=>{
+                                this.setState({mtn:false});
+                                this.setState({glo:false});
+                                this.setState({airtel:false});
+                                this.setState({etisalat:true});
+                            }}
+                        >
+                            <Image source={require('../../Images/etisalat.jpg')} style={{height:50, width:50, borderRadius:10}} />
+                        </TouchableOpacity>
                     </View>
-                    <View style={styles.right}>
-                        <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
-                    </View> 
-                </View>
-                <View style={[styles.formLine]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Enter Phone Number</Text>
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setState({phonenumber_value})} value={this.state.phonenumber_value}  />
+                    <View style={styles.formLine}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Enter Amount</Text>
+                            <View style={styles.grida}>
+                                <TouchableOpacity style={styles.flexa} onPress={()=>{this.setState({amount:50});}}>
+                                    <Text style={styles.labeltexta}>₦50</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.flexa} onPress={()=>{this.setState({amount:100});}}>
+                                    <Text style={styles.labeltexta}>₦100</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.flexa} onPress={()=>{this.setState({amount:200});}}>
+                                    <Text style={styles.labeltexta}>₦200</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.flexa} onPress={()=>{this.setState({amount:500});}}>
+                                    <Text style={styles.labeltexta}>₦500</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.flexb} onPress={()=>{this.setState({amount:1000});}}>
+                                    <Text style={styles.labeltexta}>₦1,000</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        <View style={styles.formCenter}>
+                            {/* <Text style={styles.labeltext}>Enter Phone Number</Text> */}
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Type in airtime amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} value={this.state.amount.toString()}/>
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
+                            </View>
                         </View>
                     </View>
-                </View>
-                <View style={styles.grid}>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.mtn) ? "#0C0C54" : "#f5f5f5"}]} 
-                        onPress={()=>{
-                            this.setState({mtn:true});
-                            this.setState({glo:false});
-                            this.setState({airtel:false});
-                            this.setState({etisalat:false});
-                        }}
-                    >
-                        <Image source={require('../../Images/mtn-logo.png')} style={{height:70, width:70, borderRadius:15}} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.glo) ? "#0C0C54" : "#f5f5f5"}]} 
-                        onPress={()=>{
-                            this.setState({mtn:false});
-                            this.setState({glo:true});
-                            this.setState({airtel:false});
-                            this.setState({etisalat:false});
-                        }}
-                    >
-                        <Image source={require('../../Images/glo.png')} style={{height:55, width:55, borderRadius:15}} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.airtel) ? "#0C0C54" : "#f5f5f5"}]} 
-                        onPress={()=>{
-                            this.setState({mtn:false});
-                            this.setState({glo:false});
-                            this.setState({airtel:true});
-                            this.setState({etisalat:false});
-                        }}
-                    >
-                        <Image source={require('../../Images/airtel-logo.png')} style={{height:50, width:50, borderRadius:10}} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.etisalat) ? "#0C0C54" : "#f5f5f5"}]} 
-                        onPress={()=>{
-                            this.setState({mtn:false});
-                            this.setState({glo:false});
-                            this.setState({airtel:false});
-                            this.setState({etisalat:true});
-                        }}
-                    >
-                        <Image source={require('../../Images/etisalat.jpg')} style={{height:50, width:50, borderRadius:10}} />
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.formLine}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Enter Amount</Text>
-                        <View style={styles.grida}>
-                            <TouchableOpacity style={styles.flexa} onPress={()=>{this.setState({amount:50});}}>
-                                <Text style={styles.labeltexta}>₦50</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.flexa} onPress={()=>{this.setState({amount:100});}}>
-                                <Text style={styles.labeltexta}>₦100</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.flexa} onPress={()=>{this.setState({amount:200});}}>
-                                <Text style={styles.labeltexta}>₦200</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.flexa} onPress={()=>{this.setState({amount:500});}}>
-                                <Text style={styles.labeltexta}>₦500</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.flexb} onPress={()=>{this.setState({amount:1000});}}>
-                                <Text style={styles.labeltexta}>₦1,000</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    <View style={styles.formCenter}>
-                        {/* <Text style={styles.labeltext}>Enter Phone Number</Text> */}
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in airtime amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} value={this.state.amount.toString()}/>
-                        </View>
-                    </View>
-                </View>
-                {/* Card Option*/}
-                <View
-                    style={{
-                        backgroundColor:'#fff',
-                        marginTop:'5%',
-                        marginLeft: '4%',
-                        borderRadius: 30,
-                        borderWidth: 1,
-                        marginRight: '4%',
-                        borderColor: 'transparent',
-                        elevation: 20
-                    }}>
-                    <View 
+                    {/* Card Option*/}
+                    <View
                         style={{
-                            paddingLeft:1,
-                            marginTop:'3%',
-                            marginLeft:'2%',
-                            marginRight:'6%'
+                            backgroundColor:'#fff',
+                            marginTop:'5%',
+                            marginLeft: '4%',
+                            borderRadius: 30,
+                            borderWidth: 1,
+                            marginRight: '4%',
+                            borderColor: 'transparent',
+                            elevation: 20,
+                            shadowOpacity: 10,
+                            shadowOffset: {
+                                width: 0,
+                                height: 0,
+                            },
+                            shadowRadius: 3.84,
+                        }}>
+                        <View 
+                            style={{
+                                paddingLeft:1,
+                                marginTop:'3%',
+                                marginLeft:'2%',
+                                marginRight:'6%'
+                            }}
+                        >
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
+                                    <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
+                                        <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
+                                    </TouchableOpacity>
+
+                                    <View style={{marginLeft:'1%', padding:7}}>
+                                        <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
+                                        <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
+                                        <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
+                                    </View>
+                                </TouchableOpacity>
+                            </View> 
+                            <View style={[styles.buttonContainer,{borderTopColor:'#f5f5f5', borderTopWidth:1}]}>
+                                <TouchableOpacity style={{flexDirection:'row'}} 
+                                    onPress={()=>{
+                                        this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
+                                    }}
+                                > 
+                                    <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
+                                        <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
+                                    </TouchableOpacity>
+
+                                    <View style={{marginLeft:'1%', padding:5}}>
+                                        <Text style={{fontSize:13, marginLeft:'2%'}}>Pay with Card</Text>
+                                        <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>Make Payment with your Debit/Credit Card </Text>
+                                        <Image source={require('../../Images/payment-terms.png')} style={{ width:270, height:50, marginLeft:-7, borderRadius:20 }}/>
+                                    </View>
+                                </TouchableOpacity>
+                            </View> 
+                        </View>   
+                    </View> 
+
+                    {/* Card Option */}
+
+                    <TouchableOpacity
+                        info
+                        style={[styles.buttonPurchase]}
+                        onPress={() => {
+                            (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
                         }}
                     >
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
-                                    <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
-                                </TouchableOpacity>
-
-                                <View style={{marginLeft:'1%', padding:7}}>
-                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay from your wallet</Text>
-                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>You pay directly from your paytyme wallet</Text>
-                                    <Image source={require('../../Images/logo.jpg')} style={{ width:90, height:40, marginLeft:-7, borderRadius:20 }}/>
-                                </View>
-                            </TouchableOpacity>
-                        </View> 
-                        <View style={[styles.buttonContainer,{borderTopColor:'#f5f5f5', borderTopWidth:1}]}>
-                            <TouchableOpacity style={{flexDirection:'row'}} 
-                                onPress={()=>{
-                                    this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
-                                }}
-                            > 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
-                                    <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
-                                </TouchableOpacity>
-
-                                <View style={{marginLeft:'1%', padding:5}}>
-                                    <Text style={{fontSize:13, marginLeft:'2%'}}>Pay with Card</Text>
-                                    <Text style={{color:'#7a7a7a',fontSize:13, marginLeft:'2%'}}>Make Payment with your Debit/Credit Card </Text>
-                                    <Image source={require('../../Images/payment-terms.png')} style={{ width:270, height:50, marginLeft:-7, borderRadius:20 }}/>
-                                </View>
-                            </TouchableOpacity>
-                        </View> 
-                    </View>   
-                </View> 
-
-                {/* Card Option */}
-
-                <TouchableOpacity
-                    info
-                    style={[styles.buttonPurchase,{marginBottom:'5%'}]}
-                    onPress={() => {
-                        (this.state.epayWalletChecked) ? this.confirmPurchase("wallet") : this.confirmPurchase("card")
-                    }}
-                >
-                    <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
-                        Confirm Purchase
-                    </Text>
-                </TouchableOpacity>
-            </KeyboardAwareScrollView >
+                        <Text autoCapitalize="words" style={[styles.purchaseButton]}>
+                            Confirm Purchase
+                        </Text>
+                    </TouchableOpacity>
+                </View >
+            </TouchableWithoutFeedback>
         );
     }
 }

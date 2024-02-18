@@ -178,11 +178,13 @@ const WalletTopUp = ({ navigation }) => {
     }
 
     const checkPaymentChannel = () => {
-        if (!amount) {
-            setAmountError(true);
-        } else if (!paymentChannelValue) {
+        if (!paymentChannelValue) {
             setChannelError(true);
         } else if(paymentChannelValue === 'card'){
+            if (!amount) {
+                setAmountError(true);
+                return;
+            }
             navigation.navigate("DebitCardPayment",{
                 transaction_type:"WalletTopUp",
                 amount: amount,
@@ -244,25 +246,7 @@ const WalletTopUp = ({ navigation }) => {
                     <Image style={styles.logo} source={require('../../../assets/logo.png')} />
                 </View>
             </View>
-            <View style={styles.formLine}>
-                <View style={styles.formCenter}>
-                    <Text style={styles.labeltext}>Enter amount</Text>
-                    <View style={[styles.inputitem, { borderColor: amountError ? 'red' : '#A9A9A9' }]}>
-                    <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                        <TextInput
-                            placeholder="Type in amount"
-                            style={styles.textBox}
-                            placeholderTextColor={"#A9A9A9"}
-                            keyboardType={'numeric'}
-                            value={amount.toString()}
-                            onChangeText={(text) => setAmountValue(text)}
-                        />
-                        
-                    </View>
-                </View>
-                {amountError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>Please input the amount</Text>}
-            </View>
-            <View style={[styles.formLine, { marginTop: '5%' }]}>
+            <View style={[styles.formLine, { marginTop: '0%' }]}>
                 <View style={styles.formCenter}>
                     <Text style={styles.labeltext}>Select a payment channel</Text>
                 </View>
@@ -290,6 +274,25 @@ const WalletTopUp = ({ navigation }) => {
                 />
             </View>
             {channelError && <Text style={{ marginTop: '7%', marginLeft: '3%', color: 'red' }}>Please select a payment channel</Text>}
+            {paymentChannelValue == 'card' ? <View style={[styles.formLine, { marginTop: '5%'}]}>
+                <View style={styles.formCenter}>
+                    <Text style={styles.labeltext}>Enter amount</Text>
+                    <View style={[styles.inputitem, { borderColor: amountError ? 'red' : '#A9A9A9' }]}>
+                    <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                        <TextInput
+                            placeholder="Type in amount"
+                            style={styles.textBox}
+                            placeholderTextColor={"#A9A9A9"}
+                            keyboardType={'numeric'}
+                            value={amount.toString()}
+                            onChangeText={(text) => setAmountValue(text)}
+                        />
+                        
+                    </View>
+                </View>
+                {amountError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>Please input the amount</Text>}
+            </View> : <></>}
+            
             {/* {displayCards && <Text style={{ marginTop: '7%', marginLeft: '3%', color: 'red' }}>Please select a payment channel</Text>} */}
             <View style={[styles.tcview, { marginTop:'15%', marginLeft:'30%' }]}>
                 <View style={styles.tandcView}>

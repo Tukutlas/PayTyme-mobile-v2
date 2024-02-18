@@ -44,7 +44,7 @@
         "READ_EXTERNAL_STORAGE"
       ],
       "package": "com.victorel.paytymemobileapp",
-      "versionCode": 8
+      "versionCode": 9
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -60,7 +60,8 @@
         {
           "cameraPermission": "Allow PayTyme to access your camera."
         }
-      ]
+      ],
+      "./plugins/screen.js"
     ]
   }
 }

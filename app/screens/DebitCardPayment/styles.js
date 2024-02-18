@@ -117,21 +117,19 @@ const styles = StyleSheet.create({
     borderColor: "#8493d5",
     backgroundColor: "#0C0C54",
     alignSelf: "center",
-    paddingLeft: 6,
-    // paddingRight: 40,
-    paddingTop: 11.5,
-    paddingBottom: 15,
-    marginTop: 30,
+    justifyContent: 'center',
+    marginTop: '10%',
     marginRight: 5,
     borderRadius: 4,
-    width: Metrics.WIDTH * 0.3,
+    width: '30%',
     height: Metrics.HEIGHT * 0.06
   },
 
   purchaseButton: {
     fontFamily: Fonts.type.RobotoMedium,
     color: "#fff",
-    alignSelf: "center"
+    alignSelf: "center",
+    fontWeight: 'bold' 
   },
 
   iconStyle: {

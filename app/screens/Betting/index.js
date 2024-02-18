@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
+import { Platform, StatusBar, View, Text, Keyboard, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
@@ -68,6 +68,15 @@ export default class Airtime extends Component {
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
         });
         this.setState({ fontLoaded: true });
+
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this.handleKeyboardDidShow
+        );
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this.handleKeyboardDidHide
+        );
     }
 
     backPressed = () => {
@@ -434,6 +443,19 @@ export default class Airtime extends Component {
         });   
     }
 
+    handleKeyboardDidShow = () => {
+        this.setState({ isKeyboardOpen: true });
+    };
+    
+    handleKeyboardDidHide = () => {
+        this.setState({ isKeyboardOpen: false });
+    };
+
+    // Function to dismiss the keyboard
+    dismissKeyboard = () => {
+        Keyboard.dismiss();
+    };
+
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
@@ -464,6 +486,13 @@ export default class Airtime extends Component {
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Enter account id" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id})}  />
+                            { 
+                                this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                    {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                    <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                </TouchableOpacity> : ''
+                            }
                         </View>
                     </View>
                 </View>
@@ -474,7 +503,7 @@ export default class Airtime extends Component {
                 </View>
                 <View style={styles.grid}>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:60}}>NairaBet</Text>
+                        <Text style={{width:49}}>NairaBet</Text>
                         <Image source={require('../../Images/Betting/nairabet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} 
                             onPress={()=>{
@@ -726,7 +755,7 @@ export default class Airtime extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={[styles.flexx]}>
-                        <Text style={{width:100}}>LiveScoreBet</Text>
+                        <Text style={{width:75}}>LiveScoreBet</Text>
                         <Image source={require('../../Images/Betting/livescorebet.jpg')} style={[styles.betIcon]} />
                         <TouchableOpacity style={[styles.circle, {marginTop:'3%'}]} 
                             onPress={()=>{
@@ -778,6 +807,13 @@ export default class Airtime extends Component {
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})}/>
+                            { 
+                                this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                    {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                    <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                </TouchableOpacity> : ''
+                            }
                         </View>
                     </View>
                 </View>
@@ -791,7 +827,13 @@ export default class Airtime extends Component {
                         borderWidth: 1,
                         marginRight: '4%',
                         borderColor: 'transparent',
-                        elevation: 20
+                        elevation: 20,
+                        shadowOpacity: 10,
+                        shadowOffset: {
+                            width: 0,
+                            height: -2,
+                        },
+                        shadowRadius: 3.84,
                     }}>
                     <View 
                         style={{

@@ -9,10 +9,10 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: Colors.transparent,
-    height: Metrics.HEIGHT * 0.15,
+    height: Metrics.HEIGHT * 0.12,
     borderBottomWidth: 0,
     paddingTop: Metrics.HEIGHT * 0.0354,
-    marginTop: Metrics.HEIGHT * 0.0404,
+    marginTop: Metrics.HEIGHT * 0.0304,
     elevation: 0,
     flexDirection: 'row',
     flexWrap: 'wrap'
@@ -103,24 +103,29 @@ const styles = StyleSheet.create({
     marginHorizontal: 10, // Adjust the margin according to your requirement
   },
 
+  touchableButton: {
+    padding: 5,
+    borderRadius: 25,
+    marginLeft: 10,
+  },
+
   buttonPurchase: {
     borderWidth: 1,
     borderColor: "#8493d5",
     backgroundColor: "#0C0C54",
     alignSelf: "center",
-    paddingLeft: 40,
-    paddingRight: 40,
-    paddingTop: 15,
-    paddingBottom: 15,
-    marginTop: 30,
-    borderRadius: 4,
-    width: Metrics.WIDTH * 0.91
+    justifyContent: "center",
+    marginTop: '6%',
+    borderRadius: 15,
+    width: '91%',
+    height: '6%'
   },
 
   purchaseButton: {
     fontFamily: Fonts.type.RobotoMedium,
     color: "#fff",
-    alignSelf: "center"
+    alignSelf: "center",
+    fontWeight: 'bold' 
   },
 
   input:{

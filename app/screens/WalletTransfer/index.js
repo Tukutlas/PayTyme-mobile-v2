@@ -8,13 +8,14 @@ import {
   BackHandler,
   Image,
   TextInput,
-  Alert
+  Alert,
+  Keyboard
 } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import Spinner from 'react-native-loading-spinner-overlay';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
 import { CommonActions } from '@react-navigation/native';
@@ -34,7 +35,8 @@ export default class WalletTransfer extends Component {
             account_id: '',
             transaction: false,
             there_cards:false,
-            customerName: ''
+            customerName: '',
+            isKeyboardOpen: false
         };
     }
 
@@ -46,9 +48,10 @@ export default class WalletTransfer extends Component {
                 ).user.access_token
             }
         );
+        
         this.loadWalletBalance();
        
-        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
+        // BackHandler.addEventListener("hardwareBackPress", this.backPressed);
 
         await Font.loadAsync({
             'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
@@ -63,7 +66,18 @@ export default class WalletTransfer extends Component {
             'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
         });
+
         this.setState({ fontLoaded: true });
+
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this.handleKeyboardDidShow
+        );
+
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this.handleKeyboardDidHide
+        );
     }
 
     // componentWillUnmount() {
@@ -80,7 +94,7 @@ export default class WalletTransfer extends Component {
                 })
             );
         }else{
-            this.props.navigation.goBack();
+            this.props.navigation.navigate('Tabs', { screen: 'Home' });
         }
         return true;  
     };
@@ -337,6 +351,19 @@ export default class WalletTransfer extends Component {
         }); 
     }
 
+    handleKeyboardDidShow = () => {
+        this.setState({ isKeyboardOpen: true });
+    };
+    
+    handleKeyboardDidHide = () => {
+        this.setState({ isKeyboardOpen: false });
+    };
+
+    // Function to dismiss the keyboard
+    dismissKeyboard = () => {
+        Keyboard.dismiss();
+    };
+
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
@@ -350,8 +377,8 @@ export default class WalletTransfer extends Component {
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                 <View style={styles.header}>
                     <View style={styles.headerBody}>
-                        <Text style={styles.body}>Transfer to a Paytyme User</Text>
-                        {/* <Text style={styles.text}>Buy airtime of your choice here!!!</Text> */}
+                        <Text style={styles.body}>Transfer</Text>
+                        <Text style={styles.text}>Transfer funds to another paytyme user</Text>
                     </View>
                     <View style={styles.right}>
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
@@ -385,6 +412,13 @@ export default class WalletTransfer extends Component {
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref='amount' onChangeText={(amount) => this.setState({amount})}/>
+                            { 
+                                this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                    {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                    <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                </TouchableOpacity> : ''
+                            }
                         </View>
                         {this.state.amountError && <Text style={{ color: 'red' }}>{this.state.amountErrorMessage}</Text>}
                     </View>
@@ -399,7 +433,13 @@ export default class WalletTransfer extends Component {
                         borderWidth: 1,
                         marginRight: '4%',
                         borderColor: 'transparent',
-                        elevation: 2
+                        elevation: 20,
+                        shadowOpacity: 10,
+                        shadowOffset: {
+                            width: 0,
+                            height: 0,
+                        },
+                        shadowRadius: 3.84,
                     }}
                 >
                     <View 
@@ -412,7 +452,7 @@ export default class WalletTransfer extends Component {
                     >
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={{flexDirection:'row'}} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}}> 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
+                                <TouchableOpacity style={[styles.circle, {marginTop:'7%', marginLeft: '2%'}]} onPress={()=>{this.setState({epayWalletChecked:true, payOnDelieveryChecked:false});}} >
                                     <View style={(this.state.epayWalletChecked)?styles.checkedCircle:styles.circle } /> 
                                 </TouchableOpacity>
 
@@ -429,7 +469,7 @@ export default class WalletTransfer extends Component {
                                     this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});
                                 }}
                             > 
-                                <TouchableOpacity style={[styles.circle, {marginTop:'7%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
+                                <TouchableOpacity style={[styles.circle, {marginTop:'7%', marginLeft: '2%'}]} onPress={()=>{this.setState({epayWalletChecked:false, payOnDelieveryChecked:true});}}>
                                     <View style={(this.state.epayWalletChecked) ? styles.circle : styles.checkedCircle }/> 
                                 </TouchableOpacity>
 
@@ -454,11 +494,11 @@ export default class WalletTransfer extends Component {
                 >
                     {
                         (this.state.epayWalletChecked) ?  
-                        <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
+                        <Text autoCapitalize="words" style={[styles.purchaseButton]}>
                             Transfer
                         </Text>
                         :
-                        <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
+                        <Text autoCapitalize="words" style={[styles.purchaseButton]}>
                             Next
                         </Text>
                    }

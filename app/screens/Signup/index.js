@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import { Image, StatusBar, Platform, TouchableOpacity, BackHandler, View, Alert, Text, TextInput, ScrollView } from "react-native";
+import { Image, StatusBar, Platform, TouchableOpacity, BackHandler, View, Alert, Text, TextInput, ScrollView, Keyboard} from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Screen Styles
 import styles from "./styles";
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 // import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Font from 'expo-font';
 export default class Signup extends Component {
     constructor(props) {
@@ -30,9 +30,35 @@ export default class Signup extends Component {
             isProgress: false,
             isProcessing: false,
             hidePassword: true,
-            hideConfirmPassword: true
+            hideConfirmPassword: true,
+            isKeyboardOpen: false
         }
     }
+
+    async componentDidMount() {
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this.handleKeyboardDidShow
+        );
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this.handleKeyboardDidHide
+        );
+    }
+
+    handleKeyboardDidShow = () => {
+        this.setState({ isKeyboardOpen: true });
+    };
+    
+    handleKeyboardDidHide = () => {
+        this.setState({ isKeyboardOpen: false });
+    };
+
+    // Function to dismiss the keyboard
+    dismissKeyboard = () => {
+        this.setState({ isKeyboardOpen: false });
+        Keyboard.dismiss();
+    };
 
     showLoader() {
         this.setState({ isLoading: true });
@@ -405,6 +431,7 @@ export default class Signup extends Component {
                     { cancelable: false },
                 );
             });
+            this.dismissKeyboard
         }
     }
 
@@ -536,7 +563,14 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>First Name</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your first name" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="firstname" onChangeText={(firstname) => this.setState({ firstname })} />
+                                <TextInput placeholder="Enter your first name" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="firstname" onChangeText={(firstname) => this.setState({ firstname })} />
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
                             </View>
                         </View>
                     </View>
@@ -546,7 +580,14 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Last Name</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your last name" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="lastname" onChangeText={(lastname) => this.setState({ lastname })} />
+                                <TextInput placeholder="Enter your last name" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="lastname" onChangeText={(lastname) => this.setState({ lastname })} />
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
                             </View>
                         </View>
                     </View>
@@ -582,7 +623,14 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Phone</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="+234" style={styles.input} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" ref="phone" onChangeText={(phone) => this.setState({ phone })} />
+                                <TextInput placeholder="+234" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" ref="phone" onChangeText={(phone) => this.setState({ phone })} />
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
                             </View>
                         </View>
                     </View>
@@ -592,7 +640,14 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Username</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Input a preferred username" style={styles.input} placeholderTextColor={"#A9A9A9"} ref="username" onChangeText={(username) => this.setState({ username })} />
+                                <TextInput placeholder="Input a preferred username" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="username" onChangeText={(username) => this.setState({ username })} />
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
                             </View>
                         </View>
                     </View>
@@ -602,7 +657,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Password</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter Password" secureTextEntry={this.state.hidePassword} style={styles.input} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })}/>
+                                <TextInput placeholder="Enter Password" secureTextEntry={this.state.hidePassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })}/>
                                 <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
                                     <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                                 </TouchableOpacity>
@@ -615,7 +670,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Confirm Password</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Confirm Password" secureTextEntry={this.state.hideConfirmPassword} style={styles.input} placeholderTextColor={"#A9A9A9"} ref="confirm_password" onChangeText={(confirm_password) => this.setState({ confirm_password })}/>
+                                <TextInput placeholder="Confirm Password" secureTextEntry={this.state.hideConfirmPassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="confirm_password" onChangeText={(confirm_password) => this.setState({ confirm_password })}/>
                                 <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setConfirmPasswordVisibility}>
                                     <Image source={(this.state.hideConfirmPassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                                 </TouchableOpacity>

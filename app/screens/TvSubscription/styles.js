@@ -86,19 +86,19 @@ const styles = StyleSheet.create({
         borderColor: "#8493d5",
         backgroundColor: "#0C0C54",
         alignSelf: "center",
-        paddingLeft: 40,
-        paddingRight: 40,
-        paddingTop: 15,
-        paddingBottom: 15,
-        marginTop: '4%',
+        justifyContent: "center",
+        marginTop: '6%',
         borderRadius: 15,
-        width: Metrics.WIDTH * 0.91
+        width: '91%',
+        height: '8%'
     },
+
 
     purchaseButton: {
         fontFamily: Fonts.type.robotoMedium,
         color: "#fff",
-        alignSelf: "center"
+        alignSelf: "center",
+        fontWeight: 'bold'
     },
 
     input: {

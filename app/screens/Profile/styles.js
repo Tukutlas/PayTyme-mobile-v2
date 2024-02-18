@@ -50,7 +50,13 @@ module.exports = StyleSheet.create({
         margin:'4%',
         elevation:8,
         borderRadius:10,
-        backgroundColor:'#E0EBEC'
+        backgroundColor:'#E0EBEC',
+        shadowOpacity: 8,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        shadowRadius: 3.84,
     },
 
     flext:{

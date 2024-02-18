@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     backgroundColor: '#fff',
     width: '100%',
-    paddingTop: 0,
+    paddingTop: 5,
 },
 
   formCenter: {
