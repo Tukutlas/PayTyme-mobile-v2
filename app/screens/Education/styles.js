@@ -157,12 +157,12 @@ const styles = StyleSheet.create({
     flex:3,
     borderRadius:10,
     backgroundColor:'#E0EBEC',
-    shadowOpacity: 10,
+    shadowOpacity: 8,
     shadowOffset: {
         width: 0,
-        height: -2,
+        height: 0,
     },
-    shadowRadius: 3.84
+    shadowRadius: 2
   },
   flexb:{
     height:60,

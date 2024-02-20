@@ -672,6 +672,7 @@ export default class Data extends Component {
                                     listMode="MODAL"  
                                     searchable={false}
                                     disabled={this.state.bundleDisable}
+                                    modalTitle="Select a Bundle Plan"
                                 />
                             </View> :
                             <View style={{ width: '92.7%', marginLeft: '3.7%', backgroundColor: "#f6f6f6", height: 40, borderWidth: 1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center' }}>                    
@@ -705,7 +706,7 @@ export default class Data extends Component {
                             borderWidth: 1,
                             marginRight: '4%',
                             borderColor: 'transparent',
-                            elevation: 2,
+                            elevation: 8,
                             shadowOpacity: 10,
                             shadowOffset: {
                                 width: 0,

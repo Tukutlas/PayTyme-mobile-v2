@@ -103,6 +103,12 @@ const styles = StyleSheet.create({
         marginHorizontal: 10, // Adjust the margin according to your requirement
     },
     
+    touchableButton: {
+        padding: 5,
+        borderRadius: 25,
+        marginLeft: 10,
+    },
+    
     buttonPurchase: {
         borderWidth: 1,
         borderColor: "#8493d5",
@@ -121,6 +127,16 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.type.RobotoMedium,
         color: "#fff",
         alignSelf: "center"
+    },
+
+    dropdown: {
+        minHeight: 40,
+        backgroundColor: "#f6f6f6",
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        width: '97%',
+        marginLeft: '1.5%'
     },
 });
 

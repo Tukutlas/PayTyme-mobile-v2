@@ -1,15 +1,14 @@
 import React, { Component} from "react";
-import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, Button } from "react-native";
+import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, Button, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
-
 import styles from "./styles";
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
 import * as DocumentPicker from 'expo-document-picker';
-
 
 export default class PaymentConfirmation extends Component {
     constructor(props) {
@@ -36,6 +35,7 @@ export default class PaymentConfirmation extends Component {
             fileSize: null,
             fileMimeType: null,
             sender: "",
+            isKeyboardOpen: false
         };
     }
 
@@ -63,6 +63,15 @@ export default class PaymentConfirmation extends Component {
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
         });
         this.setState({ fontLoaded: true });
+
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this.handleKeyboardDidShow
+        );
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this.handleKeyboardDidHide
+        );
     }
 
     numberFormat = x => {
@@ -176,15 +185,22 @@ export default class PaymentConfirmation extends Component {
             type: ["application/pdf", // .pdf,
                     "image/*"] // all images files
           });
-            if (!result.cancelled) {
+            if (!result.canceled) {
                 // do something with the selected document
-                this.setState({
-                    fileUri: result.uri,
-                    fileType: result.type,
-                    fileMimeType: result.mimeType,
-                    fileName: result.name,
-                    fileSize: result.size,
-                });
+                // Assuming 'result' is the assetsData object
+                if (result.assets.length > 0) {
+                    const firstAsset = result.assets[0];
+                
+                    this.setState({
+                        fileUri: firstAsset.uri,
+                        fileType: firstAsset.mimeType.split('/')[0],
+                        fileMimeType: firstAsset.mimeType,
+                        fileName: firstAsset.name,
+                        fileSize: firstAsset.size,
+                    });
+                } else {
+                    console.log('No assets found.');
+                }
             } else {
                 // console.log('User cancelled document picker');
             }
@@ -203,6 +219,7 @@ export default class PaymentConfirmation extends Component {
         this.setState(state => ({
             bankValue: callback(state.bankValue)
         }));
+        this.setState({bankError: false})
     }
 
     setBankItems = (callback) => {
@@ -250,136 +267,176 @@ export default class PaymentConfirmation extends Component {
         }); 
     }
 
+    // Function to dismiss the keyboard
+    dismissKeyboard = () => {
+        Keyboard.dismiss();
+    };
+
+    handleKeyboardDidShow = () => {
+        this.setState({ isKeyboardOpen: true });
+    };
+    
+    handleKeyboardDidHide = () => {
+        this.setState({ isKeyboardOpen: false });
+    };
+
     render() {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#ffff", true);
+            StatusBar.setTranslucent(true);
         }
 
         return (
-            <View style={styles.container}>
-                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>  
-                <View style={styles.header}>
-                    <View style={styles.left}>
-                        <TouchableOpacity onPress={() =>this.backPressed()}>
-                            <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
-                        </TouchableOpacity>
-                    </View> 
-                    <View style={styles.headerBody}>
-                        <Text style={styles.body}>Payment Confirmation</Text>
-                    </View>
-                    <View style={styles.right}>
-                        <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
-                    </View> 
-                </View>
-                <View style={[styles.formLine, {marginTop: '2%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Enter amount</Text>
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount: amount, amount_error: false})}/>
+            <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
+                <View style={styles.container}>
+                    <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>  
+                    <View style={styles.header}>
+                        <View style={styles.left}>
+                            <TouchableOpacity onPress={() =>this.backPressed()}>
+                                <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
+                            </TouchableOpacity>
+                        </View> 
+                        <View style={styles.headerBody}>
+                            <Text style={styles.body}>Payment Confirmation</Text>
                         </View>
+                        <View style={styles.right}>
+                            <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
+                        </View> 
                     </View>
-                </View>
-                
-                {
-                    this.state.amount_error ?
-                    <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
-                        <Text style={{color: 'red'}}>Please input the amount</Text>
-                    </View>
-                    :
-                    <View></View>
-                }
-                <View style={[styles.formLine, {marginTop:'2%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Banks Transferred From</Text>
-                    </View>
-                </View>
-                <View style={{ width: '93.7%', marginLeft: '2.7%', backgroundColor: "#f6f6f6", height: 40, borderWidth: 1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center' }}>
-                    <Picker
-                        selectedValue={this.state.bankValue}
-                        onValueChange={(itemValue, itemIndex) =>
-                            this.setBank(itemValue)
-                        }
-                        enabled={this.state.bankEnable}
-                        style={{height: '100%', width: '100%'}}
-                    >
-                        <Picker.Item label="Select Bank" value={null} style={{ fontSize: 14 }} />
-
-                        {this.state.banks.map((bank, index) => (
-                            <Picker.Item key={index} label={bank.label} value={bank.value} style={{ fontSize: 14 }} />
-                        ))}
-                    </Picker>
-                </View>
-                {
-                    this.state.bankError ?
-                    <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
-                        <Text style={{color: 'red'}}>Please select a bank</Text>
-                    </View>
-                    :
-                    <View></View>
-                }
-                <View style={[styles.formLine, {marginTop:'2%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Sender's Name</Text>
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in sender's name" style={[styles.textBox]} placeholderTextColor={"#A9A9A9"} ref="sender" onChangeText={(sender) => this.setState({sender: sender, sender_error: false})}  />
-                        </View>
-                    </View>
-                </View>
-                {
-                    this.state.sender_error ?
-                    <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
-                        <Text style={{color: 'red'}}>Please input the sender's name</Text>
-                    </View>
-                    :
-                    <View></View>
-                }
-                <View style={[styles.formLine, {marginTop:'2%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Upload Receipt</Text>
-                        <View roundedc >
-                            <Button title="Select receipt" onPress={this.pickDocument} />
-                            
-                        </View>
-                    </View>
-                </View>
-                {
-                    this.state.receipt_error ?
-                    <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
-                        <Text style={{color: 'red'}}>Please upload payment receipt</Text>
-                    </View>
-                    :
-                    <View></View>
-                }
-                {this.state.fileUri && (
-                    <>
-                        {this.state.fileMimeType === 'application/pdf' ? (
-                        <View style={{ width: '80%', height: 50, marginLeft: '10%', backgroundColor: '#f2f2f2', justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontWeight: 'bold' }}>{this.state.fileName}</Text>
-                        </View>
-                        ) : (
-                            <View>
-                                <Image source={{ uri: this.state.fileUri }} style={{ width: 100, height: 100 }} />
-                                <Text>{this.state.fileName}</Text>
+                    <View style={[styles.formLine, {marginTop: '2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Enter amount</Text>
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount: amount, amount_error: false})}/>
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
                             </View>
-                        )}
-                    </>
-                )}
+                        </View>
+                    </View>
+                    {
+                        this.state.amount_error ?
+                        <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
+                            <Text style={{color: 'red'}}>Please input the amount</Text>
+                        </View>
+                        :
+                        <View></View>
+                    }
+                    <View style={[styles.formLine, {marginTop:'2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Banks Transferred From</Text>
+                        </View>
+                    </View>
+                    
+                    {
+                        Platform.OS == 'ios' ?
+                        <View style={{width:'97%', marginLeft:'1.5%', backgroundColor:'#fff', borderColor:'#445cc4', borderRadius:5, marginTop:'1%'}}>
+                            <DropDownPicker
+                                placeholder={'Select Bank'}
+                                open={this.state.bankOpen}
+                                value={this.state.bankValue}
+                                style={[styles.dropdown]}
+                                items={this.state.banks}
+                                setOpen={this.setBankOpen}
+                                setValue={this.setBankValue}
+                                setItems={this.setBankItems}
+                                listMode="MODAL"  
+                                searchable={false}
+                                disabled={this.state.bankDisable}
+                                modalTitle="Select Bank"
+                            />
+                        </View> :
+                        <View style={{ width: '93.7%', marginLeft: '2.7%', backgroundColor: "#f6f6f6", height: 40, borderWidth: 1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center' }}>
+                            <Picker
+                                selectedValue={this.state.bankValue}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    this.setBank(itemValue)
+                                }
+                                enabled={this.state.bankEnable}
+                                style={{height: '100%', width: '100%'}}
+                            >
+                                <Picker.Item label="Select Bank" value={null} style={{ fontSize: 14 }} />
+        
+                                {this.state.banks.map((bank, index) => (
+                                    <Picker.Item key={index} label={bank.label} value={bank.value} style={{ fontSize: 14 }} />
+                                ))}
+                            </Picker>
+                        </View>
+                    }
+                    {
+                        this.state.bankError ?
+                        <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
+                            <Text style={{color: 'red'}}>Please select a bank</Text>
+                        </View>
+                        :
+                        <View></View>
+                    }
+                    <View style={[styles.formLine, {marginTop:'2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Sender's Name</Text>
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Type in sender's name" style={[styles.textBox]} placeholderTextColor={"#A9A9A9"} ref="sender" onChangeText={(sender) => this.setState({sender: sender, sender_error: false})}  />
+                            </View>
+                        </View>
+                    </View>
+                    {
+                        this.state.sender_error ?
+                        <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
+                            <Text style={{color: 'red'}}>Please input the sender's name</Text>
+                        </View>
+                        :
+                        <View></View>
+                    }
+                    <View style={[styles.formLine, {marginTop:'2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Upload Receipt</Text>
+                            <View roundedc >
+                                <Button title="Select receipt" onPress={this.pickDocument} />
+                            </View>
+                        </View>
+                    </View>
+                    {
+                        this.state.receipt_error ?
+                        <View style={{marginTop: '0.5%', marginLeft: '4%'}}>
+                            <Text style={{color: 'red'}}>Please upload payment receipt</Text>
+                        </View>
+                        :
+                        <View></View>
+                    }
+                    {this.state.fileUri && (
+                        <>
+                            {this.state.fileMimeType === 'application/pdf' ? (
+                            <View style={{ width: '80%', height: 50, marginLeft: '10%', backgroundColor: '#f2f2f2', justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ fontWeight: 'bold' }}>{this.state.fileName}</Text>
+                            </View>
+                            ) : (
+                                <View>
+                                    <Image source={{ uri: this.state.fileUri }} style={{ width: 100, height: 100 }} />
+                                    <Text>{this.state.fileName}</Text>
+                                </View>
+                            )}
+                        </>
+                    )}
 
-                <TouchableOpacity
-                    info
-                    style={[styles.buttonPurchase,{marginBottom:'5%'}]}
-                    onPress={() => {this.upload()}}
-                >
-                    <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
-                        Confirm Transaction
-                    </Text>
-                </TouchableOpacity>
-            </View>
+                    <TouchableOpacity
+                        info
+                        style={[styles.buttonPurchase,{marginBottom:'5%'}]}
+                        onPress={() => {this.upload()}}
+                    >
+                        <Text autoCapitalize="words" style={[styles.purchaseButton,{color:'#fff', fontWeight:'bold'}]}>
+                            Confirm Transaction
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </TouchableWithoutFeedback>
         );
     }
 }

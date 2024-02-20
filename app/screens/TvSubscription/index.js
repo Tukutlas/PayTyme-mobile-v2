@@ -900,7 +900,7 @@ export default class TvSubscription extends Component {
                         Platform.OS == 'ios' ?
                         <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
                             <DropDownPicker
-                                placeholder={'Select your subscription plan'}
+                                placeholder={'Select your Subscription Plan'}
                                 open={this.state.bouquetOpen}
                                 value={this.state.bouquetValue}
                                 style={[styles.dropdown]}
@@ -918,6 +918,7 @@ export default class TvSubscription extends Component {
                                         this.planvariable(item.value)
                                     }
                                 }}
+                                modalTitle="Select a Subscription Plan"
                             />
                         </View> :
                         <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>

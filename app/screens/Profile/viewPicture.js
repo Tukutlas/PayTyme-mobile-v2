@@ -14,7 +14,7 @@ export default class ViewPicture extends Component {
             fileName: null,
             fileSize: null,
             fileMimeType: null,
-            image: null
+            image: null,
         };
     }
     
@@ -154,7 +154,7 @@ export default class ViewPicture extends Component {
                     <Image style={{width:'80%', height:'70%', marginLeft:'10%', borderRadius:145}} source={{ uri: this.state.image}}/> 
                 </View>
                 <View style={{marginTop: '20%', flexDirection:'row', padding:1, width:'100%'}}>
-                    <TouchableOpacity style={{color: 'white', marginLeft: '15%'}} onPress={() => {this.props.navigation.navigate('Tabs', 'Profile')}}>
+                    <TouchableOpacity style={{color: 'white', marginLeft: '15%'}} onPress={() => {this.props.navigation.goBack()}}>
                         <Text style={{color: 'white', fontSize: 15}}>Cancel</Text>
                     </TouchableOpacity>
                     

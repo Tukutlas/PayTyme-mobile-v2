@@ -761,7 +761,8 @@ export default class Education extends Component {
                 <View style={[styles.grid,{marginTop:'-3%'}]}>
                     <TouchableOpacity style={[styles.flexb]}>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.waec) ? "#445cc4" : "#f5f5f5"}]} 
+                    {/* <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.waec) ? "#445cc4" : "#f5f5f5"}]}  */}
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.waec) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({waec:true});
                             this.setState({jamb:false});
@@ -772,7 +773,8 @@ export default class Education extends Component {
                     >
                         <Image source={require('../../Images/Education/waec.png')} style={{height:57, width:57, borderRadius:10}} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.jamb) ? "#445cc4" : "#f5f5f5"}]} 
+                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.jamb) ? "#0C0C54" : "#f5f5f5"}]} 
+                    // <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.jamb) ? "#445cc4" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({waec:false});
                             this.setState({jamb:true});
@@ -938,7 +940,7 @@ export default class Education extends Component {
                         shadowOpacity: 10,
                         shadowOffset: {
                             width: 0,
-                            height: -2,
+                            height: 0,
                         },
                         shadowRadius: 3.84
                     }}>

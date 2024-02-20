@@ -16,7 +16,7 @@ export default class Profile extends Component {
         super(props, context);
         this.state = {
             auth_token:"",
-            modalVisible: false,
+            isModalVisible: false,
             balance:"...",
             fullname:"",
             wallet_id: "",
@@ -137,7 +137,7 @@ export default class Profile extends Component {
     }
     
     setModalVisible = (visible) => {
-        this.setState({ modalVisible: visible });
+        this.setState({ isModalVisible: visible });
     }
 
     checkPermissions = async () => {
@@ -240,27 +240,32 @@ export default class Profile extends Component {
     };
     
     uploadProfilePicture = async () => {
-        this.setState({modalVisible: false})
+        // this.setState({isModalVisible: false})
         try {
             const result = await DocumentPicker.getDocumentAsync({
                 type: ["image/*"], // all images files,
                 // copyToCacheDirectory: false,
             });
-            if (result.type != 'cancel' && result != null) {
-                this.props.navigation.navigate("ViewPicture",
-                {
-                    image: result,
-                }); 
+            if (!result.canceled) {
+                if (result.assets.length > 0) {
+                    const imageAsset = result.assets[0];
+                    this.setState({isModalVisible: false})
+                    this.props.navigation.navigate("ViewPicture",
+                    {
+                        image: imageAsset,
+                    }); 
+                }
+                
             } else {
                 // console.log('User cancelled document picker');
             }
         } catch (err) {
-            // console.log('Document picker error:', err);
+            console.log('Document picker error:', err);
         }
     }
 
     goToCameraSection = async () => {
-        this.setState({modalVisible: false})
+        this.setState({isModalVisible: false})
         this.props.navigation.navigate("CameraSection")
     }
 
@@ -316,7 +321,7 @@ export default class Profile extends Component {
 
         return (
             <>
-                <TouchableWithoutFeedback onPress={() => this.setState({modalVisible: false})}>
+                <TouchableWithoutFeedback onPress={() => this.setState({isModalVisible: false})}>
                     <View style={styles.container}>
                         <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  /> 
                         <View style={styles.header}>
@@ -327,7 +332,7 @@ export default class Profile extends Component {
                                     :
                                     <Image style={styles.profileImage} source={require('../../../assets/user.png')}/> 
                                 }
-                                <TouchableOpacity onPress={()=>{this.setState({modalVisible: true})}} style={{marginLeft:'40%', marginTop:'-15%'}}>
+                                <TouchableOpacity onPress={()=>{this.setState({isModalVisible: true})}} style={{marginLeft:'40%', marginTop:'-15%'}}>
                                     <FontAwesome name={'camera'} size={18}  color={'#1e90ff'} style={{position: 'absolute'}} />
                                 </TouchableOpacity>
                                 <Text style={{fontSize:30, fontWeight: 'bold', color:'#fff', fontFamily: "SFUIDisplay-Medium", marginTop:'25%', marginLeft:'0%' }}>Profile</Text>
@@ -442,17 +447,17 @@ export default class Profile extends Component {
                             <Modal
                                 animationType="slide"
                                 transparent={true}
-                                visible={this.state.modalVisible}
+                                visible={this.state.isModalVisible}
                                 onRequestClose={() => {
                                     // setModalVisible(!modalVisible);
-                                    this.setState({modalVisible: false})
+                                    this.setState({isModalVisible: false})
                                 }}
                             >
                                 <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end'}}>
                                     <View style={{ backgroundColor: 'white', padding: 0, width: '100%', height: '40%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
-                                        <View style={{marginLeft: '5%', marginTop: '5%', alignItems: 'center', backgroundColor: '#0C0C54', width: '15%', height: '17%', borderRadius:10}}> 
+                                        <View style={{marginLeft: '5%', marginTop: '5%', alignItems: 'center', justifyContent: 'center',backgroundColor: '#0C0C54', width: '15%', height: '17%', borderRadius:10}}> 
                                             <TouchableOpacity onPress={()=>{this.goToCameraSection()}}>
-                                                <FontAwesome name={'camera'} size={29}  color={'#ffff'} style={{marginTop: '15%'}} />
+                                                <FontAwesome name={'camera'} size={29}  color={'#ffff'} />
                                             </TouchableOpacity>
                                         </View>
                                         <View 
@@ -494,7 +499,7 @@ export default class Profile extends Component {
                                         >
                                         </View>
                                         <View style={{marginLeft: '3%', marginTop: '12%', }}>
-                                            <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.setState({modalVisible: false})}}>
+                                            <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.setState({isModalVisible: false})}}>
                                                 <Text autoCapitalize="words" style={styles.loginbutton}>
                                                     Cancel
                                                 </Text>

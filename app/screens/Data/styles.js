@@ -164,7 +164,13 @@ const styles = StyleSheet.create({
     elevation:8,
     flex:3,
     borderRadius:10,
-    backgroundColor:'#E0EBEC'
+    backgroundColor:'#E0EBEC',
+    shadowOpacity: 8,
+    shadowOffset: {
+        width: 0,
+        height: 0,
+    },
+    shadowRadius: 2,
   },
 
   flexa:{
