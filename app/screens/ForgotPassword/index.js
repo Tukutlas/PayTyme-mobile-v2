@@ -186,7 +186,7 @@ export default class ForgotPassword extends Component {
                         <Text style={styles.labeltext}>Enter your Phone Number</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput  placeholder="Type in phone Number" style={styles.input} keyboardType={'numeric'} placeholderTextColor={"#A9A9A9"} ref="phone" onChangeText={(phone) => this.setState({phone})} value={this.state.phone} />
+                            <TextInput  placeholder="Type in phone Number" style={styles.input} keyboardType={'numeric'} returnKeyType="done" placeholderTextColor={"#A9A9A9"} ref="phone" onChangeText={(phone) => this.setState({phone})} value={this.state.phone} />
                         </View>
                     </View>
                 </View>

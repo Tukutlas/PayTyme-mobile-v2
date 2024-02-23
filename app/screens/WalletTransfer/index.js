@@ -411,7 +411,7 @@ export default class WalletTransfer extends Component {
                         <Text style={styles.labeltext}>Enter amount</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref='amount' onChangeText={(amount) => this.setState({amount})}/>
+                            <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref='amount' onChangeText={(amount) => this.setState({amount})}/>
                             { 
                                 this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                 <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>

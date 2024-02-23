@@ -418,7 +418,7 @@ export default class CreateVirtualAccount extends Component {
                                     <Text style={styles.labeltext}>Input your BVN</Text>
                                     <View roundedc style={styles.inputitem}>
                                         <FontAwesome5 name={'credit-card'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                        <TextInput placeholder="Type in your BVN" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="bvn" onChangeText={(bvn) => this.setBVN(bvn)}/>
+                                        <TextInput placeholder="Type in your BVN" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="bvn" onChangeText={(bvn) => this.setBVN(bvn)}/>
                                     </View>
                                 </View>
                             </View>

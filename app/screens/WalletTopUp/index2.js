@@ -283,7 +283,8 @@ const WalletTopUp = ({ navigation }) => {
                             placeholder="Type in amount"
                             style={styles.textBox}
                             placeholderTextColor={"#A9A9A9"}
-                            keyboardType={'numeric'}
+                            keyboardType={'numeric'} 
+                            returnKeyType="done"
                             value={amount.toString()}
                             onChangeText={(text) => setAmountValue(text)}
                         />

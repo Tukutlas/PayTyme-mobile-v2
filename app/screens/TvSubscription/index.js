@@ -976,7 +976,7 @@ export default class TvSubscription extends Component {
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'credit-card'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                                 {/* <TextInput placeholder="Type your smart card number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={cardnumber => this.getValueFunction(cardnumber)} value={this.state.cardnumber}/> */}
-                                <TextInput placeholder={this.state.providerValue == 'showmax' ?"Type your phone number": "Type your smart card number"} style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={(cardnumber) => this.setCardNo(cardnumber)}/>
+                                <TextInput placeholder={this.state.providerValue == 'showmax' ?"Type your phone number": "Type your smart card number"} style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="cardnumber" onChangeText={(cardnumber) => this.setCardNo(cardnumber)}/>
                                 {
                                     this.state.providerValue == 'showmax' 
                                     ? <></> 

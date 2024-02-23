@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, ScrollView, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
-// import DropDownPicker from 'react-native-dropdown-picker';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
@@ -318,7 +318,6 @@ export default class Insurance extends Component {
 
     publishAmount(product){
         let string = product.split("#");
-        console.log(string)
 
         this.setState({
             packageName: string[0],
@@ -645,52 +644,49 @@ export default class Insurance extends Component {
                         <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                     </View> 
                 </View>
-                {/* <View style={[styles.formLine, {marginTop:'0%'}]}>
-                    <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Select Cable Tv Service Provider</Text>
-                    </View>
-                </View> */}
                 <View style={{justifyContent:'center'}}>
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Vehicle Type</Text>
                 </View>
-                
-                {/* <View style={{width:'95%', marginLeft:'2.5%', zIndex:1000, marginTop:'0.5%',}}>
-                    <DropDownPicker
-                        placeholder={'Select your vehicle type'}
-                        open={this.state.vehicleOpen}
-                        value={this.state.vehicle}
-                        style={[styles.dropdown]}
-                        items={this.state.vehicles}
-                        setOpen={this.setVehicleOpen}
-                        setValue={this.setVehicleValue}
-                        setItems={this.setVehicleItems}
-                        searchable={false}
-                        onSelectItem={(item) => {
-                            this.publishAmount(item.value);
-                        }}
-                        dropDownContainerStyle={{
-                            width:'97%',
-                            marginLeft:'1.5%'
-                        }}  
-                    />    
-                </View> */}
-                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
-                    <Picker
-                        selectedValue={this.state.vehicle}
-                        onValueChange={(itemValue, itemIndex) =>{
-                            this.setVehicle(itemValue)
-                            this.publishAmount(itemValue)
+                {
+                    Platform.OS == 'ios' ?
+                    <View style={{width:'95%', marginLeft:'2.5%', zIndex:1000, marginTop:'0.5%',}}>
+                        <DropDownPicker
+                            placeholder={'Select vehicle\'s type'}
+                            open={this.state.vehicleOpen}
+                            value={this.state.vehicle}
+                            style={[styles.dropdown]}
+                            items={this.state.vehicles}
+                            setOpen={this.setVehicleOpen}
+                            setValue={this.setVehicleValue}
+                            setItems={this.setVehicleItems}
+                            searchable={false}
+                            onSelectItem={(item) => {
+                                this.publishAmount(item.value);
+                            }}
+                            dropDownContainerStyle={{
+                                width:'97%',
+                                marginLeft:'1.5%'
+                            }}
+                        />    
+                    </View> :
+                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                        <Picker
+                            selectedValue={this.state.vehicle}
+                            onValueChange={(itemValue, itemIndex) =>{
+                                this.setVehicle(itemValue)
+                                this.publishAmount(itemValue)
 
-                        }}
-                        style={{height: '100%', width: '100%'}}
-                    >
-                        <Picker.Item label="Select your vehicle type" value={null} style={{fontSize: 14}}/>
-                        
-                        {this.state.vehicles.map((plan, index) => (
-                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
-                        ))}
-                    </Picker>
-                </View>
+                            }}
+                            style={{height: '100%', width: '100%'}}
+                        >
+                            <Picker.Item label="Select vehicle's type" value={null} style={{fontSize: 14}}/>
+                            
+                            {this.state.vehicles.map((plan, index) => (
+                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                            ))}
+                        </Picker>
+                    </View>
+                }
                 {this.state.vehicleError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.vehicleErrorMessage}</Text>}
                 
                 <View style={[styles.formLine, {marginTop:'1.2%'}]}>
@@ -706,72 +702,79 @@ export default class Insurance extends Component {
                 <View style={{justifyContent:'center', marginTop:'1.2%'}}>
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Year of Make</Text>
                 </View>
+                {
+                    Platform.OS == 'ios' ?
+                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
+                        <DropDownPicker
+                            placeholder={'Select vehicle\'s year of make'}
+                            open={this.state.yearOpen}
+                            value={this.state.year}
+                            style={[styles.dropdown]}
+                            items={this.state.years}
+                            setOpen={this.setYearOpen}
+                            setValue={this.setYearValue}
+                            setItems={this.setYearItems}
+                            listMode="MODAL"  
+                            searchable={false}
+                            modalTitle="Select Vehicle's Year of Make"
+                        />
+                    </View> :
+                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                        <Picker
+                            selectedValue={this.state.year}
+                            onValueChange={(itemValue, itemIndex) =>{
+                                this.setYear(itemValue)
 
-                {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4',borderRadius:5}}>
-                    <DropDownPicker
-                        placeholder={'Select your vehicle year of make'}
-                        open={this.state.yearOpen}
-                        value={this.state.year}
-                        style={[styles.dropdown]}
-                        items={this.state.years}
-                        setOpen={this.setYearOpen}
-                        setValue={this.setYearValue}
-                        setItems={this.setYearItems}
-                        listMode="MODAL"  
-                        searchable={false}
-                    />
-                </View> */}
-                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
-                    <Picker
-                        selectedValue={this.state.year}
-                        onValueChange={(itemValue, itemIndex) =>{
-                            this.setYear(itemValue)
-
-                        }}
-                        style={{height: '100%', width: '100%'}}
-                    >
-                        <Picker.Item label="Select your vehicle year" value={null} style={{fontSize: 14}}/>
-                        
-                        {this.state.years.map((plan, index) => (
-                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
-                        ))}
-                    </Picker>
-                </View>
+                            }}
+                            style={{height: '100%', width: '100%'}}
+                        >
+                            <Picker.Item label="Select vehicle's year of make" value={null} style={{fontSize: 14}}/>
+                            
+                            {this.state.years.map((plan, index) => (
+                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                            ))}
+                        </Picker>
+                    </View>
+                }
                 {this.state.yearError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.yearErrorMessage}</Text>}
 
                 <View style={{justifyContent:'center', marginTop:'1.2%'}}>
                     <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Vehicle's Color</Text>
                 </View>
-                {/* <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', borderRadius:5}}>
-                    <DropDownPicker
-                        placeholder={'Select your vehicle\'s color'}
-                        open={this.state.colorOpen}
-                        value={this.state.color}
-                        style={[styles.dropdown]}
-                        items={this.state.colors}
-                        setOpen={this.setColorOpen}
-                        setValue={this.setColorValue}
-                        setItems={this.setColorItems}
-                        listMode="MODAL"  
-                        searchable={false}
-                        // disabled={this.state.ColorDisable}
-                    />
-                </View> */}
-                <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
-                    <Picker
-                        selectedValue={this.state.color}
-                        onValueChange={(itemValue, itemIndex) =>{
-                            this.setColor(itemValue)
-                        }}
-                        style={{height: '100%', width: '100%'}}
-                    >
-                        <Picker.Item label="Select your vehicle color" value={null} style={{fontSize: 14}}/>
-                        
-                        {this.state.colors.map((plan, index) => (
-                            <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
-                        ))}
-                    </Picker>
-                </View>
+                {
+                    Platform.OS == 'ios' ? 
+                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', borderRadius:5}}>
+                        <DropDownPicker
+                            placeholder={'Select vehicle\'s color'}
+                            open={this.state.colorOpen}
+                            value={this.state.color}
+                            style={[styles.dropdown]}
+                            items={this.state.colors}
+                            setOpen={this.setColorOpen}
+                            setValue={this.setColorValue}
+                            setItems={this.setColorItems}
+                            listMode="MODAL"  
+                            searchable={false}
+                            // disabled={this.state.ColorDisable}
+                            modalTitle="Select Your Vehicle's Color"
+                        />
+                    </View> :
+                    <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
+                        <Picker
+                            selectedValue={this.state.color}
+                            onValueChange={(itemValue, itemIndex) =>{
+                                this.setColor(itemValue)
+                            }}
+                            style={{height: '100%', width: '100%'}}
+                        >
+                            <Picker.Item label="Select vehicle's color" value={null} style={{fontSize: 14}}/>
+                            
+                            {this.state.colors.map((plan, index) => (
+                                <Picker.Item key={index} label={plan.label} value={plan.value} style={{fontSize: 14}} />
+                            ))}
+                        </Picker>
+                    </View>
+                }
                 {this.state.colorError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.colorErrorMessage}</Text>}
 
                 <View style={[styles.formLine, {marginTop:'1%'}]}>
@@ -790,7 +793,7 @@ export default class Insurance extends Component {
                         <Text style={styles.labeltext}>Owner's Email-address</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'envelope'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in your vehicle owner's email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="platenumber" onChangeText={(email) => this.setEmail(email)}/>
+                            <TextInput placeholder="Type in vehicle owner's email-address" style={styles.textBox} keyboardType="email-address" placeholderTextColor={"#A9A9A9"} ref="platenumber" onChangeText={(email) => this.setEmail(email)}/>
                         </View>
                         {this.state.emailError && <Text style={{ color: 'red' }}>{this.state.emailErrorMessage}</Text>}
                     </View>
@@ -802,7 +805,7 @@ export default class Insurance extends Component {
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             
-                            <TextInput placeholder="Type in your vehicle owner's phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="phoneNumber" onChangeText={(phoneNumber) => this.setPhoneNo(phoneNumber)}/>
+                            <TextInput placeholder="Type in vehicle owner's phone number" style={styles.textBox} keyboardType="numeric" returnKeyType="done" placeholderTextColor={"#A9A9A9"} ref="phoneNumber" onChangeText={(phoneNumber) => this.setPhoneNo(phoneNumber)}/>
                             {/* <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
                                 <Text style={styles.verifyButtonText}>Verify</Text>
                             </TouchableOpacity> */}
@@ -817,7 +820,7 @@ export default class Insurance extends Component {
                         <View roundedc style={styles.inputitem}>
                             <MaterialIcons name={'money'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             
-                            <TextInput placeholder="Type in your vehicle plate number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="platenumber" onChangeText={(platenumber) => this.setPlateNo(platenumber)}/>
+                            <TextInput placeholder="Type in vehicle's plate number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="platenumber" onChangeText={(platenumber) => this.setPlateNo(platenumber)}/>
                             {/* <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
                                 <Text style={styles.verifyButtonText}>Verify</Text>
                             </TouchableOpacity> */}
@@ -831,7 +834,7 @@ export default class Insurance extends Component {
                         <Text style={styles.labeltext}>Vehicle Engine Number</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'sort-numeric-up'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in your vehicle engine number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="engineNumber" onChangeText={(engineNumber) => this.setEngineNo(engineNumber)}/>
+                            <TextInput placeholder="Type in vehicle's engine number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="engineNumber" onChangeText={(engineNumber) => this.setEngineNo(engineNumber)}/>
                         </View>
                         {this.state.engineError && <Text style={{ color: 'red' }}>{this.state.engineErrorMessage}</Text>}
                     </View>
@@ -842,7 +845,7 @@ export default class Insurance extends Component {
                         <Text style={styles.labeltext}>Vehicle Chasis Number</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'sort-numeric-up'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in your vehicle plate number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="chassisNumber" onChangeText={(chassisNumber) => this.setChassisNo(chassisNumber)}/>
+                            <TextInput placeholder="Type in vehicle's plate number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="chassisNumber" onChangeText={(chassisNumber) => this.setChassisNo(chassisNumber)}/>
                         </View>
                         {this.state.chassisError && <Text style={{ color: 'red' }}>{this.state.chassisErrorMessage}</Text>}
                     </View>
@@ -854,7 +857,7 @@ export default class Insurance extends Component {
                         <View roundedc style={styles.inputitem}>
                             <MaterialIcons name={'branding-watermark'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             
-                            <TextInput placeholder="Type in your vehicle make/brand e.g Toyota" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="brand" onChangeText={(brand) => this.setVehicleBrand(brand)}/>
+                            <TextInput placeholder="Type in vehicle's make/brand e.g Toyota" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="brand" onChangeText={(brand) => this.setVehicleBrand(brand)}/>
                         </View>
                         {this.state.brandError && <Text style={{ color: 'red' }}>{this.state.brandErrorMessage}</Text>}
                     </View>
@@ -865,7 +868,7 @@ export default class Insurance extends Component {
                         <Text style={styles.labeltext}>Vehicle Model</Text>
                         <View roundedc style={styles.inputitem}>
                             <MaterialIcons name={'collections-bookmark'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in your vehicle model e.g Camry" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="model" onChangeText={(model) => this.setVehicleModel(model)}/>
+                            <TextInput placeholder="Type in vehicle's model e.g Camry" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="model" onChangeText={(model) => this.setVehicleModel(model)}/>
                         </View>
                         {this.state.modelError && <Text style={{ color: 'red' }}>{this.state.modelErrorMessage}</Text>}
                     </View>

@@ -579,7 +579,7 @@ export default class Data extends Component {
                             <Text style={styles.labeltext}>Enter Phone Number</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon} />
-                                <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setPhone(phonenumber_value)} />
+                                <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setPhone(phonenumber_value)} />
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>

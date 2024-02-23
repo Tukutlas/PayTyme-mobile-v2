@@ -876,7 +876,7 @@ export default class Education extends Component {
                                 <Text style={styles.labeltext}>Quantity</Text>
                                 <View roundedc style={styles.inputitem}>
                                     <FontAwesome5 name={'sort-numeric-up'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                    <TextInput placeholder="Type in no of pins" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="quantity" onChangeText={(quantity) => this.setQuanity(quantity)}/>
+                                    <TextInput placeholder="Type in no of pins" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="quantity" onChangeText={(quantity) => this.setQuanity(quantity)}/>
                                 </View>
                             </View>
                         </View> 
@@ -893,7 +893,7 @@ export default class Education extends Component {
                                 <Text style={styles.labeltext}>Profile Code</Text>
                                 <View roundedc style={styles.inputitem}>
                                     <FontAwesome5 name={'sort-numeric-up'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                    <TextInput placeholder="Type in profile code" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="profile_code" onChangeText={(profile_code) => this.setProfileCode(profile_code)}/>
+                                    <TextInput placeholder="Type in profile code" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="profile_code" onChangeText={(profile_code) => this.setProfileCode(profile_code)}/>
                                     <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
                                         <Text style={styles.verifyButtonText}>Verify</Text>
                                     </TouchableOpacity>
@@ -920,7 +920,7 @@ export default class Education extends Component {
                         <Text style={styles.labeltext}>Recipient Phone-Number</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in recipient phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phone" onChangeText={(phone) => this.setPhone(phone)} value={this.state.phone.toString()}/>
+                            <TextInput placeholder="Type in recipient phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phone" onChangeText={(phone) => this.setPhone(phone)} value={this.state.phone.toString()}/>
                         </View>
                     </View>
                 </View>

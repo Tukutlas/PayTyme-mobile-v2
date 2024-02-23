@@ -283,7 +283,7 @@ export default class WalletTopUp extends Component {
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter amount</Text>
                         <View roundedc style={styles.inputitem}>
-                            <TextInput placeholder="Type in amount" style={[styles.textBox]} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount:amount, amount_error: false})}/>
+                            <TextInput placeholder="Type in amount" style={[styles.textBox]} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="amount" onChangeText={(amount) => this.setState({amount:amount, amount_error: false})}/>
                             {
                                 this.state.amount_error ?
                                 <View >

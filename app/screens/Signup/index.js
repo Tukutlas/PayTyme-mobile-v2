@@ -597,7 +597,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Email-Address</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'envelope'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="email" onChangeText={(email) => this.setState({ email, emailVerified:false })}/>
+                                <TextInput placeholder="Enter your email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="email-address" ref="email" onChangeText={(email) => this.setState({ email, emailVerified:false })}/>
                                 <TouchableOpacity style={styles.verifyButton} onPress={() => {this.sendVerificationEmail()}}>
                                     <Text style={styles.verifyButtonText}>Verify</Text>
                                 </TouchableOpacity>
@@ -610,7 +610,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Confirmation Code</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'sort-numeric-up'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your confirmation code" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="code" onChangeText={(code) => this.setState({ confirmationCode:code})}/>
+                                <TextInput placeholder="Enter your confirmation code" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" returnKeyType="done" ref="code" onChangeText={(code) => this.setState({ confirmationCode:code})}/>
                                 <TouchableOpacity style={styles.verifyButton} onPress={() => {this.verifyConfirmationCode()}}>
                                     <Text style={styles.verifyButtonText}>Confirm</Text>
                                 </TouchableOpacity>
@@ -623,7 +623,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Phone</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="+234" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" ref="phone" onChangeText={(phone) => this.setState({ phone })} />
+                                <TextInput placeholder="+234" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" returnKeyType="done" onChangeText={(phone) => this.setState({ phone })} />
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>

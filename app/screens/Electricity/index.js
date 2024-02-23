@@ -603,7 +603,7 @@ export default class Electricity extends Component {
                             <Text style={styles.labeltext}>Enter Meter Number</Text>
                             <View roundedc style={[styles.inputitem]}>
                                 <FontAwesome5 name={'tachometer-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/>
+                                <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/>
                                 <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
                                     <Text style={styles.verifyButtonText}>Verify</Text>
                                 </TouchableOpacity>
@@ -627,7 +627,7 @@ export default class Electricity extends Component {
                             <Text style={styles.labeltext}>Customer Phone Number</Text>
                             <View roundedc style={[styles.inputitem]}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
+                                <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
@@ -645,7 +645,7 @@ export default class Electricity extends Component {
                             <Text style={styles.labeltext}>Amount</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type in the token amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="amount" onChangeText={(amount) => this.setState({amount})} />
+                                <TextInput placeholder="Type in the token amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="amount" onChangeText={(amount) => this.setState({amount})} />
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
