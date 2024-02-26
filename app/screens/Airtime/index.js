@@ -12,7 +12,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+// import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 // import FontAwesome5 from "react-native-vector-icons/FontAwesome5";

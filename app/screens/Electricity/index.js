@@ -509,7 +509,7 @@ export default class Electricity extends Component {
 
         return (
             <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
-                <ScrollView style={styles.container}>
+                <View style={styles.container}>
                     <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                     <View style={styles.header}>
                         <View style={styles.left}>
@@ -525,7 +525,7 @@ export default class Electricity extends Component {
                             <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                         </View> 
                     </View>
-                    <View style={[styles.formLine]}>
+                    <View style={[styles.formLine, {marginTop:'-1%',}]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Select Disco</Text>
                         </View>
@@ -730,7 +730,7 @@ export default class Electricity extends Component {
                             Confirm Purchase
                         </Text>
                     </TouchableOpacity>
-                </ScrollView>
+                </View>
             </TouchableWithoutFeedback>
         );
     }

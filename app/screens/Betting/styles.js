@@ -99,6 +99,28 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
 
+  dropdown: {
+    minHeight: 40,
+    backgroundColor: "#f6f6f6",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    width: '97%',
+    marginLeft: '1.5%'
+},
+
+verifyButton: {
+  backgroundColor: '#0C0C54',
+  padding: 5,
+  borderRadius: 25,
+  marginLeft: 10
+},
+
+verifyButtonText: {
+  color: '#fff',
+  fontWeight: 'bold',
+},
+
   betIcon: {
     height:40, 
     width:40, 

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, Text, Keyboard, TouchableOpacity, BackHandler, Image, TextInput, Alert, TouchableWithoutFeedback } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+// import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Picker } from '@react-native-picker/picker';
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';

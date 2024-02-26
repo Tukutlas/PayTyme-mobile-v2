@@ -1,10 +1,10 @@
-import { StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
+import * as SplashScreen from 'expo-splash-screen';
 
-import SplashScreen from './app/screens/SplashScreen';
 import Signin from './app/screens/Signin';
 import Signup from './app/screens/Signup';
 import AccountVerification from './app/screens/Signup/accountVerification';
@@ -23,7 +23,7 @@ import Data from './app/screens/Data';
 import TvSubscription from './app/screens/TvSubscription';
 import Insurance from './app/screens/Insurance';
 import Education from './app/screens/Education';
-import Betting from './app/screens/Betting';
+import Betting from './app/screens/Betting/index2';
 import Electricity from './app/screens/Electricity';
 import Paystack from './app/screens/Paystack';
 import DebitCardPayment from './app/screens/DebitCardPayment';
@@ -83,7 +83,18 @@ const Tabs = () => (
 );
 
 const RootStack = () => {
-    // const AppNavigator = () =>
+    useEffect(() => {
+        async function prepare() {
+            try {
+                await SplashScreen.preventAutoHideAsync();
+                setTimeout(SplashScreen.hideAsync, 3000);
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+        prepare();
+    }, []);
+
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Signin" screenOptions={{ headerShown: false }}>

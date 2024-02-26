@@ -205,7 +205,7 @@ export default class Home extends Component {
             }
         })
         .catch((error) => {
-            // console.log(error)
+            console.log(error)
             alert("Network error. Please check your connection settings");
             // this.setState({isLoading:false});
         });

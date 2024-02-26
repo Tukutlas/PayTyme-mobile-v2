@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.transparent,
     height: '7.5%',
     borderBottomWidth: 0,
-    marginTop: Metrics.HEIGHT * 0.06,
+    marginTop: Metrics.HEIGHT * 0.055,
     elevation: 0,
     flexDirection: 'row',
     flexWrap: 'wrap'
@@ -115,7 +115,6 @@ const styles = StyleSheet.create({
   },
 
   touchableButton: {
-    backgroundColor: '#0C0C54',
     padding: 5,
     borderRadius: 25,
     marginLeft: 10,
@@ -127,10 +126,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#0C0C54",
     alignSelf: "center",
     justifyContent: "center",
-    marginTop: '6%',
+    marginTop: '4.5%',
     borderRadius: 15,
     width: '91%',
-    height: '7%'
+    height: '6%'
   },
 
   purchaseButton: {

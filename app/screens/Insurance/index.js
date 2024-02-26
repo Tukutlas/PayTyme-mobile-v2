@@ -9,6 +9,7 @@ import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default class Insurance extends Component {
     constructor(props) {
@@ -623,12 +624,12 @@ export default class Insurance extends Component {
         const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#ffff", true);
+            StatusBar.setTranslucent(true);
         }
 
         return (
-            <ScrollView style={styles.container}>
+            <KeyboardAwareScrollView style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                 <View style={styles.header}>
                     <View style={styles.left}>
@@ -645,7 +646,7 @@ export default class Insurance extends Component {
                     </View> 
                 </View>
                 <View style={{justifyContent:'center'}}>
-                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14,marginTop:'1%',marginLeft:'3.5%'}}>Vehicle Type</Text>
+                    <Text style={{fontFamily: "Roboto-Medium",fontSize:14, marginTop:'0%',marginLeft:'3.5%'}}>Vehicle Type</Text>
                 </View>
                 {
                     Platform.OS == 'ios' ?
@@ -756,7 +757,7 @@ export default class Insurance extends Component {
                             listMode="MODAL"  
                             searchable={false}
                             // disabled={this.state.ColorDisable}
-                            modalTitle="Select Your Vehicle's Color"
+                            modalTitle="Select Vehicle's Color"
                         />
                     </View> :
                     <View style={{width:'92.7%', marginLeft:'3.7%', backgroundColor: "#f6f6f6", height:40, borderWidth:1, borderColor: '#ccc', borderRadius: 5, justifyContent: 'center'}}>
@@ -958,7 +959,7 @@ export default class Insurance extends Component {
                         Confirm Purchase (₦{this.state.amount})
                     </Text>
                 </TouchableOpacity>
-            </ScrollView>
+            </KeyboardAwareScrollView>
         );
     }
 }

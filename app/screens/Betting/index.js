@@ -9,7 +9,7 @@ import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
 import { CommonActions } from '@react-navigation/native';
    
-export default class Airtime extends Component {
+export default class Betting extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -465,7 +465,7 @@ export default class Airtime extends Component {
         }
     
         return (
-            <KeyboardAwareScrollView style={styles.container}>
+            <View style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                 <View style={styles.header}>
                     <View style={styles.left}>
@@ -891,7 +891,7 @@ export default class Airtime extends Component {
                     </Text>
                 </TouchableOpacity>
 
-            </KeyboardAwareScrollView >
+            </View >
         );
     }
 }

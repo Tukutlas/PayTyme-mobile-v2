@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from "react-native";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+// import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -843,7 +843,7 @@ export default class TvSubscription extends Component {
 
         return (
             <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
-                <KeyboardAwareScrollView style={styles.container}>
+                <View style={styles.container}>
                     <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  />  
                     <View style={styles.header}>
                         <View style={styles.left}>
@@ -1076,7 +1076,7 @@ export default class TvSubscription extends Component {
                             Confirm Purchase (₦{this.state.amount})
                         </Text>
                     </TouchableOpacity>
-                </KeyboardAwareScrollView>
+                </View>
             </TouchableWithoutFeedback>
         );
     }

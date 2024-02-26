@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         marginTop: '6%',
         borderRadius: 15,
         width: '91%',
-        height: '8%'
+        height: '6%'
     },
 
 

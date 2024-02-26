@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { Metrics } from "../../Themes/";
 
 module.exports = StyleSheet.create({
@@ -104,23 +104,28 @@ module.exports = StyleSheet.create({
         backgroundColor:'#E0EBEC'
     },
 
-    flexy:{
-        height:68,
+    flexy: {
+        height: 68,
         width: 68,
-        justifyContent:'center',
-        alignItems:'center',
-        margin:'4%',
-        elevation:8,
-        shadowOpacity: 3,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: '4%',
+        borderRadius: 10,
         flex:3,
-        borderRadius:10,
-        backgroundColor:'#E0EBEC',
-        shadowOffset: {
-            width: 0,
-            height: 0,
-        },
-        shadowRadius: 2,
+        backgroundColor: '#E0EBEC',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOpacity: 3,
+                shadowOffset: { width: 0, height: 0 },
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 8,
+            },
+        }),
     },
+    
 
     menutext:{
         color:'#333',

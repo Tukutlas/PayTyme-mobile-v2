@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
 
     header: {
         backgroundColor: Colors.transparent,
-        height: Metrics.HEIGHT * 0.08,
+        height: Metrics.HEIGHT * 0.06,
         borderBottomWidth: 0,
         marginTop: Metrics.HEIGHT * 0.06,
         elevation: 0,
