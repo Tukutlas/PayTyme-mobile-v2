@@ -121,6 +121,7 @@ inputIcon: {
     width: 30,
     height: 30
   },
+  
   buttonPurchase: {
     borderWidth: 1,
     borderColor: "#8493d5",

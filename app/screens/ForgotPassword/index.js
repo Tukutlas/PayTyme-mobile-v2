@@ -193,7 +193,7 @@ export default class ForgotPassword extends Component {
                 
                 <View style={{marginTop:'35%'}}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => {this.forgotPassword();}}>
-                        <Text autoCapitalize="words" style={{color:'white', alignItems: "center"}}>
+                        <Text autoCapitalize="words" style={{color:'white'}}>
                             Next
                         </Text>
                     </TouchableOpacity>

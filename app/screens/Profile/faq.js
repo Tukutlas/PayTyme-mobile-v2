@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BackHandler, View, Text, TouchableOpacity, StatusBar, ScrollView, Image } from 'react-native';
+import { BackHandler, View, Text, TouchableOpacity, StatusBar, ScrollView, Image, Platform} from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import styles from './faqStyles';
 

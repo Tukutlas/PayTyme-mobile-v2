@@ -42,7 +42,8 @@ export default class Betting extends Component {
             ],
             bettingError: false,
             bettingErrorMessage: '',
-            customerName: ''
+            customerName: '',
+            verified: false
         };
     }
 
@@ -227,10 +228,20 @@ export default class Betting extends Component {
         let amount = this.state.amount;
         let account_id = this.state.account_id;
         let betplatform = this.state.bettingValue;
+        let verified = this.state.verified;
+        let error = 0;
+
+        if (!verified){
+            this.setState({accountError: true, accountErrorMessage: "Account ID must be verified"});
+            error++;
+        }
         
         if(amount > this.state.balance){
-            alert("Insufficient Funds, Pls fund your account.");
-        }else{
+            error++;
+            this.setState({amountError: true, amountErrorMessage: "Insufficient Funds, Pls fund your account."});
+        }
+
+        if(error == 0){
             this.setState({isLoading:true});
             let endpoint ="";  
             //send api for airtime purchase
@@ -386,10 +397,9 @@ export default class Betting extends Component {
             {
                 this.setState({isLoading:true});
                 let response = JSON.parse(responseText);
-                console.log(response)
                 if(response.status == true) { 
                     this.setState({isLoading:false});
-                    this.setState({customerName: response.data.name})
+                    this.setState({customerName: response.data.name, verified:true, accountError:false})
                 }else if(response.status == false){
                     this.setState({isLoading:false});
                     this.setState({accountError: true, accountErrorMessage: "Account ID invalid"});
@@ -497,7 +507,7 @@ export default class Betting extends Component {
                         <Text style={styles.labeltext}>Enter Account ID</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Enter account id" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id})}  />
+                            <TextInput placeholder="Enter account id" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id, verified:false, accountError:false})}  />
                             <TouchableOpacity style={styles.verifyButton} onPress={() => {this.verifyBettingID()}}>
                                 <Text style={styles.verifyButtonText}>Verify</Text>
                             </TouchableOpacity>
@@ -522,7 +532,7 @@ export default class Betting extends Component {
                     <View style={styles.formCenter}>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="amount" onChangeText={(amount) => this.setState({amount})}/>
+                            <TextInput placeholder="Type in amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="amount" onChangeText={(amount) => this.setState({amount, amountError:false})}/>
                             { 
                                 this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                 <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>

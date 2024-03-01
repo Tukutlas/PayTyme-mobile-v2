@@ -270,32 +270,35 @@ export default class Profile extends Component {
     }
 
     handleRateButtonPress = async () => {
+        var fallbackURL = Platform.OS == 'android' ? 'https://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp' : 'https://www.paytyme.com.ng';
         const options = {
-            AppleAppID: '',
+            AppleAppID: '6475634944',
             GooglePackageName: 'com.victorel.paytymemobileapp',
             AmazonPackageName:"",
             OtherAndroidURL:"",
             preferredAndroidMarket: AndroidMarket.Google,
-            preferredIOSStoreCountry: '',
+            preferredIOSStoreCountry: 'NG',
             preferInApp: false,
             openAppStoreIfInAppFails: true,
-            fallbackPlatformURL: 'https://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp'
+            fallbackPlatformURL: fallbackURL
         }
 
-        try {
-            const success = await Rate.rate(options);
+        await Rate.rate(options, (success, errorMessage)=>{
             if (success) {
-                this.setState({ rated: true });
+                // console.log(success)
             }
-        } catch (error) {
-            // console.error(`Error in handleRateButtonPress: ${error}`);
-        }
+            if (errorMessage) {
+                // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
+                // console.error(`Example page Rate.rate() error: ${errorMessage}`)
+            }
+        })
     }
 
     handleShareLink = async () => {
         try {
+            var message = (Platform.OS == 'android') ? `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\nhttps://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp` : `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\nhttps://paytyme.com.ng`;
             const result = await Share.share({
-                message: `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\nhttps://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp`,
+                message: message
             });
       
             if (result.action === Share.sharedAction) {
