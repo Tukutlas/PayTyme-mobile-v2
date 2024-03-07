@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import {StatusBar, TouchableOpacity, Image, Alert, View, Text, Platform, BackHandler} from 'react-native';
+import {StatusBar, TouchableOpacity, Image, Alert, View, Text, Platform, BackHandler, ToastAndroid} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import styles from "./transaction_styles";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';
 import * as Font from 'expo-font';
+import * as Clipboard from 'expo-clipboard';
 import { CommonActions } from '@react-navigation/native';
 
 export default class SingleTransaction extends Component {
@@ -22,6 +23,11 @@ export default class SingleTransaction extends Component {
             package_name: "",
             metre_no: "",
             disco: "",
+            unit: "",
+            name: "",
+            address: "",
+            token: "",
+            copyIcon: "copy",
             recipient: "",
             network: "",
             amount: "",
@@ -135,7 +141,11 @@ export default class SingleTransaction extends Component {
                         transaction_type: transaction.type,
                         amount: this.numberFormat(transaction.amount), 
                         metre_no: data.electricity_info.meter_no, 
-                        disco: data.electricity_info.company
+                        disco: data.electricity_info.company,
+                        name: data.electricity_info.customer_name,
+                        address: data.electricity_info.customer_address,
+                        token: data.electricity_info.token,
+                        unit: data.electricity_info.unit,
                     });
                 }else if(transaction.type == 'Insurance'){
                     this.setState({
@@ -200,6 +210,17 @@ export default class SingleTransaction extends Component {
             this.setState({isLoading:false});
             alert("Network error. Please check your connection settings");
         });
+    }
+
+    copyToken(){
+        Clipboard.setStringAsync(this.state.token);
+        if(Platform.OS == 'android'){
+            ToastAndroid.show('ELectricity Bill Token Copied', ToastAndroid.SHORT);
+        }
+        this.setState({copyIcon: 'check'})
+        setTimeout(()=>{
+            this.setState({copyIcon: 'copy'})
+        }, 5000);
     }
 
     render(){
@@ -301,6 +322,30 @@ export default class SingleTransaction extends Component {
                                 <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Metre No:</Text>
                                 <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.metre_no}</Text>
                             </View>
+                            <View style={{flexDirection:'row', marginTop: '4%'}}>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Customer Name:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.name}</Text>
+                            </View>
+                            <View style={{flexDirection:'row', marginTop: '4%'}}>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Customer Address:</Text>
+                                <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.address}</Text>
+                            </View>
+                            <View style={{flexDirection:'row', marginTop: '4%'}}>
+                                <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Token:</Text>
+                                <Text style={{width:'40%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.token}</Text>
+                                <TouchableOpacity onPress={() => this.copyToken()}>
+                                    <FontAwesome5 name={this.state.copyIcon} size={15} color={'green'}/>
+                                </TouchableOpacity>
+                            </View>
+                            {
+                                this.state.unit !== '' ? 
+                                <>
+                                    <View style={{flexDirection:'row', marginTop: '4%'}}>
+                                        <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Unit:</Text>
+                                        <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.unit}</Text>
+                                    </View>
+                                </> : ''
+                            }
                         </>: ''
                     }
                     {

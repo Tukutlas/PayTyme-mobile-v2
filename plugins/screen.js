@@ -10,7 +10,7 @@ function addAttributesToManifest(androidManifest) {
       "android:smallScreens": true,
       "android:normalScreens": true,
       "android:largeScreens": true,
-      "android:xlargeScreens": false,
+      "android:xlargeScreens": true,
     },
   };
 

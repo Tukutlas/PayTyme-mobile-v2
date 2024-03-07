@@ -296,7 +296,8 @@ export default class Profile extends Component {
 
     handleShareLink = async () => {
         try {
-            var message = (Platform.OS == 'android') ? `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\nhttps://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp` : `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\nhttps://paytyme.com.ng`;
+            var message = `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\n
+                    Android\r\nhttps://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp\r\nIOS\r\n` ;
             const result = await Share.share({
                 message: message
             });

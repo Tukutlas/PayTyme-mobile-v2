@@ -22,7 +22,7 @@
         "NSDocumentPickerUsageDescription": "This app requires access to documents for file selection.",
         "NSTouchIDUsageDescription": "We use Touch ID to secure your data."
       },
-      "buildNumber": "7"
+      "buildNumber": "10"
     },
     "android": {
       "adaptiveIcon": {
@@ -44,7 +44,7 @@
         "READ_EXTERNAL_STORAGE"
       ],
       "package": "com.victorel.paytymemobileapp",
-      "versionCode": 9
+      "versionCode": 11
     },
     "web": {
       "favicon": "./assets/favicon.png"

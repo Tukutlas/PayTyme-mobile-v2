@@ -38,6 +38,8 @@ import BankTransfer from './app/screens/BankTransfer';
 import FAQ from './app/screens/Profile/faq';
 import CameraSection from './app/screens/Profile/camera';
 
+SplashScreen.preventAutoHideAsync();
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -85,13 +87,10 @@ const Tabs = () => (
 const RootStack = () => {
     useEffect(() => {
         async function prepare() {
-            try {
-                await SplashScreen.preventAutoHideAsync();
-                setTimeout(SplashScreen.hideAsync, 3000);
-            } catch (e) {
-                console.warn(e);
-            }
-        }
+            setTimeout(async () => {
+                await SplashScreen.hideAsync();
+            }, 3000);
+        }        
         prepare();
     }, []);
 
