@@ -12,6 +12,7 @@ import Home from './app/screens/Home';
 import Profile from './app/screens/Profile';
 import ViewPicture from './app/screens/Profile/viewPicture';
 import AboutUs from './app/screens/Profile/aboutUs';
+import ContactUs from './app/screens/Profile/contactUs';
 import Transactions from './app/screens/Transactions';
 import SuccessPage from './app/screens/Transactions/success';
 import StatusPage from './app/screens/Transactions/statusPage';
@@ -103,6 +104,7 @@ const RootStack = () => {
                 <Stack.Screen name='AccountVerification' component={AccountVerification}/>
                 <Stack.Screen name="ViewPicture" component={ViewPicture} />
                 <Stack.Screen name="AboutUs" component={AboutUs} />
+                <Stack.Screen name="ContactUs" component={ContactUs} />
                 <Stack.Screen name="Airtime" component={Airtime} />
                 <Stack.Screen name="Data" component={Data} />
                 <Stack.Screen name="TvSubscription" component={TvSubscription}/>

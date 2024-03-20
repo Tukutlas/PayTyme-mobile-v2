@@ -86,9 +86,19 @@ module.exports = StyleSheet.create({
         width: Metrics.WIDTH * 0.71
     },
 
-    loginbutton: {
+    loginButton: {
         fontFamily: Fonts.type.robotoMedium,
         color: "#fff",
-        alignSelf: "center"
+        alignSelf: "center",
+        fontSize: 17,
+        fontWeight: 'bold'
+    },
+
+    cancelButton: {
+        fontFamily: Fonts.type.robotoMedium,
+        color: "#0C0C54",
+        alignSelf: "center",
+        fontSize: 17,
+        fontWeight: 'bold'
     },
 });

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Camera, CameraType } from 'expo-camera';
-import { FontAwesome, Fontisto, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-class App extends Component {
+class CameraSection extends Component {
     constructor(props) {
         super(props);
 
@@ -19,12 +19,22 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.requestPermission();
+        // this.requestPermission();
+        this.getPermission();
     }
 
     async requestPermission() {
         const { status } = await Camera.requestCameraPermissionsAsync();
         this.setState({ permission: status === 'granted' });
+    }
+
+    async getPermission() {
+        const { status } = await Camera.getCameraPermissionsAsync();
+        if(status !== 'granted'){
+            this.requestPermission()
+        }else{
+            this.setState({ permission: status === 'granted' });
+        }
     }
 
     toggleCameraType() {
@@ -46,7 +56,7 @@ class App extends Component {
         
             const photo = await this.camera.takePictureAsync(options);
             
-            console.log('Photo taken:', photo);
+            // console.log('Photo taken:', photo);
 
             const image = {
                 uri: photo.uri,
@@ -162,4 +172,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default App;
+export default CameraSection;

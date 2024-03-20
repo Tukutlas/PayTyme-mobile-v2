@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {BackHandler, StatusBar, Platform} from 'react-native';
 import { WebView } from 'react-native-webview';
 
-export default class AboutUs extends Component {
+export default class ContactUs extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -11,7 +11,6 @@ export default class AboutUs extends Component {
             user_id: "",
             SpinnerVisible: true,
         };
-
     }
 
     async UNSAFE_componentWillMount() {
@@ -31,7 +30,7 @@ export default class AboutUs extends Component {
         }
         return (
             <WebView
-                source={{ uri: Platform.OS == 'ios' ? "https://paytyme.com.ng/ios" : "https://paytyme.com.ng" }}
+                source={{ uri: Platform.OS == 'ios' ? "https://paytyme.com.ng/ios/contact-us.php" : "https://paytyme.com.ng/contact-us.php" }}
                 style={{
                     width: '100%',
                     height: 500,

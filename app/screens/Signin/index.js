@@ -49,8 +49,11 @@ export default class Signin extends Component {
     }
 
     async componentDidMount() {
-        this.checkDeviceForHardware();
-        this.checkIfBiometricIsEnabled();
+        setTimeout(async () => {
+            // await SplashScreen.hideAsync();
+            this.checkDeviceForHardware();
+            this.checkIfBiometricIsEnabled();
+        }, 3000);
         // this.checkForFingerprints();
         // let hasfingerprint = await LocalAuthentication.isEnrolledAsync();
         // this.setState({ hasfingerprint });
@@ -327,6 +330,8 @@ export default class Signin extends Component {
                     let firstname = JSON.parse(responseText).data.first_name;
                     let lastname = JSON.parse(responseText).data.last_name;
                     let image = JSON.parse(responseText).data.image;
+                    let phone = JSON.parse(responseText).data.phone_number;
+                    let email = JSON.parse(responseText).data.email_address;
                     let tier = JSON.parse(responseText).data.tier;
                     let response = {
                         "status": "ok",
@@ -335,7 +340,9 @@ export default class Signin extends Component {
                             "username": "" + username + "",
                             "fullname": "" + firstname + " " + lastname + "",
                             "image": image,
-                            "tier": tier
+                            "tier": tier,
+                            "email": email,
+                            "phone": phone
                         }
                     };
 

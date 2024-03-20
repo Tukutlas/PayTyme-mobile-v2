@@ -87,9 +87,9 @@ export default class Betting extends Component {
         if(this.state.transaction){
             this.props.navigation.dispatch(
                 CommonActions.reset({
-                routes: [
-                    { name: 'Tabs' }
-                ],
+                    routes: [
+                        { name: 'Tabs' }
+                    ],
                 })
             );
         }else{
@@ -117,18 +117,18 @@ export default class Betting extends Component {
                   let wallet = JSON.parse(responseText).data;  
                   this.setState({balance:parseInt(wallet.balance)});
               }else if(response_status == false){
-                  Alert.alert(
-                  'Session Out',
-                  'Your session has timed-out. Login and try again',
-                  [
-                      {
-                          text: 'OK',
-                          onPress: () => this.props.navigation.navigate('Signin'),
-                          style: 'cancel',
-                      }, 
-                      ],
-                  {cancelable: false},
-                  );
+                Alert.alert(
+                    'Session Out',
+                    'Your session has timed-out. Login and try again',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => this.props.navigation.navigate('Signin'),
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
               }else if(response_status == 'error'){
                 Alert.alert(
                 'Session Out',

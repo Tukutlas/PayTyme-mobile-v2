@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Switch, StatusBar, PermissionsAndroid, TouchableOpacity, TouchableWithoutFeedback, Image, Alert, View, Text, Modal, Platform, Share} from 'react-native';
+import {Switch, StatusBar, Linking, PermissionsAndroid, TouchableOpacity, TouchableWithoutFeedback, Image, Alert, View, Text, Modal, Platform, Share} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ import { CommonActions } from '@react-navigation/native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as DocumentPicker from 'expo-document-picker';
 import Rate, { AndroidMarket } from 'react-native-rate';
+import { Camera } from 'expo-camera';
 
 export default class Profile extends Component {
     constructor(props, context) {
@@ -17,8 +18,11 @@ export default class Profile extends Component {
         this.state = {
             auth_token:"",
             isModalVisible: false,
+            deleteModalVisible: false,
             balance:"...",
             fullname:"",
+            email: "",
+            phone: "",
             wallet_id: "",
             view: false,
             isEnabled: false,
@@ -40,8 +44,9 @@ export default class Profile extends Component {
     async componentDidMount() {
         this.setState({
             auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token,
-          
-            fullname:JSON.parse(await AsyncStorage.getItem('login_response')).user.fullname
+            fullname:JSON.parse(await AsyncStorage.getItem('login_response')).user.fullname,
+            email:JSON.parse(await AsyncStorage.getItem('login_response')).user.email,
+            phone:JSON.parse(await AsyncStorage.getItem('login_response')).user.phone,
         });
         if(JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null){
             this.setState({profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image})
@@ -70,6 +75,7 @@ export default class Profile extends Component {
             'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
             'Helvetica': require('../../Fonts/Helvetica.ttf'),
             'Lato-Regular': require('../../Fonts/Lato-Regular.ttf'),
+            'Lato-Bold': require('../../Fonts/Lato-Bold.ttf'),
         });
         this.setState({ fontLoaded: true });
 
@@ -88,8 +94,8 @@ export default class Profile extends Component {
         { 
             method: 'GET',
             headers: new Headers({
-            'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-            'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer '+this.state.auth_token, // <-- Specifying the Authorization
             }),
             body:  ""         
             // <-- Post parameters
@@ -132,7 +138,7 @@ export default class Profile extends Component {
         })
         .catch((error) => {
             this.setState({isLoading:false});
-            alert("Network error. Please check your connection settings");
+            // alert("Network error. Please check your connection settings");
         });     
     }
     
@@ -150,7 +156,7 @@ export default class Profile extends Component {
                     PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
                     {
                         title: 'You need to give storage permission to download and save the file',
-                        message: 'App needs access to your camera ',
+                        message: 'App needs access to your storage',
                         buttonNeutral: 'Ask Me Later',
                         buttonNegative: 'Cancel',
                         buttonPositive: 'OK',
@@ -264,9 +270,31 @@ export default class Profile extends Component {
         }
     }
 
+    async getCameraPermission() {
+        const { status } = await Camera.getCameraPermissionsAsync();
+        if (status !== 'granted') {
+            await this.requestCameraPermission();
+        } else {
+            this.setState({ permission: true });
+            this.proceedToCamera();
+        }
+    }
+    
+    async requestCameraPermission() {
+        const { status } = await Camera.requestCameraPermissionsAsync();
+        this.setState({ permission: status === 'granted' });
+        if (status === 'granted') {
+            this.proceedToCamera();
+        }
+    }    
+
     goToCameraSection = async () => {
         this.setState({isModalVisible: false})
-        this.props.navigation.navigate("CameraSection")
+        this.getCameraPermission();
+    }
+
+    proceedToCamera = async () => {
+        this.props.navigation.navigate("CameraSection");
     }
 
     handleRateButtonPress = async () => {
@@ -316,6 +344,30 @@ export default class Profile extends Component {
         }
     };
 
+    sendDeleteMail = async () => {
+        Linking.openURL(`mailto:support@paytyme.com.ng?subject=${encodeURIComponent("Request for Account Deletion")}&body=${encodeURIComponent(`Dear Paytyme Support Team,
+
+            I hope this email finds you well.
+
+            I am writing to formally request the deletion of my account associated with the email address ${this.state.email} from your platform. After careful consideration, I have decided to close my account for personal reasons.
+
+            Please proceed with the necessary steps to delete all of my personal information and associated data from your system. This includes any saved preferences, and any other data associated with my account.
+
+            I understand that this action is irreversible, and I am aware that I will lose access to my account and any associated services or benefits.
+
+            Please confirm the deletion of my account once it has been processed, and provide any confirmation or follow-up instructions if necessary.
+
+            Thank you for your attention to this matter. I appreciate your prompt assistance in handling my request.
+
+            If you require any further information or clarification, please do not hesitate to contact me at ${this.state.phone} or [Your Alternative Email Address].
+
+            Sincerely,
+
+            ${this.state.fullname}
+
+        `)}`)
+    }
+
     render(){
         StatusBar.setBarStyle("light-content", true);
         if (Platform.OS === "android") {
@@ -325,11 +377,11 @@ export default class Profile extends Component {
 
         return (
             <>
-                <TouchableWithoutFeedback onPress={() => this.setState({isModalVisible: false})}>
+                <TouchableWithoutFeedback onPress={() => this.setState({isModalVisible: false, deleteModalVisible: false})}>
                     <View style={styles.container}>
                         <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}  /> 
                         <View style={styles.header}>
-                            <View style={{marginLeft:'15%', marginTop:'17%'}}>
+                            <View style={{marginLeft:'15%', marginTop:'12%'}}>
                                 {
                                     this.state.profilePicture != null ?
                                     <Image style={styles.profileImage} source={{uri:this.state.profilePicture}}/> 
@@ -343,7 +395,7 @@ export default class Profile extends Component {
                             </View>
                         </View>
                         <View style={{backgroundColor:'#120A47', height:'11%', marginLeft:'0%', borderRadius:10, width:'100%', elevation:50, 
-                            shadowColor: '#fff', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 6, shadowRadius: 10, marginTop:'-5%'}} 
+                            shadowColor: '#fff', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 6, shadowRadius: 10, marginTop:'-13%'}} 
                         >
                             <View style={{flexDirection:'row', padding:15}}>
                                 <View style={{flex: 4, alignItems: "center", marginLeft:'5%', marginRight: '2.5%'}}>
@@ -436,6 +488,18 @@ export default class Profile extends Component {
                                     <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'23%'}}/> 
                                 </TouchableOpacity>
                             </View>
+                            {
+                                Platform.OS == 'ios' ? 
+                                <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
+                                    {/* <TouchableOpacity onPress={()=>{this.props.navigation.navigate("ContactUs")}} style={{marginLeft:'0%', flexDirection:'row'}}> */}
+                                    <TouchableOpacity onPress={()=>{ this.setState({deleteModalVisible: true}) }} style={{marginLeft:'0%', flexDirection:'row'}}>
+                                        <FontAwesome5 name={'trash'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
+                                        <Text style={{fontSize:19, fontWeight:'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>Delete Account</Text>
+                                        <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'23%'}}/> 
+                                    </TouchableOpacity>
+                                </View>
+                                : <></>
+                            }
                             <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
                                 <FontAwesome5 name={'info-circle'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
                                 <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%'}}>Version 1.0</Text>
@@ -457,7 +521,7 @@ export default class Profile extends Component {
                                     this.setState({isModalVisible: false})
                                 }}
                             >
-                                <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end'}}>
+                                <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
                                     <View style={{ backgroundColor: 'white', padding: 0, width: '100%', height: '40%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
                                         <View style={{marginLeft: '5%', marginTop: '5%', alignItems: 'center', justifyContent: 'center',backgroundColor: '#0C0C54', width: '15%', height: '17%', borderRadius:10}}> 
                                             <TouchableOpacity onPress={()=>{this.goToCameraSection()}}>
@@ -504,11 +568,75 @@ export default class Profile extends Component {
                                         </View>
                                         <View style={{marginLeft: '3%', marginTop: '12%', }}>
                                             <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.setState({isModalVisible: false})}}>
-                                                <Text autoCapitalize="words" style={styles.loginbutton}>
+                                                <Text autoCapitalize="words" style={styles.loginButton}>
                                                     Cancel
                                                 </Text>
                                             </TouchableOpacity>
                                         </View>{/*button*/}
+                                    </View>
+                                </View>
+                            </Modal>
+                        </View>
+                        <View style={{ flex: 1}}>
+                            <Modal
+                                animationType="slide"
+                                transparent={true}
+                                visible={this.state.deleteModalVisible}
+                                onRequestClose={() => {
+                                    // setModalVisible(!modalVisible);
+                                    this.setState({deleteModalVisible: false})
+                                }}
+                            >
+                                <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
+                                    {/* rgba(0,0,0, 0.6) black blur, rgba(255, 255, 255, 0.6) white blur */}
+                                    <View style={{ backgroundColor: 'white', width: '100%', marginBottom: 0, borderRadius: 20}}>
+                                        <View style={{ marginTop: '4%', alignItems: 'center'}}>
+                                            <Text style={{fontSize:22, color: "#0C0C54", fontWeight:'bold'}}>Delete Account Confirmation</Text>
+                                        </View>
+                                        <View style={{marginLeft: '5%', marginTop: '2%', alignItems: 'left', justifyContent:"center", width: '90%'}}>
+                                            <Text style={[{fontSize:16, color: "#676767", fontWeight:'bold'}, Platform.OS == 'ios' ? '' : {fontFamily: "Lato-Regular"}]}>
+                                                By proceeding, you understand that:
+                                            </Text>
+                                            <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#676767"}}>
+                                                - Your account will be permanently removed from our system.
+                                            </Text>
+                                            <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#676767", marginTop:'2.3%'}}>
+                                                - This action cannot be undone.
+                                            </Text>
+                                            <Text style={{ fontFamily: "Lato-Regular", fontSize:16, color: "#676767", marginTop:'2.3%'}}>
+                                                - This request will be initiated via email to confirm your identity and ensure the security of your account.
+                                            </Text>
+                                            <Text style={[{ fontSize:16, color: "#676767", marginTop:'1.7%', fontWeight:'bold' }, Platform.OS == 'ios' ? '' : {fontFamily: "Lato-Regular"}]}>
+                                                Please note:
+                                            </Text>
+                                            <Text style={{ fontFamily: "Lato-Regular", fontSize:16, color: "#676767"}}>
+                                                - It may take some time to process your request.
+                                            </Text>
+                                            <Text style={{ fontFamily: "Lato-Regular", fontSize:16, color: "#676767", marginTop:'2.3%'}}>
+                                                - Once deleted, you will lose access to all features and services associated with your account.
+                                            </Text>
+                                            <Text style={{ fontFamily: "Lato-Regular", fontSize:16, color: "#676767", marginTop:'2.3%'}}>
+                                                - If you change your mind, you will need to create a new account to regain access.
+                                            </Text>
+                                            <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#676767", marginTop:'2.3%'}}>
+                                                - If you are certain about deleting your account, click "Proceed" below.
+                                            </Text>
+                                            <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#676767", marginTop:'2.5%'}}>
+                                                - If you wish to keep your account, click "Cancel".
+                                            </Text>
+                                        </View>
+                                        <View style={{alignSelf: "center", marginTop: '4%', flexDirection:'row', height: '10%',}}>
+                                            <TouchableOpacity info style={{width: '40%', height: '90%', borderRadius: 15, borderWidth: 2, borderColor: "#0C0C54",  alignSelf: "center", justifyContent: "center", marginRight: '5%'}} onPress={() => {this.setState({deleteModalVisible: false})}}>
+                                                <Text autoCapitalize="words" style={styles.cancelButton}>
+                                                    Cancel
+                                                </Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity info style={{width: '40%', height: '90%', backgroundColor: "#0C0C54", borderRadius: 15, alignSelf: "center", justifyContent: "center",}} onPress={() => { this.sendDeleteMail() }} title={"[email protected]"}>
+                                                <Text autoCapitalize="words" style={styles.loginButton}>
+                                                    Proceed
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </View>
                                     </View>
                                 </View>
                             </Modal>

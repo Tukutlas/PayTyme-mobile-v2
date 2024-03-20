@@ -163,7 +163,7 @@ export default class Home extends Component {
         })
         .catch((error) => {
             // console.log(error)
-            alert("Network error. Please check your connection settings");
+            // alert("Network error. Please check your connection settings");
             this.setState({isLoading:false});
         });
     }
@@ -205,8 +205,8 @@ export default class Home extends Component {
             }
         })
         .catch((error) => {
-            console.log(error)
-            alert("Network error. Please check your connection settings");
+            // console.log(error)
+            // alert("Network error. Please check your connection settings");
             // this.setState({isLoading:false});
         });
     }
@@ -495,7 +495,7 @@ export default class Home extends Component {
                             this.setState({modalVisible: false})
                         }}
                     >
-                        <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end'}}>
+                        <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
                             <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 0, width: '100%', height: '50%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
                                 <View style={{ width: '95%', height: '15%', marginTop:'2%', alignItems:"flex-end" }}>
                                     <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '40%', width: '6%', alignItems:"center", justifyContent:"center"}} onPress={()=>{this.setState({modalVisible: false})}}>

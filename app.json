@@ -22,7 +22,7 @@
         "NSDocumentPickerUsageDescription": "This app requires access to documents for file selection.",
         "NSTouchIDUsageDescription": "We use Touch ID to secure your data."
       },
-      "buildNumber": "10"
+      "buildNumber": "11"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,7 +30,7 @@
         "backgroundColor": "#ffffff"
       },
       "blockedPermissions": [
-        "RECORD_AUDIO", 
+        "RECORD_AUDIO",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION"
