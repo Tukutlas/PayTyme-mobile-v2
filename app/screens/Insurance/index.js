@@ -8,7 +8,6 @@ import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
-import * as Font from 'expo-font';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default class Insurance extends Component {
@@ -86,21 +85,6 @@ export default class Insurance extends Component {
         this.loadWalletBalance();
 
         this.getInsurancePackages();
-        //check random balances
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-        });
-        this.setState({ fontLoaded: true });
     }
     
     numberFormat = x => {

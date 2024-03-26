@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Image, View, StatusBar, Modal, TouchableOpacity, BackHandler, Text, TextInput , Platform} from "react-native";
+import { Image, View, StatusBar, TouchableOpacity, BackHandler, Text, TextInput , Platform} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -11,7 +11,6 @@ import styles from "./styles";
 // import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const WalletTopUp = ({ navigation }) => {
-    const [modalVisible1, setModalVisible] = useState(false);
     const [amount, setAmount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [transaction, setTransaction] = useState(false);
@@ -45,7 +44,7 @@ const WalletTopUp = ({ navigation }) => {
         };
         fetchData();
         getUserCards();
-        const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
+        BackHandler.addEventListener("hardwareBackPress", () => {
             if (transaction) {
                 navigation.dispatch(
                     CommonActions.reset({
@@ -58,9 +57,9 @@ const WalletTopUp = ({ navigation }) => {
             return true;
         });
 
-        return () => {
-            backHandler.remove();
-        };
+        // return () => {
+        //     backHandler.remove();
+        // };
     }, [navigation, transaction]);
 
     const checkIfUserHasCard = () => {
@@ -246,12 +245,12 @@ const WalletTopUp = ({ navigation }) => {
                     <Image style={styles.logo} source={require('../../../assets/logo.png')} />
                 </View>
             </View>
-            <View style={[styles.formLine, { marginTop: '0%' }]}>
+            <View style={[styles.formLine]}>
                 <View style={styles.formCenter}>
                     <Text style={styles.labeltext}>Select a payment channel</Text>
                 </View>
             </View>
-            <View style={{ width: '95%', marginLeft: '2.5%', backgroundColor: '#fff', height: 30, zIndex: 1000 }}>
+            <View style={{ width: '95%', marginTop: '1%', marginLeft: '2.5%', backgroundColor: '#fff', height: '5%', zIndex: 1000 }}>
                 <DropDownPicker 
                     open={open}
                     value={paymentChannelValue}
@@ -268,17 +267,22 @@ const WalletTopUp = ({ navigation }) => {
                     //     </TouchableOpacity>
                     //   )}
                     dropDownContainerStyle={{
-                        width:'97%',
-                        marginLeft:'1.5%'
+                        width:'100%',
+                        // marginLeft:'0%'
                     }} 
                 />
             </View>
-            {channelError && <Text style={{ marginTop: '7%', marginLeft: '3%', color: 'red' }}>Please select a payment channel</Text>}
-            {paymentChannelValue == 'card' ? <View style={[styles.formLine, { marginTop: '5%'}]}>
-                <View style={styles.formCenter}>
-                    <Text style={styles.labeltext}>Enter amount</Text>
+            {channelError && <Text style={{ marginTop: '1%', marginLeft: '2.5%', color: 'red' }}>Please select a payment channel</Text>}
+            {
+                paymentChannelValue == 'card' ? 
+                <>
+                    <View style={[styles.formLine, { marginTop: '2%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Enter amount</Text>
+                        </View>
+                    </View>
                     <View style={[styles.inputitem, { borderColor: amountError ? 'red' : '#A9A9A9' }]}>
-                    <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                        <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                         <TextInput
                             placeholder="Type in amount"
                             style={styles.textBox}
@@ -288,24 +292,22 @@ const WalletTopUp = ({ navigation }) => {
                             value={amount.toString()}
                             onChangeText={(text) => setAmountValue(text)}
                         />
-                        
                     </View>
-                </View>
-                {amountError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>Please input the amount</Text>}
-            </View> : <></>}
+                    <View>
+                        {amountError ? <Text style={{ marginTop: '1.2%', marginLeft: '2.5%', color: 'red' }}>Please input the amount</Text> : <></>}
+                    </View>
+                </>: 
+                <></>
+            }
             
-            {/* {displayCards && <Text style={{ marginTop: '7%', marginLeft: '3%', color: 'red' }}>Please select a payment channel</Text>} */}
-            <View style={[styles.tcview, { marginTop:'15%', marginLeft:'30%' }]}>
-                <View style={styles.tandcView}>
-                    <TouchableOpacity onPress={() => navigation.navigate("PaymentConfirmation")}>
-                    {/* <TouchableOpacity onPress={() => { alert("Coming Soon"); }} > */}
-                        <Text style={[styles.textTermsCondition, { marginTop: '2%', color: '#1D59E1' }]}>
-                            Upload Proof of Payment
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+            <View style={{ marginTop:'5%', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => navigation.navigate("PaymentConfirmation")}>
+                    <Text style={{ color: '#1D59E1' }}>
+                        Upload Proof of Payment
+                    </Text>
+                </TouchableOpacity>
             </View>
-            <View style={{ marginTop: '20%', marginBottom: '45%' }}>
+            <View style={{ marginTop: '5%' }}>
                 <TouchableOpacity style={styles.buttonPurchase} onPress={checkPaymentChannel}>
                     <Text style={{ color: 'white', alignSelf: 'center' }}>Next</Text>
                 </TouchableOpacity>

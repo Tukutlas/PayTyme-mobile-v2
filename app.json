@@ -18,11 +18,11 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.victorel.paytymemobileapp",
       "infoPlist": {
-        "NSCameraUsageDescription": "This app uses the camera to take pictures.",
+        "NSCameraUsageDescription": "PayTyme requires camera access to add images to your profile.",
         "NSDocumentPickerUsageDescription": "This app requires access to documents for file selection.",
         "NSTouchIDUsageDescription": "We use Touch ID to secure your data."
       },
-      "buildNumber": "11"
+      "buildNumber": "13"
     },
     "android": {
       "adaptiveIcon": {

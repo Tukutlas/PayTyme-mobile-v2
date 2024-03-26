@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";  
 import { FontAwesome5 } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
-import * as Font from 'expo-font';
 import * as Clipboard from 'expo-clipboard';
 
 export default class BankTransfer extends Component {
@@ -14,6 +13,7 @@ export default class BankTransfer extends Component {
         this.state = {
             modalVisible1: false,
             isChecked: false,
+            copyIcon: "copy",
             
             isLoading: false,
             modalVisible: false,
@@ -27,20 +27,6 @@ export default class BankTransfer extends Component {
         this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});
         
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-        });
-        this.setState({ fontLoaded: true });
     }
 
     backPressed = () => {
@@ -50,7 +36,13 @@ export default class BankTransfer extends Component {
 
     copyAccountNumber(){
         Clipboard.setStringAsync('1024141760');
-        ToastAndroid.show('Paytyme Account Number Copied', ToastAndroid.SHORT);
+        if(Platform.OS == 'android'){
+            ToastAndroid.show('Paytyme Account Number Copied', ToastAndroid.SHORT);
+        }
+        this.setState({copyIcon: 'check'})
+        setTimeout(()=>{
+            this.setState({copyIcon: 'copy'})
+        }, 5000);
     }
 
     render(){
@@ -99,7 +91,7 @@ export default class BankTransfer extends Component {
                     </View> 
                     <View style={styles.accountRight}>
                         <TouchableOpacity onPress={() => this.copyAccountNumber()}>
-                            <FontAwesome5 name={'copy'} size={20} color={'green'}/>
+                            <FontAwesome5 name={this.state.copyIcon} size={20} color={'green'}/>
                         </TouchableOpacity>
                         
                         <View style={{marginLeft: '3%'}}>

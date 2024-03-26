@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StatusBar, TouchableOpacity, Image, View, Text, Platform} from 'react-native';
+import {StatusBar, TouchableOpacity, Image, View, Text, Platform, BackHandler} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';

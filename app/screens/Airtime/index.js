@@ -1,17 +1,5 @@
 import React, { Component} from "react";
-import {
-  Platform,
-  StatusBar,
-  View,
-  Text,
-  TouchableOpacity,
-  BackHandler,
-  Image,
-  TextInput,
-  Alert,
-  Keyboard,
-  TouchableWithoutFeedback
-} from "react-native";
+import { Platform, StatusBar, View, Text, TouchableOpacity, BackHandler, Image, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from "react-native";
 // import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
@@ -20,7 +8,6 @@ import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
-import * as Font from 'expo-font';
 
 export default class Airtime extends Component {
     constructor(props) {
@@ -71,21 +58,7 @@ export default class Airtime extends Component {
         this.getUserCards();
        
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-        });
-        this.setState({ fontLoaded: true });
-
+        
         this.keyboardDidShowListener = Keyboard.addListener(
             'keyboardDidShow',
             this.handleKeyboardDidShow

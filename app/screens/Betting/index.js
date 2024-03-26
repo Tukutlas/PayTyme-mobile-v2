@@ -1,14 +1,13 @@
 import React, { Component } from "react";
 import { Platform, StatusBar, View, Text, Keyboard, TouchableOpacity, BackHandler, Image, TextInput, Alert } from "react-native";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+// import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
-import * as Font from 'expo-font';
 import { CommonActions } from '@react-navigation/native';
-   
+
 export default class Betting extends Component {
     constructor(props) {
         super(props);
@@ -54,20 +53,6 @@ export default class Betting extends Component {
         this.getUserCards();
        
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-        });
-        this.setState({ fontLoaded: true });
 
         this.keyboardDidShowListener = Keyboard.addListener(
             'keyboardDidShow',

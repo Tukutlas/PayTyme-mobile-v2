@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";  
 import { FontAwesome5 } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
-import * as Font from 'expo-font';
 import * as Clipboard from 'expo-clipboard';
 import { GlobalVariables } from '../../../global';
 
@@ -19,6 +18,7 @@ export default class VirtualAccount extends Component {
             isLoading: false,
             modalVisible: false,
             isProgress: false,
+            copyIcon: "copy",
             
             auth_token: '',
             bank_name: '',
@@ -37,20 +37,6 @@ export default class VirtualAccount extends Component {
         );
         
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-        });
-        this.setState({ fontLoaded: true });
         this.virtualAccount();
     }
 
@@ -61,7 +47,13 @@ export default class VirtualAccount extends Component {
 
     copyAccountNumber(){
         Clipboard.setStringAsync(this.state.account_number);
-        ToastAndroid.show('Paytyme Account Number Copied', ToastAndroid.SHORT);
+        if(Platform.OS == 'android'){
+            ToastAndroid.show('Account Number Copied', ToastAndroid.SHORT);
+        }
+        this.setState({copyIcon: 'check'})
+        setTimeout(()=>{
+            this.setState({copyIcon: 'copy'})
+        }, 5000);
     }
 
     async virtualAccount(){
@@ -88,14 +80,16 @@ export default class VirtualAccount extends Component {
                     let account_name = result.data.account_name;
                     let account_number = result.data.account_number;
                     
-                    let bank_details = {
-                        "bank": "" + bank + "",
-                        "account_name": "" + account_name + "",
-                        "account_number": "" + account_number + "",
-                    };
-                    AsyncStorage.setItem('bank_details', JSON.stringify(bank_details))
-                    // result.message
-                    this.setState({bank_name: bank, account_name:account_name, account_number:account_number});
+                    if(bank != null || bank != ""){
+                        let bank_details = {
+                            "bank": "" + bank + "",
+                            "account_name": "" + account_name + "",
+                            "account_number": "" + account_number + "",
+                        };
+                        AsyncStorage.setItem('bank_details', JSON.stringify(bank_details))
+                        // result.message
+                        this.setState({bank_name: bank, account_name:account_name, account_number:account_number});
+                    }
                 }else if(result.status != true){
                     this.props.navigation.navigate('CreateVirtualAccount')
                     this.setState({isLoading:false});
@@ -166,7 +160,7 @@ export default class VirtualAccount extends Component {
                     </View> 
                     <View style={styles.accountRight}>
                         <TouchableOpacity onPress={() => this.copyAccountNumber()}>
-                            <FontAwesome5 name={'copy'} size={20} color={'green'}/>
+                            <FontAwesome5 name={this.state.copyIcon} size={20} color={'green'}/>
                         </TouchableOpacity>
                         
                         <View style={{marginLeft: '3%'}}>

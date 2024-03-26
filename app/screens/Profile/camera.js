@@ -107,6 +107,9 @@ class CameraSection extends Component {
                     
                 >
                     <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.button} onPress={this.props.navigation.goBack}>
+                            <Fontisto name={'arrow-left'} color={'white'} size={20} />
+                        </TouchableOpacity>
                         <TouchableOpacity style={styles.button} onPress={this.toggleCameraType}>
                             <Fontisto name={'spinner-refresh'} color={'white'} size={20} />
                         </TouchableOpacity>
@@ -154,6 +157,12 @@ const styles = StyleSheet.create({
     camera: {
         flex: 1,
     },
+    // backButton: {
+    //     position: 'absolute',
+    //     top: '7%',
+    //     left: 16,
+    //     zIndex: 1, // Ensure the button is above the camera view
+    // },
     buttonContainer: {
         flex: 1,
         flexDirection: 'row',

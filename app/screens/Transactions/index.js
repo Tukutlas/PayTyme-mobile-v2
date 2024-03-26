@@ -5,7 +5,6 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import styles from "./styles";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';
-import * as Font from 'expo-font';
 
 export default class Transactions extends Component {
     constructor(props, context) {
@@ -37,20 +36,6 @@ export default class Transactions extends Component {
             this.setWalletVisibility(true)
         }
         this.getTransactionHistory();
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-            'Lato-Regular': require('../../Fonts/Lato-Regular.ttf')
-        });
         
         if(JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null){
             this.setState({profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image})
@@ -62,7 +47,6 @@ export default class Transactions extends Component {
             this.loadWalletBalance();
             this.getTransactionHistory();
         });
-        this.setState({ fontLoaded: true });
     }
       
     loadWalletBalance(){

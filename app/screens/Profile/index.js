@@ -5,7 +5,6 @@ import styles from "./styles";
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
-import * as Font from 'expo-font';
 import { CommonActions } from '@react-navigation/native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as DocumentPicker from 'expo-document-picker';
@@ -62,22 +61,6 @@ export default class Profile extends Component {
         if(walletVisibility != null && walletVisibility == "true"){
             this.setWalletVisibility(true);
         }
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-            'Lato-Regular': require('../../Fonts/Lato-Regular.ttf'),
-            'Lato-Bold': require('../../Fonts/Lato-Bold.ttf'),
-        });
-        this.setState({ fontLoaded: true });
 
         this.props.navigation.addListener('focus', () => {
             this.loadWalletBalance();
@@ -209,10 +192,22 @@ export default class Profile extends Component {
     }
 
     setBiometricEnability(biometrics){
-        this.setState({
-            isEnabled: biometrics.isEnabled
-        });
-        AsyncStorage.setItem('biometricEnabled',  ""+biometrics.isEnabled+"");
+        if(biometrics.isEnabled == true){
+            let biometricAvailable = this.checkDeviceForHardware();
+            if(biometricAvailable){
+                this.setState({
+                    isEnabled: biometrics.isEnabled
+                });
+                AsyncStorage.setItem('biometricEnabled',  ""+biometrics.isEnabled+"");
+            }else{
+                this.setBiometricSwitchToFalse()
+            }
+        }else{
+            this.setState({
+                isEnabled: biometrics.isEnabled
+            });
+            AsyncStorage.setItem('biometricEnabled',  ""+biometrics.isEnabled+"");
+        }
     }
 
     async removeItemValue(key) {
@@ -591,10 +586,10 @@ export default class Profile extends Component {
                                     {/* rgba(0,0,0, 0.6) black blur, rgba(255, 255, 255, 0.6) white blur */}
                                     <View style={{ backgroundColor: 'white', width: '100%', marginBottom: 0, borderRadius: 20}}>
                                         <View style={{ marginTop: '4%', alignItems: 'center'}}>
-                                            <Text style={{fontSize:22, color: "#0C0C54", fontWeight:'bold'}}>Delete Account Confirmation</Text>
+                                            <Text style={{fontFamily: "Lato-Bold", fontSize:22, color: "#0C0C54"}}>Delete Account Confirmation</Text>
                                         </View>
                                         <View style={{marginLeft: '5%', marginTop: '2%', alignItems: 'left', justifyContent:"center", width: '90%'}}>
-                                            <Text style={[{fontSize:16, color: "#676767", fontWeight:'bold'}, Platform.OS == 'ios' ? '' : {fontFamily: "Lato-Regular"}]}>
+                                            <Text style={[{fontFamily: "Lato-Bold", fontSize:16, color: "#676767" }]}>
                                                 By proceeding, you understand that:
                                             </Text>
                                             <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#676767"}}>
@@ -606,7 +601,7 @@ export default class Profile extends Component {
                                             <Text style={{ fontFamily: "Lato-Regular", fontSize:16, color: "#676767", marginTop:'2.3%'}}>
                                                 - This request will be initiated via email to confirm your identity and ensure the security of your account.
                                             </Text>
-                                            <Text style={[{ fontSize:16, color: "#676767", marginTop:'1.7%', fontWeight:'bold' }, Platform.OS == 'ios' ? '' : {fontFamily: "Lato-Regular"}]}>
+                                            <Text style={[{ fontFamily: "Lato-Bold", fontSize:16, color: "#676767", marginTop:'1.7%' }]}>
                                                 Please note:
                                             </Text>
                                             <Text style={{ fontFamily: "Lato-Regular", fontSize:16, color: "#676767"}}>
@@ -631,7 +626,7 @@ export default class Profile extends Component {
                                                     Cancel
                                                 </Text>
                                             </TouchableOpacity>
-                                            <TouchableOpacity info style={{width: '40%', height: '90%', backgroundColor: "#0C0C54", borderRadius: 15, alignSelf: "center", justifyContent: "center",}} onPress={() => { this.sendDeleteMail() }} title={"[email protected]"}>
+                                            <TouchableOpacity info style={{width: '40%', height: '90%', backgroundColor: "#0C0C54", borderWidth: 2, borderRadius: 15, borderColor: "#0C0C54", alignSelf: "center", justifyContent: "center",}} onPress={() => { this.sendDeleteMail() }} title={"[email protected]"}>
                                                 <Text autoCapitalize="words" style={styles.loginButton}>
                                                     Proceed
                                                 </Text>

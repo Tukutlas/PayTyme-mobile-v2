@@ -31,7 +31,7 @@ export default class AboutUs extends Component {
         }
         return (
             <WebView
-                source={{ uri: Platform.OS == 'ios' ? "https://paytyme.com.ng/ios" : "https://paytyme.com.ng" }}
+                source={{ uri: Platform.OS == "ios" ? "https://paytyme.com.ng/ios" : "https://paytyme.com.ng" }}
                 style={{
                     width: '100%',
                     height: 500,

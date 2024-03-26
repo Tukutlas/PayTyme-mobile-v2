@@ -17,7 +17,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
-import * as Font from 'expo-font';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { FontAwesome5, MaterialCommunityIcons} from "@expo/vector-icons";
 export default class Signin extends Component {
@@ -136,7 +135,7 @@ export default class Signin extends Component {
         try {
             if(Platform.OS == 'android'){
                 let result = await LocalAuthentication.authenticateAsync(
-                    { promptMessage: 'Scan your fingerprint.' }
+                    { promptMessage: 'Scan your fingerprint to login.' }
                 );
 
                 if (result.success) {
@@ -148,7 +147,7 @@ export default class Signin extends Component {
                 }   
             }else if(Platform.OS == 'ios'){
                 let result = await LocalAuthentication.authenticateAsync(
-                    { promptMessage: 'Scan your biometrics (TOuch ID or Face ID).' }
+                    { promptMessage: 'Scan your biometrics (Touch ID or Face ID) to login' }
                 );
 
                 if (result.success) {
@@ -175,26 +174,6 @@ export default class Signin extends Component {
     // Function to dismiss the keyboard
     dismissKeyboard = () => {
         Keyboard.dismiss();
-    };
-
-    showAndroidAlert = () => {
-        Alert.alert(
-            'Fingerprint Scan',
-            'Place your finger over the touch sensor and press scan.',
-            [
-                {
-                    text: 'Scan',
-                    onPress: () => {
-                        this.scanFingerprint();
-                    },
-                },
-                {
-                    text: 'Cancel',
-                    onPress: () => { },
-                    style: 'cancel',
-                },
-            ]
-        );
     };
 
     showLoader() {
@@ -489,23 +468,6 @@ export default class Signin extends Component {
                 }
             )
         });
-    }
-
-    async UNSAFE_componentWillMount() {
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-        });
-        this.setState({ fontLoaded: true });
     }
 
     setModalVisible(visible) {

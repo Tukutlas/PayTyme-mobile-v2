@@ -5,7 +5,6 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import styles from "./transaction_styles";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';
-import * as Font from 'expo-font';
 import * as Clipboard from 'expo-clipboard';
 import { CommonActions } from '@react-navigation/native';
 
@@ -50,21 +49,6 @@ export default class SingleTransaction extends Component {
         });
 
         this.getTransaction();
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-            'Lato-Regular': require('../../Fonts/Lato-Regular.ttf')
-        });
-        this.setState({ fontLoaded: true });
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
     }
 

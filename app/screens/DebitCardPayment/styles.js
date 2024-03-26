@@ -8,25 +8,29 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    backgroundColor: Colors.transparent,
-    height: Metrics.HEIGHT * 0.08,
+    alignItems: 'center',
+    width: '100%',
+    // backgroundColor: Colors.transparent,
+    height: '8%',
     borderBottomWidth: 0,
     marginTop: Metrics.HEIGHT * 0.0714,
-    elevation: 0,
+    // elevation: 0,
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    // flexWrap: 'wrap'
   },
 
   left: {
-    alignSelf: "flex-start",
-    paddingLeft: Metrics.WIDTH * 0.02,
-    marginTop: Metrics.HEIGHT * 0.01,
+    // alignSelf: "flex-start",
+    marginLeft: '2%',
+    // marginTop: Metrics.HEIGHT * 0.01,
   },
 
   headerBody: {
-    paddingLeft: Metrics.WIDTH * 0.0550,
-    paddingRight: Metrics.WIDTH * 0.01,
-    width: 220,
+    // justifyContent: 'center',
+    // alignItems: "center",
+    marginLeft: '5%',
+    // paddingRight: Metrics.WIDTH * 0.01,
+    width: '50%',
   },
 
   body: {
@@ -43,15 +47,18 @@ const styles = StyleSheet.create({
   },
 
   right: {
-    alignSelf: "flex-end",
-    paddingLeft: Metrics.WIDTH * 0.85,
-    marginTop: Metrics.HEIGHT * -0.090,
-    width: 79,
+    // alignSelf: "flex-end",
+    marginLeft: '23%',
+    // marginTop: Metrics.HEIGHT * -0.090,
+    width: '10%',
+    height: '100%'
   },
 
   logo: {
-    width: Metrics.HEIGHT * 0.06,
-    height: Metrics.HEIGHT * 0.08,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    width: '80%',
+    height: '100%',
     borderColor: "white",
     borderWidth: 3,
     backgroundColor: '#fff'
@@ -116,13 +123,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#8493d5",
     backgroundColor: "#0C0C54",
-    alignSelf: "center",
+    alignSelf: "flex-end",
     justifyContent: 'center',
-    marginTop: '10%',
-    marginRight: 5,
+    // marginTop: '10%',
+    marginRight: '1%',
     borderRadius: 4,
     width: '30%',
-    height: Metrics.HEIGHT * 0.06
+    height: '100%'
   },
 
   purchaseButton: {
@@ -209,8 +216,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ACACAC',
-    alignItems: 'center',
-    justifyContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
 
   checkedCircle: {

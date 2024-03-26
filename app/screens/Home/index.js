@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import Spinner from "react-native-loading-spinner-overlay";
-import * as Font from 'expo-font';
 import { GlobalVariables } from '../../../global';
 import * as Clipboard from 'expo-clipboard';
 
@@ -50,21 +49,6 @@ export default class Home extends Component {
         if(walletVisibility != null && walletVisibility == "true"){
             this.setWalletVisibility(true)
         }
-
-        await Font.loadAsync({
-            'SFUIDisplay-Medium': require('../../Fonts/ProximaNova-Regular.ttf'),
-            'SFUIDisplay-Light': require('../../Fonts/ProximaNovaThin.ttf'),
-            'SFUIDisplay-Regular': require('../../Fonts/SF-UI-Text-Regular.ttf'),
-            'SFUIDisplay-Semibold': require('../../Fonts/ProximaNovaAltBold.ttf'),
-            'Roboto-Medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto_medium': require('../../Fonts/Roboto-Medium.ttf'),
-            'Roboto-Regular': require('../../Fonts/Roboto-Regular.ttf'),
-            'HelveticaNeue-Bold': require('../../Fonts/HelveticaNeue-Bold.ttf'),
-            'HelveticaNeue-Light': require('../../Fonts/HelveticaNeue-Light.ttf'),
-            'HelveticaNeue-Regular': require('../../Fonts/HelveticaNeue-Regular.ttf'),
-            'Helvetica': require('../../Fonts/Helvetica.ttf'),
-            'Lato-Regular': require('../../Fonts/Lato-Regular.ttf'),
-        });
 
         this.setState({ fontLoaded: true });
 
@@ -263,14 +247,26 @@ export default class Home extends Component {
     }
 
     async checkIfUserHasVirtualAccount(){
-        let showVirtualModal = await AsyncStorage.getItem('showVirtualModal');
-        if(showVirtualModal == 'true'){
-            this.setModalVisible(true)
+        this.setModalVisible(true);
+        if(this.state.tier !== '1'){
+            const lastShownDate = await AsyncStorage.getItem('lastShownDate');
+            if (!lastShownDate) {
+                // Modal hasn't been shown yet
+                this.setModalVisible(true);
+            } else {
+                const currentDate = new Date().toDateString();
+                if (currentDate !== lastShownDate) {
+                    // Current date is different from last shown date
+                    this.setModalVisible(true);
+                }
+            }
         }
     }
 
     closeVirtualAccountModal(){
-        
+        const currentDate = new Date().toDateString();
+        AsyncStorage.setItem('lastShownDate', currentDate);
+        this.setModalVisible(false)
     }
 
     setModalVisible = (visible) => {
@@ -310,7 +306,13 @@ export default class Home extends Component {
 
     copyWalletID(){
         Clipboard.setStringAsync(this.state.wallet_id)
-        ToastAndroid.show('Wallet ID Copied', ToastAndroid.SHORT);
+        if(Platform.OS == 'android'){
+            ToastAndroid.show('Wallet ID Copied', ToastAndroid.SHORT);
+        }
+        // this.setState({copyIcon: 'check'})
+        // setTimeout(()=>{
+        //     this.setState({copyIcon: 'copy'})
+        // }, 5000);
     }
 
     render() {
@@ -473,7 +475,6 @@ export default class Home extends Component {
                         }}
                     >
                     </View>
-                    
                     {
                         this.state.transactions.length === 0?
                         <View style={{alignItems: 'center'}}>
@@ -498,27 +499,27 @@ export default class Home extends Component {
                         <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
                             <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 0, width: '100%', height: '50%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
                                 <View style={{ width: '95%', height: '15%', marginTop:'2%', alignItems:"flex-end" }}>
-                                    <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '40%', width: '6%', alignItems:"center", justifyContent:"center"}} onPress={()=>{this.setState({modalVisible: false})}}>
+                                    <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '40%', width: '6%', alignItems:"center", justifyContent:"center"}} onPress={()=>{this.closeVirtualAccountModal()}}>
                                         <FontAwesome name={'times'} size={18} color={'#0C0C54'} style={{marginTop: '0%', }} />
                                     </TouchableOpacity>
                                 </View>
                                 
                                 <View style={{ marginTop: '0%', alignItems: 'center'}}>
-                                    <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#393636", fontWeight:'600'}}>Register your BVN for better experience</Text>
+                                    <Text style={{fontFamily: "Lato-Bold", fontSize:16, color: "#393636"}}>Register your BVN for better experience</Text>
                                 </View>
                                 <View style={{ marginTop: '2%', alignItems: 'center', justifyContent:"center"}}>
                                     <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}>Kindly note that you would be required to register your BVN to have access to the Virtual account option for wallet funding and other services attached to this option. </Text>
                                 </View>
                                 
                                 <View style={{marginLeft: '3%', marginTop: '10%', }}>
-                                    <TouchableOpacity info style={styles.proceedButton} onPress={() => {this.props.navigation.navigate("CreateVirtualAccount") }}>
+                                    <TouchableOpacity info style={styles.proceedButton} onPress={() => { this.props.navigation.navigate("CreateVirtualAccount") }}>
                                         <Text autoCapitalize="words" style={styles.proceedText}>
                                             Proceed
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={{marginLeft: '3%', marginTop: '-15%', }}>
-                                    <TouchableOpacity info style={styles.skipButton} onPress={() => {this.setState({modalVisible: false}), this.closeVirtualAccountModal()}}>
+                                    <TouchableOpacity info style={styles.skipButton} onPress={() => { this.closeVirtualAccountModal() }}>
                                         <Text autoCapitalize="words" style={styles.skipText}>
                                             Skip for now
                                         </Text>

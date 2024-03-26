@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
+import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 import Signin from './app/screens/Signin';
@@ -40,6 +41,27 @@ import FAQ from './app/screens/Profile/faq';
 import CameraSection from './app/screens/Profile/camera';
 
 SplashScreen.preventAutoHideAsync();
+
+// Preload fonts before rendering components
+async function loadFonts() {
+    await Font.loadAsync({
+        'Bariol': require('./app/Fonts/Bariol.ttf'),
+        'Bariol-Regular': require('./app/Fonts/BariolRegular.ttf'),
+        'SFUIDisplay-Medium': require('./app/Fonts/ProximaNova-Regular.ttf'),
+        'SFUIDisplay-Light': require('./app/Fonts/ProximaNovaThin.ttf'),
+        'SFUIDisplay-Regular': require('./app/Fonts/SF-UI-Text-Regular.ttf'),
+        'SFUIDisplay-Semibold': require('./app/Fonts/ProximaNovaAltBold.ttf'),
+        'Roboto-Medium': require('./app/Fonts/Roboto-Medium.ttf'),
+        'Roboto_medium': require('./app/Fonts/Roboto-Medium.ttf'),
+        'Roboto-Regular': require('./app/Fonts/Roboto-Regular.ttf'),
+        'HelveticaNeue-Bold': require('./app/Fonts/HelveticaNeue-Bold.ttf'),
+        'HelveticaNeue-Light': require('./app/Fonts/HelveticaNeue-Light.ttf'),
+        'HelveticaNeue-Regular': require('./app/Fonts/HelveticaNeue-Regular.ttf'),
+        'Helvetica': require('./app/Fonts/Helvetica.ttf'),
+        'Lato-Regular': require('./app/Fonts/Lato-Regular.ttf'),
+        'Lato-Bold': require('./app/Fonts/Lato-Bold.ttf'),
+    });
+}
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -88,6 +110,7 @@ const Tabs = () => (
 const RootStack = () => {
     useEffect(() => {
         async function prepare() {
+            await loadFonts();
             setTimeout(async () => {
                 await SplashScreen.hideAsync();
             }, 3000);
@@ -135,12 +158,3 @@ const RootStack = () => {
 }
 
 export default RootStack;
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         backgroundColor: '#fff',
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-// });

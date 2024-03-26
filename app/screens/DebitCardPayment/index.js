@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, StatusBar, Image, TouchableOpacity, BackHandler, Alert, View } from 'react-native';
+import { Text, StatusBar, Image, TouchableOpacity, BackHandler, Alert, View, Platform} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { FontAwesome5 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -907,18 +907,18 @@ export default class DebitCardPayment extends Component {
             if (i == 1) {
                 value = "";
                 card_list.push(
-                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.8%', paddingLeft: '5%', borderWidth: 0.5, width: '90%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ primaryCard: true }); this.setState({ secondaryCard: false }); this.setState({ newCard: false }); this.setPaymentCard('primary'); }} key={card.id}>
-                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: true }); this.setState({ secondaryCard: false }); this.setPaymentCard('primary'); this.setState({ newCard: false }); }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.8%', paddingLeft: '5%', borderWidth: 0.5, width: '90%', marginTop: '2%', borderRadius: 20, alignItems: "center" }} onPress={() => { this.setState({ primaryCard: true }); this.setState({ secondaryCard: false }); this.setState({ newCard: false }); this.setPaymentCard('primary'); }} key={card.id}>
+                        <TouchableOpacity style={[{ marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: true }); this.setState({ secondaryCard: false }); this.setPaymentCard('primary'); this.setState({ newCard: false }); }}>
                             <View style={(this.state.primaryCard) ? styles.checkedCircle : styles.circle} />
                         </TouchableOpacity>
 
-                        <View style={{ marginLeft: '3.8%', padding: 7, marginTop: '2.0%' }}>
+                        <View style={{ marginLeft: '3.8%', padding: 7 }}>
                             <Image source={require('../../Images/Bank/default-image.png')} style={{ width: 25, height: 25, marginLeft: -7, borderRadius: 20 }} />
                         </View>
-                        <View style={{ marginLeft: '1%', padding: 7, marginTop: '3.5%' }}>
-                            <Text style={{ fontSize: 13, marginLeft: '2%' }}>{card.bank}{'      ****'}{card.last4}</Text>
+                        <View style={{ marginLeft: '1%', padding: 7, width: '70%' }}>
+                            <Text style={{ fontSize: 13,  }}>{card.bank}{'      ****'}{card.last4}</Text>
                         </View>
-                        <View style={{ marginLeft: '1%', padding: 6, marginTop: '2.0%' }}>
+                        <View style={{ marginLeft: '1%', padding: 6 }}>
                             {card.card_type == 'visa ' || card.card_type == 'visa' ? <Image source={require('../../Images/visa.png')} style={{ width: 45, height: 25, marginLeft: -7, borderRadius: 20 }} /> : ''}
                             {card.card_type == 'mastercard ' || card.card_type == 'mastercard' ? <Image source={require('../../Images/mastercard.png')} style={{ width: 45, height: 25, marginLeft: -7, borderRadius: 20 }} /> : ''}
                         </View>
@@ -926,16 +926,16 @@ export default class DebitCardPayment extends Component {
                 )
             } else if (i == 2) {
                 card_list.push(
-                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.8%', paddingLeft: '5%', borderWidth: 0.5, width: '90%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ primaryCard: false }); this.setState({ secondaryCard: true }); this.setState({ newCard: false }); this.setPaymentCard('secondary'); }} key={card.id}>
-                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: false }); this.setState({ secondaryCard: true }); this.setPaymentCard('secondary'); this.setState({ newCard: false }); }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.8%', paddingLeft: '5%', borderWidth: 0.5, width: '90%', marginTop: '2%', borderRadius: 20, alignItems: "center" }} onPress={() => { this.setState({ primaryCard: false }); this.setState({ secondaryCard: true }); this.setState({ newCard: false }); this.setPaymentCard('secondary'); }} key={card.id}>
+                        <TouchableOpacity style={[{ marginLeft: '-0.5%', paddingLeft: 0.5 }]} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: false }); this.setState({ secondaryCard: true }); this.setPaymentCard('secondary'); this.setState({ newCard: false }); }}>
                             <View style={(this.state.secondaryCard) ? styles.checkedCircle : styles.circle} />
                         </TouchableOpacity>
 
-                        <View style={{ marginLeft: '3.8%', padding: 7, marginTop: '2.0%' }}>
+                        <View style={{ marginLeft: '3.8%', padding: 7 }}>
                             <Image source={require('../../Images/Bank/default-image.png')} style={{ width: 25, height: 25, marginLeft: -7, borderRadius: 20 }} />
                         </View>
-                        <View style={{ marginLeft: '1%', padding: 7, marginTop: '3.5%' }}>
-                            <Text style={{ fontSize: 13, marginLeft: '2%' }}>{card.bank}{'      ****'}{card.last4}</Text>
+                        <View style={{ marginLeft: '1%', padding: 7, width: '70%' }}>
+                            <Text style={{ fontSize: 13,  }}>{card.bank}{'      ****'}{card.last4}</Text>
                         </View>
                         <View style={{ marginLeft: '1%', padding: 6, marginTop: '1.5%' }}>
                             {card.card_type == 'visa ' || card.card_type == 'visa' ? <Image source={require('../../Images/visa.png')} style={{ width: 45, height: 25, marginLeft: 2, borderRadius: 20 }} /> : ''}
@@ -1353,16 +1353,16 @@ export default class DebitCardPayment extends Component {
                 if (i == 1) {
                     value = "";
                     card_list.push(
-                        <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: true, secondaryCard: false }); this.setState({ newCard: false }); this.setPaymentCard('primary'); }} key={card.card_id}>
-                            <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: true, secondaryCard: false }); this.setPaymentCard('primary'); this.setState({ newCard: false }); }}>
+                        <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20, alignItems: "center" }} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: true, secondaryCard: false }); this.setState({ newCard: false }); this.setPaymentCard('primary'); }} key={card.card_id}>
+                            <TouchableOpacity style={[ { marginLeft: '-0.5%', paddingLeft: 0.5  }]} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: true, secondaryCard: false }); this.setPaymentCard('primary'); this.setState({ newCard: false }); }}>
                                 <View style={(this.state.primaryCard) ? styles.checkedCircle : styles.circle} />
                             </TouchableOpacity>
 
-                            <View style={{ marginLeft: '3.8%', padding: 7, marginTop: '2.0%' }}>
+                            <View style={{ marginLeft: '3.8%', padding: 7  }}>
                                 <Image source={require('../../Images/Bank/default-image.png')} style={{ width: 25, height: 25, marginLeft: -7, borderRadius: 20 }} />
                             </View>
-                            <View style={{ marginLeft: '1%', padding: 7, marginTop: '3.5%' }}>
-                                <Text style={{ fontSize: 13, marginLeft: '2%' }}>{card.bank}{'      ****'}{card.last4}</Text>
+                            <View style={{ marginLeft: '1%', padding: 7, width: '70%'  }}>
+                                <Text style={{ fontSize: 13, }}>{card.bank}{'      ****'}{card.last4}</Text>
                             </View>
                             <View style={{ marginLeft: '1%', padding: 6, marginTop: '2.0%' }}>
                                 {card.card_type == 'visa ' || card.card_type == 'visa' || card.card_type == 'VISA' ? <Image source={require('../../Images/visa.png')} style={{ width: 45, height: 25, marginLeft: -7, borderRadius: 20 }} /> : ''}
@@ -1372,18 +1372,18 @@ export default class DebitCardPayment extends Component {
                     )
                 } else if (i == 2) {
                     card_list.push(
-                        <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: false, secondaryCard: true }); this.setState({ newCard: false }); this.setPaymentCard('secondary'); }} key={card.id}>
-                            <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: false, secondaryCard: true }); this.setPaymentCard('secondary'); this.setState({ newCard: false }); }}>
+                        <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20, alignItems: "center"}} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: false, secondaryCard: true }); this.setState({ newCard: false }); this.setPaymentCard('secondary'); }} key={card.id}>
+                            <TouchableOpacity style={[{ marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: card.card_id, primaryCard: false, secondaryCard: true }); this.setPaymentCard('secondary'); this.setState({ newCard: false }); }}>
                                 <View style={(this.state.secondaryCard) ? styles.checkedCircle : styles.circle} />
                             </TouchableOpacity>
 
-                            <View style={{ marginLeft: '3.8%', padding: 7, marginTop: '2.0%' }}>
+                            <View style={{ marginLeft: '3.8%', padding: 7 }}>
                                 <Image source={require('../../Images/Bank/default-image.png')} style={{ width: 25, height: 25, marginLeft: -7, borderRadius: 20 }} />
                             </View>
-                            <View style={{ marginLeft: '1%', padding: 7, marginTop: '3.5%' }}>
-                                <Text style={{ fontSize: 13, marginLeft: '2%' }}>{card.bank}{'      ****'}{card.last4}</Text>
+                            <View style={{ marginLeft: '1%', padding: 7, width: '70%' }}>
+                                <Text style={{ fontSize: 13,  }}>{card.bank}{'      ****'}{card.last4}</Text>
                             </View>
-                            <View style={{ marginLeft: '1%', padding: 6, marginTop: '1.5%' }}>
+                            <View style={{ marginLeft: '1%', padding: 6  }}>
                                 {card.card_type == 'visa ' || card.card_type == 'visa' ? <Image source={require('../../Images/visa.png')} style={{ width: 45, height: 25, marginLeft: 2, borderRadius: 20 }} /> : ''}
                                 {card.card_type == 'mastercard ' || card.card_type == 'mastercard' ? <Image source={require('../../Images/mastercard.png')} style={{ width: 50, height: 30, marginLeft: 2, borderRadius: 20 }} /> : ''}
                             </View>
@@ -1414,7 +1414,7 @@ export default class DebitCardPayment extends Component {
                     </View>
                     <View style={styles.headerBody}>
                         <Text style={styles.body}>Select Cards</Text>
-                        <Text style={styles.text}></Text>
+                        {/* <Text style={styles.text}></Text> */}
                     </View>
                     <View style={styles.right}>
                         <Image style={styles.logo} source={require('../../../assets/logo.png')} />
@@ -1476,56 +1476,56 @@ export default class DebitCardPayment extends Component {
                     ?
                     <View></View>
                     :
-                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({  card_id: '',primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
-                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20, alignItems:'center' }} onPress={() => { this.setState({  card_id: '',primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                        <TouchableOpacity style={[ { marginLeft: '-0.5%', paddingLeft: 0.5 }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
                             <View style={(this.state.newCard) ? styles.checkedCircle : styles.circle} />
                         </TouchableOpacity>
 
-                        <View style={{ marginLeft: '3.8%', padding: 7, marginTop: '2.0%' }}>
+                        <View style={{ marginLeft: '3.8%', padding: 7 }}>
                             <Image source={require('../../Images/Bank/default-image.png')} style={{ width: 25, height: 25, marginLeft: -7, borderRadius: 20 }} />
                         </View>
-                        <View style={{ marginLeft: '1%', padding: 7, marginTop: '3.5%' }}>
-                            <Text style={{ fontSize: 13, marginLeft: '2%' }}>Use another Card</Text>
+                        <View style={{ marginLeft: '1%', padding: 7, width: '70%' }}>
+                            <Text style={{ fontSize: 13,  }}>Use another Card</Text>
                         </View>
                     </TouchableOpacity>
                 }
 
-                {this.state.gatewayValue !== null && (!this.state.there_cards)
+                {/* {this.state.gatewayValue !== null && (!this.state.there_cards)
                     ?
-                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({ card_id: '', primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
-                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20, alignItems:'center' }} onPress={() => { this.setState({ card_id: '', primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                        <TouchableOpacity style={[{ marginLeft: '-0.5%', paddingLeft: 0.5 }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
                             <View style={(this.state.newCard) ? styles.checkedCircle : styles.circle} />
                         </TouchableOpacity>
 
-                        <View style={{ marginLeft: '3.8%', padding: 7, marginTop: '2.0%' }}>
+                        <View style={{ marginLeft: '3.8%', padding: 7 }}>
                             <Image source={require('../../Images/Bank/default-image.png')} style={{ width: 25, height: 25, marginLeft: -7, borderRadius: 20 }} />
                         </View>
-                        <View style={{ marginLeft: '1%', padding: 7, marginTop: '3.5%' }}>
-                            <Text style={{ fontSize: 13, marginLeft: '2%' }}>{this.state.gatewayValue !== null ? 'Use a new Card' : 'Use another card'}</Text>
+                        <View style={{ marginLeft: '1%', padding: 7, width: '70%'}}>
+                            <Text style={{ fontSize: 13,  }}>{this.state.gatewayValue !== null ? 'Use a new Card' : 'Use another Card'}</Text>
                         </View>
                     </TouchableOpacity>
                     : <View></View>
-                }
+                } */}
 
                 {this.state.gatewayValue !== null && (this.state.no_of_acards == 0)
                     ?
-                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20 }} onPress={() => { this.setState({  card_id: '', primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
-                        <TouchableOpacity style={[styles.circle, { marginLeft: '-0.5%', paddingLeft: 0.5, marginTop: '5.7%' }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', marginLeft: '2.5%', paddingLeft: '5%', borderWidth: 0.5, width: '95%', marginTop: '2%', borderRadius: 20, alignItems:'center' }} onPress={() => { this.setState({  card_id: '', primaryCard: false }); this.setState({ secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
+                        <TouchableOpacity style={[{ marginLeft: '-0.5%', paddingLeft: 0.5 }]} onPress={() => { this.setState({ card_id: '', primaryCard: false, secondaryCard: false }); this.setPaymentCard('new'); this.setState({ newCard: true }); }}>
                             <View style={(this.state.newCard) ? styles.checkedCircle : styles.circle} />
                         </TouchableOpacity>
 
-                        <View style={{ marginLeft: '3.8%', padding: 7, marginTop: '2.0%' }}>
+                        <View style={{ marginLeft: '3.8%', padding: 7 }}>
                             <Image source={require('../../Images/Bank/default-image.png')} style={{ width: 25, height: 25, marginLeft: -7, borderRadius: 20 }} />
                         </View>
-                        <View style={{ marginLeft: '1%', padding: 7, marginTop: '3.5%' }}>
-                            <Text style={{ fontSize: 13, marginLeft: '2%' }}>{this.state.gatewayValue !== null ? 'Use a new Card' : 'Use another card'}</Text>
+                        <View style={{ marginLeft: '1%', padding: 7, width: '70%' }}>
+                            <Text style={{ fontSize: 13 }}>{this.state.gatewayValue !== null ? 'Use a new Card' : 'Use another Card'}</Text>
                         </View>
                     </TouchableOpacity>
                     : <View></View>
                 }
                 {this.state.cardError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>{this.state.cardErrorMessage}</Text>}
 
-                <View style={{ marginTop: '90%' }}>
+                <View style={{ marginTop: '40%', height: '6%'}}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => { this.saveCardOption() }}>
                         <Text autoCapitalize="words" style={[styles.purchaseButton]}>
                             Next

@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 },
 
 formCenter: {
-    marginLeft: '4%', // Adjust the padding according to your requirement
+    marginLeft: '2.5%', // Adjust the padding according to your requirement
     width: '95%',
 },
 
@@ -76,7 +76,9 @@ inputitem: {
   borderWidth: 1,
   borderColor: '#ccc',
   borderRadius: 5,
-  height: 40,
+  height: '5%',
+  width: '95%',
+  marginLeft: '2.5%',
   marginTop: '1%',
   backgroundColor: '#F6F6F6',
 },
@@ -91,11 +93,11 @@ labeltext: {
 textBox: {
   fontSize: 13,
   flex: 1,
-  height: 35,
   paddingVertical: 0,
   paddingHorizontal: 10, // Adjust the padding according to your requirement
   borderRadius: 2,
   backgroundColor: '#F6F6F6',
+  width: '100%'
 },
 
 inputIcon: {
@@ -103,13 +105,13 @@ inputIcon: {
 },
 
   dropdown: {
-    minHeight: 40,
+    minHeight: '100%',
     backgroundColor: "#f6f6f6",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#ccc',
-    width: '97%',
-    marginLeft: '1.5%'
+    width: '100%',
+    // marginLeft: '1.5%'
   },
 
   iconStyle:{
