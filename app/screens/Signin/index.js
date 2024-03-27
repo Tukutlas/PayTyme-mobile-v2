@@ -67,7 +67,6 @@ export default class Signin extends Component {
     }
 
     checkIfBiometricIsEnabled = async () => {
-        
         let biometricEnabled = await AsyncStorage.getItem('biometricEnabled');
 
         if (biometricEnabled !== null && biometricEnabled === "true") {
@@ -285,6 +284,9 @@ export default class Signin extends Component {
             //post details to server 
             dis.openProgressbar();
             //this functions posts to the login API ; //#endregion
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
+
             fetch(GlobalVariables.apiURL + "/auth/login",
             {
                 method: 'POST',
@@ -295,10 +297,13 @@ export default class Signin extends Component {
                     + "&password=" + password
                 // <-- Post parameters
             })
-            .then((response) => response.text())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text()
+            })
             .then((responseText) => {
-                // console.log(responseText);
-                // return;
                 dis.closeProgressbar();
                 let response_status = JSON.parse(responseText).status;
                 this.setState({ isProgress: false });
@@ -393,20 +398,43 @@ export default class Signin extends Component {
             })
             .catch((error) => {
                 dis.closeProgressbar();
-                Alert.alert(
-                    'Network Error',
-                    'Couldn\'t connect to our server. Check your network settings and Try Again ',
-                    [
+                if (error.name === 'AbortError') {
+                    console.log('Request timed out');
+                    Alert.alert(
+                        'Network Error',
+                        'Request timed out',
+                        [
+                            {
+                                text: 'OK',
+                                style: 'cancel'
+                            }
+                        ],
                         {
-                            text: 'OK',
-                            style: 'cancel'
+                            cancelable: true
                         }
-                    ],
-                    {
-                        cancelable: true
-                    }
-                )
-                // console.error(error);
+                    )
+                    // Handle timeout error
+                } else {
+                    // console.error('Error:', error);
+                    // Handle other errors
+                    Alert.alert(
+                        'Network Error',
+                        'Couldn\'t connect to our server. Check your network settings and Try Again ',
+                        [
+                            {
+                                text: 'OK',
+                                style: 'cancel'
+                            }
+                        ],
+                        {
+                            cancelable: true
+                        }
+                    )
+                }
+            })
+            .finally(() => {
+                clearTimeout(timeoutId); // Clear the timeout
+                controller.abort(); // Cancel the fetch request
             });
             //end post details to server 
         }
@@ -478,12 +506,10 @@ export default class Signin extends Component {
         StatusBar.setBarStyle("dark-content", true);
         
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#ffff", true);
+            StatusBar.setTranslucent(true);
         }
-        if (!this.state.fontLoaded) {
-            return <View></View>;
-        }
+
         return (
             <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
                 <View style={styles.container}>
@@ -547,7 +573,7 @@ export default class Signin extends Component {
                     <View style={{ flexDirection: 'row', marginTop: '4%', marginBottom: '4%', justifyContent: 'center' }}>
                         <TouchableOpacity>
                             <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14 }]}>
-                                New To Paytyme?
+                                New To PayTyme?
                             </Text>
                         </TouchableOpacity>
 

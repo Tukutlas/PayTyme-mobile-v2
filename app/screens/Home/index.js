@@ -50,8 +50,6 @@ export default class Home extends Component {
             this.setWalletVisibility(true)
         }
 
-        this.setState({ fontLoaded: true });
-
         this.props.navigation.addListener('focus', () => {
             this.loadWalletBalance();
             this.reloadTransactionHistory();
@@ -247,7 +245,6 @@ export default class Home extends Component {
     }
 
     async checkIfUserHasVirtualAccount(){
-        this.setModalVisible(true);
         if(this.state.tier !== '1'){
             const lastShownDate = await AsyncStorage.getItem('lastShownDate');
             if (!lastShownDate) {

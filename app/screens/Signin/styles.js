@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         color: '#222222',
         marginTop: '1%',
         fontSize: 14,
-        fontFamily: 'Roboto-Medium',
+        fontFamily: "Roboto-Medium",
     },
     
     textBox: {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     },
 
     loginbutton: {
-        fontFamily: Fonts.type.robotoMedium,
+        fontFamily: "Roboto-Medium",
         color: "#fff",
         alignSelf: "center"
     },
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     },
     txtsingIn: {
         fontSize: 25,
-        fontFamily: Fonts.robotoRegular,
+        fontFamily: "Roboto-Regular",
         justifyContent: "center",
         color: "#fff",
         alignSelf: "center",

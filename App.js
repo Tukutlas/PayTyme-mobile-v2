@@ -45,19 +45,17 @@ SplashScreen.preventAutoHideAsync();
 // Preload fonts before rendering components
 async function loadFonts() {
     await Font.loadAsync({
-        'Bariol': require('./app/Fonts/Bariol.ttf'),
-        'Bariol-Regular': require('./app/Fonts/BariolRegular.ttf'),
-        'SFUIDisplay-Medium': require('./app/Fonts/ProximaNova-Regular.ttf'),
-        'SFUIDisplay-Light': require('./app/Fonts/ProximaNovaThin.ttf'),
-        'SFUIDisplay-Regular': require('./app/Fonts/SF-UI-Text-Regular.ttf'),
-        'SFUIDisplay-Semibold': require('./app/Fonts/ProximaNovaAltBold.ttf'),
         'Roboto-Medium': require('./app/Fonts/Roboto-Medium.ttf'),
-        'Roboto_medium': require('./app/Fonts/Roboto-Medium.ttf'),
         'Roboto-Regular': require('./app/Fonts/Roboto-Regular.ttf'),
-        'HelveticaNeue-Bold': require('./app/Fonts/HelveticaNeue-Bold.ttf'),
-        'HelveticaNeue-Light': require('./app/Fonts/HelveticaNeue-Light.ttf'),
-        'HelveticaNeue-Regular': require('./app/Fonts/HelveticaNeue-Regular.ttf'),
-        'Helvetica': require('./app/Fonts/Helvetica.ttf'),
+        'Roboto-Bold': require('./app/Fonts/Roboto-Bold.ttf'),
+        'SFUIDisplay-Medium': require('./app/Fonts/ProximaNova-Regular.ttf'),
+        // 'SFUIDisplay-Light': require('./app/Fonts/ProximaNovaThin.ttf'),
+        // 'SFUIDisplay-Regular': require('./app/Fonts/SF-UI-Text-Regular.ttf'),
+        // 'SFUIDisplay-Semibold': require('./app/Fonts/ProximaNovaAltBold.ttf'),
+        // 'HelveticaNeue-Bold': require('./app/Fonts/HelveticaNeue-Bold.ttf'),
+        // 'HelveticaNeue-Light': require('./app/Fonts/HelveticaNeue-Light.ttf'),
+        // 'HelveticaNeue-Regular': require('./app/Fonts/HelveticaNeue-Regular.ttf'),
+        // 'Helvetica': require('./app/Fonts/Helvetica.ttf'),
         'Lato-Regular': require('./app/Fonts/Lato-Regular.ttf'),
         'Lato-Bold': require('./app/Fonts/Lato-Bold.ttf'),
     });

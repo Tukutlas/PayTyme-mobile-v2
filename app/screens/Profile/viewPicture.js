@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {StatusBar, TouchableOpacity, Image, View, Text, Platform, BackHandler} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Spinner from "react-native-loading-spinner-overlay";
 import { FontAwesome } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';
 import { CommonActions } from '@react-navigation/native';
@@ -15,13 +16,15 @@ export default class ViewPicture extends Component {
             fileSize: null,
             fileMimeType: null,
             image: null,
+            isLoading: false
         };
     }
     
     async UNSAFE_componentWillMount(){
         try {  
             this.setState({auth_token:JSON.parse( 
-            await AsyncStorage.getItem('login_response')).user.access_token});
+                await AsyncStorage.getItem('login_response')).user.access_token
+            });
             this.getUserPicture();
             BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         } 
@@ -51,11 +54,12 @@ export default class ViewPicture extends Component {
     };
 
     uploadPicture = async () => {
+        this.setState({isLoading:true});
         const picture = this.props.route.params.image;
         const formData = new FormData();
         formData.append('image', {uri: picture.uri, name: picture.name, type: picture.mimeType, size: picture.size});
         //upload picture to API
-        let upload = await fetch(GlobalVariables.apiURL+"/user/profile-picture",
+        fetch(GlobalVariables.apiURL+"/user/profile-picture",
         { 
             method: 'POST',
             headers: new Headers({
@@ -110,8 +114,10 @@ export default class ViewPicture extends Component {
                             })                            
                         );
                     }else if(response_status == false){
+                        this.setState({isLoading:false});
                         alert("An error Occured");
                     }else if(response_status == 'error'){
+                        this.setState({isLoading:false});
                         Alert.alert(
                             'Session Out',
                             'Your session has timed-out. Login and try again',
@@ -127,12 +133,13 @@ export default class ViewPicture extends Component {
                     }
                 })
                 .catch((error) => {
+                    this.setState({isLoading:false});
                     alert("Network error. Please check your connection settings");
                 });
             }else {
+                this.setState({isLoading:false});
                 alert("File didn't upload");
             }
-            
         })
         .catch((error) => {
             this.setState({isLoading:false});
@@ -150,6 +157,7 @@ export default class ViewPicture extends Component {
 
         return (
             <View style={{flex: 1, backgroundColor:"#0C0C54"}}>
+                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>
                 <View style={{marginTop:'40%'}}>
                     <Image style={{width:'80%', height:'70%', marginLeft:'10%', borderRadius:145}} source={{ uri: this.state.image}}/> 
                 </View>
@@ -159,7 +167,7 @@ export default class ViewPicture extends Component {
                     </TouchableOpacity>
                     
                     <TouchableOpacity style={{color: 'white', marginLeft: '22%'}}>
-                        <FontAwesome name={'rotate-left'} color={'white'} size={15} />
+                        <FontAwesome name={'rotate-left'} color={'#0C0C54'} size={15} />
                     </TouchableOpacity>
                     <TouchableOpacity style={{color: 'white', marginLeft: '22%'}} onPress={() => {this.uploadPicture()}}>
                         <Text style={{color: 'white', marginLeft: '0%', fontSize: 15}}>Done</Text>
