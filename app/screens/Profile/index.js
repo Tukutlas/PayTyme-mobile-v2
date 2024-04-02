@@ -415,27 +415,27 @@ export default class Profile extends Component {
                             </View>
                         </View>
                         <View style={[styles.body,{}]}>
-                            <View style={{flexDirection:'row', marginLeft: '2%'}}>
-                                <FontAwesome5 name={'user-alt'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
+                            <View style={{flexDirection:'row', marginLeft: '2%', justifyContent:'flex-start'}}>
+                                <FontAwesome5 name={'user-alt'} color={'#120A47'} size={16} style={{ alignSelf:'center' }}/> 
                                 <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%', width:'30%'}}>Name</Text>
                                 <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', width:'60%', textAlign: 'center'}}>{this.state.fullname}</Text>
                             </View>
-                            <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
-                                <FontAwesome5 name={'wallet'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
+                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
+                                <FontAwesome5 name={'wallet'} color={'#120A47'} size={15} style={{ alignSelf:'center'}}/> 
                                 <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%', width:'30%'}}>Wallet ID</Text>
                                 <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'7%', width:'40%', textAlign: 'right'}}>{this.state.wallet_id}</Text>
                             </View>
                             
-                            <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
+                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
                                 <TouchableOpacity onPress={()=>{this.props.navigation.navigate("ForgotPassword")}} style={{marginLeft:'0%', flexDirection:'row'}}>
-                                    <FontAwesome5 name={'lock'} color={'#120A47'} size={15} style={{marginTop:2}}/>
+                                    <FontAwesome5 name={'lock'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/>
                                     <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>Change Password</Text>
                                     <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'24%'}}/> 
                                 </TouchableOpacity>
                             </View>
                             
-                            <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
-                                <FontAwesome5 name={'fingerprint'} color={'#120A47'} size={15} style={{marginTop:2}}/>
+                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
+                                <FontAwesome5 name={'fingerprint'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/>
                                 <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%',width:'40%'}}>Biometric Login</Text>
                                 <Switch
                                     trackColor={{ false: "", true: "#120A47" }}
@@ -455,48 +455,44 @@ export default class Profile extends Component {
                                 }}
                             >
                             </View>
-                            <View style={{flexDirection:'row', marginTop: '4%'}}>
+                            <View style={{flexDirection:'row', marginTop: '3%'}}>
                                 <TouchableOpacity onPress={()=>{this.props.navigation.navigate("AboutUs")}} style={{marginLeft:'2%', flexDirection:'row'}}>
-                                    <FontAwesome5 name={'info-circle'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
+                                    <FontAwesome5 name={'info-circle'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/> 
                                     <Text style={{fontSize:19, fontWeight:'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>About PayTyme</Text>
                                     <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'23.4%'}}/> 
                                 </TouchableOpacity>
                             </View>
-                            <View style={{flexDirection:'row', marginTop:'4%'}}>
+                            <View style={{flexDirection:'row', marginTop:'3%'}}>
                                 <TouchableOpacity onPress={()=>{this.handleRateButtonPress()}} style={{marginLeft:'2%', flexDirection:'row'}}>
-                                    <FontAwesome5 name={'user-alt'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
+                                    <FontAwesome5 name={'user-alt'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/> 
                                     <Text style={{fontSize:19, fontWeight: 'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>Rate the app</Text>
                                     <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'23.4%'}}/> 
                                 </TouchableOpacity>
                             </View>
-                            <View style={{flexDirection:'row', marginTop:'4%'}}>
+                            <View style={{flexDirection:'row', marginTop:'3%'}}>
                                 <TouchableOpacity onPress={()=>{this.handleShareLink()}} style={{marginLeft:'2%', flexDirection:'row'}}>
-                                    <FontAwesome5 name={'share-alt'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
+                                    <FontAwesome5 name={'share-alt'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/> 
                                     <Text style={{fontSize:19, fontWeight: 'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>Invite Friends</Text>
                                     <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'24%'}}/> 
                                 </TouchableOpacity>
                             </View>
-                            <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
+                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
                                 <TouchableOpacity onPress={()=>{this.props.navigation.navigate("Faq")}} style={{marginLeft:'0%', flexDirection:'row'}}>
-                                    <FontAwesome5 name={'question-circle'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
+                                    <FontAwesome5 name={'question-circle'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/> 
                                     <Text style={{fontSize:19, fontWeight:'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>FAQs</Text>
                                     <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'23%'}}/> 
                                 </TouchableOpacity>
                             </View>
-                            {
-                                Platform.OS == 'ios' ? 
-                                <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
-                                    {/* <TouchableOpacity onPress={()=>{this.props.navigation.navigate("ContactUs")}} style={{marginLeft:'0%', flexDirection:'row'}}> */}
-                                    <TouchableOpacity onPress={()=>{ this.setState({deleteModalVisible: true}) }} style={{marginLeft:'0%', flexDirection:'row'}}>
-                                        <FontAwesome5 name={'trash'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
-                                        <Text style={{fontSize:19, fontWeight:'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>Delete Account</Text>
-                                        <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'23%'}}/> 
-                                    </TouchableOpacity>
-                                </View>
-                                : <></>
-                            }
-                            <View style={{flexDirection:'row', marginTop: '4%', marginLeft: '2%'}}>
-                                <FontAwesome5 name={'info-circle'} color={'#120A47'} size={15} style={{marginTop:2}}/> 
+                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
+                                {/* <TouchableOpacity onPress={()=>{this.props.navigation.navigate("ContactUs")}} style={{marginLeft:'0%', flexDirection:'row'}}> */}
+                                <TouchableOpacity onPress={()=>{ this.setState({deleteModalVisible: true}) }} style={{marginLeft:'0%', flexDirection:'row'}}>
+                                    <FontAwesome5 name={'trash'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/> 
+                                    <Text style={{fontSize:19, fontWeight:'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>Delete Account</Text>
+                                    <FontAwesome name={'angle-right'} color={'#120A47'} size={20} style={{marginLeft:'23%'}}/> 
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
+                                <FontAwesome5 name={'info-circle'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/> 
                                 <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%'}}>Version 1.0</Text>
                             </View>
                         </View>

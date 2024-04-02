@@ -5,7 +5,7 @@ module.exports = StyleSheet.create({
     container: {
         // flex: 1,
         backgroundColor: "#E0EBEC",
-        height: "100%"
+        height: "100%",
     },
 
     header: {
@@ -14,11 +14,28 @@ module.exports = StyleSheet.create({
         borderTopWidth: 0,
         elevation: 0,
         alignItems: 'center',
-        height: "25%"
+        height: "27%",
+        minHeight: Metrics.HEIGHT * 0.30,
+        paddingHorizontal: 20,
         // flexDirection: 'row',
         // flexWrap: 'wrap',
         // justifyContent: 'center',
 
+    },
+
+    left: {
+        alignSelf: "flex-start",
+        marginLeft: '1%',
+        marginTop: '13%'
+    },
+
+    profileImage: {
+        width: Metrics.HEIGHT * 0.10,
+        height: Metrics.HEIGHT * 0.10,
+        borderColor: "white",
+        borderWidth: 0,
+        backgroundColor: '#fff',
+        borderRadius: 37,
     },
 
     body: {
@@ -39,15 +56,27 @@ module.exports = StyleSheet.create({
         width: '60%'
     },
 
-    profileImage: {
-        width: Metrics.HEIGHT * 0.10,
-        height: Metrics.HEIGHT * 0.10,
-        borderColor: "white",
-        borderWidth: 0,
-        backgroundColor: '#fff',
-        borderRadius: 37,
+    buttonSkip: {
+        width: '40%', 
+        height: '100%', 
+        borderRadius: 15, 
+        borderWidth: 2, 
+        borderColor: "#0C0C54", 
+        alignSelf: "center", 
+        justifyContent: "center", 
+        marginRight: '5%'
     },
 
+    buttonVerify: {
+        // borderWidth: 1,
+        // borderColor: "#0C0C54",
+        backgroundColor: "#0C0C54",
+        alignSelf: "center",
+        justifyContent: 'center',
+        height: '100%',
+        borderRadius: 15,
+        width: '40%'
+    },
 
     grid: {
         flexDirection: 'row',
@@ -77,7 +106,7 @@ module.exports = StyleSheet.create({
         flexWrap: 'wrap',
         // backgroundColor: '#fff',
         width: '97%',
-        paddingTop: 0,
+        // paddingTop: 0,
     },
 
     formCenter: {

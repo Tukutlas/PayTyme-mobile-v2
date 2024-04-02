@@ -1,16 +1,5 @@
 import React, { Component } from "react";
-import {
-    Image,
-    View,
-    StatusBar,
-    Platform,
-    TouchableOpacity,
-    Alert,
-    Text,
-    TextInput,
-    Keyboard,
-    TouchableWithoutFeedback, 
-    Linking
+import { Image, View, StatusBar, Platform, TouchableOpacity, Alert, Text, TextInput, Keyboard, TouchableWithoutFeedback, Linking, BackHandler 
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Screen Styles
@@ -48,11 +37,10 @@ export default class Signin extends Component {
     }
 
     async componentDidMount() {
-        setTimeout(async () => {
-            // await SplashScreen.hideAsync();
-            this.checkDeviceForHardware();
+        this.checkDeviceForHardware();
+        setTimeout(async () => {    
             this.checkIfBiometricIsEnabled();
-        }, 3000);
+        }, 2000);
         // this.checkForFingerprints();
         // let hasfingerprint = await LocalAuthentication.isEnrolledAsync();
         // this.setState({ hasfingerprint });
@@ -64,7 +52,21 @@ export default class Signin extends Component {
             'keyboardDidHide',
             this.handleKeyboardDidHide
         );
+
+        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
     }
+
+    backPressed = () => {
+        Alert.alert('Exit App', 'Are you sure you want to exit?', [
+            {
+                text: 'Cancel',
+                onPress: () => null,
+                style: 'cancel',
+            },
+            { text: 'Exit', onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+    };
 
     checkIfBiometricIsEnabled = async () => {
         let biometricEnabled = await AsyncStorage.getItem('biometricEnabled');
@@ -287,23 +289,18 @@ export default class Signin extends Component {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
 
-            fetch(GlobalVariables.apiURL + "/auth/login",
-            {
+            fetch(GlobalVariables.apiURL + "/auth/login", {
                 method: 'POST',
                 headers: new Headers({
                     'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                 }),
-                body: "email_address=" + email
-                    + "&password=" + password
-                // <-- Post parameters
+                body: "email_address=" + email + "&password=" + password // <-- Post parameters
             })
-            .then((response) => {
+            .then(async (response) => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                return response.text()
-            })
-            .then((responseText) => {
+                const responseText = await response.text();
                 dis.closeProgressbar();
                 let response_status = JSON.parse(responseText).status;
                 this.setState({ isProgress: false });
@@ -333,17 +330,15 @@ export default class Signin extends Component {
                     if (this.state.compatible) {
                         this.setPersonalDetails(email, password)
                     }
-                    if(tier == '0'){
+                    if (tier == '0') {
                         this.setItemValue('showVirtualModal', true)
-                    }else{
+                    } else {
                         this.setItemValue('showVirtualModal', false)
                     }
                     //remove previous records: 
                     this.removeItemValue("login_response");
 
-                    this._storeUserData(
-                        response
-                    );
+                    this._storeUserData(response);
 
                     this.setState({ modalVisible1: false });
                     //Go to main dashboard
@@ -351,7 +346,7 @@ export default class Signin extends Component {
                     this.props.navigation.navigate("Tabs");
                 } else {
                     let account_status = JSON.parse(responseText).account_status;
-                    if(account_status == 'disabled'){
+                    if (account_status == 'disabled') {
                         Alert.alert(
                             'Oops',
                             JSON.parse(responseText).message,
@@ -363,14 +358,14 @@ export default class Signin extends Component {
                             ],
                             { cancelable: false },
                         );
-                    }else if(account_status == 'unverified'){
+                    } else if (account_status == 'unverified') {
                         Alert.alert(
                             'Oops',
                             JSON.parse(responseText).message,
                             [
                                 {
                                     text: 'Ok',
-                                    onPress: () => {  
+                                    onPress: () => {
                                         this.verifyAccount(JSON.parse(responseText).data.phone);
                                     },
                                     style: 'cancel',
@@ -378,7 +373,7 @@ export default class Signin extends Component {
                             ],
                             { cancelable: false },
                         );
-                    }else {
+                    } else {
                         Alert.alert(
                             'Oops',
                             'Invalid Login Credentials',
@@ -391,8 +386,7 @@ export default class Signin extends Component {
                             { cancelable: false },
                         );
                     }
-                    //sign in was not sucessful
-                    
+                    //sign in was not successful
                     dis.closeProgressbar();
                 }
             })
@@ -436,7 +430,8 @@ export default class Signin extends Component {
                 clearTimeout(timeoutId); // Clear the timeout
                 controller.abort(); // Cancel the fetch request
             });
-            //end post details to server 
+            //end post details to server
+
         }
     }
 

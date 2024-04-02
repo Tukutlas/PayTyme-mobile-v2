@@ -29,14 +29,14 @@ const styles = StyleSheet.create({
     width: 220,
   },
 
-  body:{
+  body: {
     fontFamily: "Roboto-Regular",
     color: "black",
     fontSize: 24,
-    fontWeight:'bold'
+    fontWeight: 'bold'
   },
 
-  text:{
+  text: {
     fontFamily: "Roboto-Regular",
     color: "black",
     fontSize: 14,
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     height: Metrics.HEIGHT * 0.08,
     borderColor: "white",
     borderWidth: 3,
-    backgroundColor:'#fff'
+    backgroundColor: '#fff'
   },
 
   formLine: {
@@ -63,46 +63,46 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     width: '97%',
     paddingTop: 0,
-},
+  },
 
-formCenter: {
+  formCenter: {
     marginLeft: '2.5%', // Adjust the padding according to your requirement
     width: '95%',
-},
+  },
 
-inputitem: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  borderWidth: 1,
-  borderColor: '#ccc',
-  borderRadius: 5,
-  height: '5%',
-  width: '95%',
-  marginLeft: '2.5%',
-  marginTop: '1%',
-  backgroundColor: '#F6F6F6',
-},
+  inputitem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    height: '5%',
+    width: '95%',
+    marginLeft: '2.5%',
+    marginTop: '1%',
+    backgroundColor: '#F6F6F6',
+  },
 
-labeltext: {
-  color: '#222222',
-  marginTop: '1%',
-  fontSize: 14,
-  fontFamily: 'Roboto-Medium',
-},
+  labeltext: {
+    color: '#222222',
+    marginTop: '1%',
+    fontSize: 14,
+    fontFamily: 'Roboto-Medium',
+  },
 
-textBox: {
-  fontSize: 13,
-  flex: 1,
-  paddingVertical: 0,
-  paddingHorizontal: 10, // Adjust the padding according to your requirement
-  borderRadius: 2,
-  backgroundColor: '#F6F6F6',
-  width: '100%'
-},
+  textBox: {
+    fontSize: 13,
+    flex: 1,
+    paddingVertical: 0,
+    paddingHorizontal: 10, // Adjust the padding according to your requirement
+    borderRadius: 2,
+    backgroundColor: '#F6F6F6',
+    width: '100%'
+  },
 
-inputIcon: {
-  marginHorizontal: 10, // Adjust the margin according to your requirement
-},
+  inputIcon: {
+    marginHorizontal: 10, // Adjust the margin according to your requirement
+  },
 
   dropdown: {
     minHeight: '100%',
@@ -114,16 +114,16 @@ inputIcon: {
     // marginLeft: '1.5%'
   },
 
-  iconStyle:{
+  iconStyle: {
     width: 150,
     height: 32,
   },
 
-  iconStyle2:{
+  iconStyle2: {
     width: 30,
     height: 30
   },
-  
+
   buttonPurchase: {
     borderWidth: 1,
     borderColor: "#8493d5",
@@ -143,8 +143,8 @@ inputIcon: {
     alignSelf: "center"
   },
 
-  input:{
-    paddingLeft:'2%',
+  input: {
+    paddingLeft: '2%',
   },
 
   buttonImage: {
@@ -153,40 +153,40 @@ inputIcon: {
     width: '5%'
   },
 
-  grid:{
-    flexDirection:'row',
-    padding:1,
-    width:'100%',
+  grid: {
+    flexDirection: 'row',
+    padding: 1,
+    width: '100%',
     // marginTop: 50
     paddingTop: Metrics.HEIGHT * 0.015,
   },
 
-  flexx:{
-    height:60,
-    justifyContent:'center',
-    alignItems:'center',
-    margin:'4%',
-    elevation:8,
-    flex:3,
-    borderRadius:10,
-    backgroundColor:'#E0EBEC'
+  flexx: {
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '4%',
+    elevation: 8,
+    flex: 3,
+    borderRadius: 10,
+    backgroundColor: '#E0EBEC'
   },
 
-  flexa:{
-    height:20,
-    justifyContent:'center',
-    alignItems:'center',
-    margin:'4%',
-    elevation:8,
-    flex:3,
-    borderRadius:10,
-    backgroundColor:'#E0EBEC'
+  flexa: {
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '4%',
+    elevation: 8,
+    flex: 3,
+    borderRadius: 10,
+    backgroundColor: '#E0EBEC'
   },
 
-  grida:{
-    flexDirection:'row',
-    padding:1,
-    width:'90%',
+  grida: {
+    flexDirection: 'row',
+    padding: 1,
+    width: '90%',
     marginTop: 15,
     // marginLeft: -20
     // marginRight: Metrics.WIDTH * 0.2
@@ -195,23 +195,50 @@ inputIcon: {
   circle: {
     height: 20,
     width: 20,
-    borderRadius: 10,  
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ACACAC',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  checkedCircle: {  
+  checkedCircle: {
     width: 14,
     height: 14,
     borderRadius: 7,
     backgroundColor: '#445cc4',
   },
 
-  buttonpaymentmethod:{
-   borderWidth:4,
-   borderColor:'#f5f5f5'
+  buttonpaymentmethod: {
+    borderWidth: 4,
+    borderColor: '#f5f5f5'
+  },
+
+  proceedButton: {
+    backgroundColor: "#0C0C54",
+    alignSelf: "center",
+    justifyContent: "center",
+    height: '31%',
+    borderRadius: 15,
+    width: Metrics.WIDTH * 0.71
+  },
+
+  proceedText: {
+    fontFamily: 'Roboto-Medium',
+    color: "#fff",
+    alignSelf: "center"
+  },
+
+  skipButton: {
+    alignSelf: "center",
+    borderRadius: 15,
+    width: Metrics.WIDTH * 0.71
+  },
+
+  skipText: {
+    fontFamily: 'Roboto-Medium',
+    // color: "#fff",
+    alignSelf: "center"
   },
 
 });

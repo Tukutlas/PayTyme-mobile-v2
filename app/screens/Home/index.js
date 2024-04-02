@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, StatusBar, Modal, TouchableOpacity, Image, View, Text, Platform, ToastAndroid } from 'react-native';
+import { Alert, StatusBar, Modal, TouchableOpacity, Image, View, Text, Platform, ToastAndroid, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
@@ -59,8 +59,21 @@ export default class Home extends Component {
             this.loadWalletBalance();
             this.reloadTransactionHistory();
         }, 120000); // 2 minutes interval
+
+        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
     }
 
+    backPressed = () => {
+        Alert.alert('Log Out', 'Are you sure you want to log out?', [
+            {
+                text: 'Cancel',
+                onPress: () => null,
+                style: 'cancel',
+            },
+            { text: 'Yes, Log out', onPress: () => this.props.navigation.navigate("Signin") },
+        ]);
+        return true;
+    };
     componentWillUnmount() {
         // Clear the interval when the component is unmounted to avoid memory leaks
         clearInterval(this.reloadInterval);
@@ -245,16 +258,18 @@ export default class Home extends Component {
     }
 
     async checkIfUserHasVirtualAccount(){
-        if(this.state.tier !== '1'){
-            const lastShownDate = await AsyncStorage.getItem('lastShownDate');
-            if (!lastShownDate) {
-                // Modal hasn't been shown yet
-                this.setModalVisible(true);
-            } else {
-                const currentDate = new Date().toDateString();
-                if (currentDate !== lastShownDate) {
-                    // Current date is different from last shown date
+        if(Platform.OS == 'android'){
+            if(this.state.tier !== '1'){
+                const lastShownDate = await AsyncStorage.getItem('lastShownDate');
+                if (!lastShownDate) {
+                    // Modal hasn't been shown yet
                     this.setModalVisible(true);
+                } else {
+                    const currentDate = new Date().toDateString();
+                    if (currentDate !== lastShownDate) {
+                        // Current date is different from last shown date
+                        this.setModalVisible(true);
+                    }
                 }
             }
         }
@@ -488,15 +503,12 @@ export default class Home extends Component {
                         animationType="slide"
                         transparent={true}
                         visible={this.state.modalVisible}
-                        onRequestClose={() => {
-                            // setModalVisible(!modalVisible);
-                            this.setState({modalVisible: false})
-                        }}
+                        onRequestClose={()=> this.setState({modalVisible: false})}
                     >
                         <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
                             <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 0, width: '100%', height: '50%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
                                 <View style={{ width: '95%', height: '15%', marginTop:'2%', alignItems:"flex-end" }}>
-                                    <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '40%', width: '6%', alignItems:"center", justifyContent:"center"}} onPress={()=>{this.closeVirtualAccountModal()}}>
+                                    <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '40%', width: '6%', alignItems:"center", justifyContent:"center"}} onPress={()=> this.closeVirtualAccountModal()}>
                                         <FontAwesome name={'times'} size={18} color={'#0C0C54'} style={{marginTop: '0%', }} />
                                     </TouchableOpacity>
                                 </View>
@@ -509,14 +521,14 @@ export default class Home extends Component {
                                 </View>
                                 
                                 <View style={{marginLeft: '3%', marginTop: '10%', }}>
-                                    <TouchableOpacity info style={styles.proceedButton} onPress={() => { this.props.navigation.navigate("CreateVirtualAccount") }}>
+                                    <TouchableOpacity info style={styles.proceedButton} onPress={()=> this.props.navigation.navigate("CreateVirtualAccount") }>
                                         <Text autoCapitalize="words" style={styles.proceedText}>
                                             Proceed
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={{marginLeft: '3%', marginTop: '-15%', }}>
-                                    <TouchableOpacity info style={styles.skipButton} onPress={() => { this.closeVirtualAccountModal() }}>
+                                    <TouchableOpacity info style={styles.skipButton} onPress={()=> this.closeVirtualAccountModal() }>
                                         <Text autoCapitalize="words" style={styles.skipText}>
                                             Skip for now
                                         </Text>

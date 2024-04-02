@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import {StatusBar, TouchableOpacity, ScrollView, Image, Alert, View, Text, Platform, TextInput} from 'react-native';
+import {StatusBar, TouchableOpacity, ScrollView, Image, Alert, View, Text, Platform, TextInput, Keyboard, BackHandler} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import styles from "./createStyles";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';
 import { OtpInput } from "react-native-otp-entry";
+import { Metrics } from "../../Themes";
 
 export default class CreateVirtualAccount extends Component {
     constructor(props, context) {
@@ -48,15 +49,28 @@ export default class CreateVirtualAccount extends Component {
         if(JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null){
             this.setState({profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image})
         }
+
+        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
+
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this.handleKeyboardDidShow
+        );
+
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this.handleKeyboardDidHide
+        );
     }
-    
-    setModalVisible = (visible) => {
-        this.setState({ modalVisible: visible });
-    }
+
+    backPressed = () => {
+        this.props.navigation.navigate('WalletTopUp');
+        return true;  
+    };
     
     noopChange() {
         this.setState({
-          changeVal: Math.random()
+            changeVal: Math.random()
         });
     }
     
@@ -110,6 +124,7 @@ export default class CreateVirtualAccount extends Component {
     };
 
     verifyBVN(){
+        Keyboard.dismiss();
         let identity_number = this.state.bvn
         if (identity_number == '') {
             this.setState({bvnError: true, bvnErrorMessage: 'Please Kindly insert your BVN'})
@@ -364,20 +379,40 @@ export default class CreateVirtualAccount extends Component {
             });   
         }
     }
+
+    cancel(){
+        this.setState({verify:false, input:true, isLoading:false});
+    }
     
-    render(){
+    handleKeyboardDidShow = () => {
+        this.statusBar()
+    };
+
+    handleKeyboardDidHide = () => {
+        this.statusBar()
+    };
+
+    statusBar = () => {
         StatusBar.setBarStyle("light-content", true);  
-    
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#120A47", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#120A47", true);
+            StatusBar.setTranslucent(true);
         }
+    }
+
+    render(){
+        this.statusBar()
 
         return (
             <View style={styles.container}>
                 <Spinner visible={this.state.isLoading} textContent={this.state.spinnerText} color={'blue'} textStyle={{fontStyle:"italic", color:'white', fontSize: 16, fontWeight:'normal'}} /> 
                 <View style={styles.header}> 
-                    <View style={{marginLeft:'0%', marginTop:'15%'}}>
+                    <View style={styles.left}>
+                        <TouchableOpacity onPress={() =>this.backPressed()}>
+                            <FontAwesome5 name={'arrow-left'} size={20} color={'#fff'} />
+                        </TouchableOpacity>
+                    </View> 
+                    <View style={{marginTop:'-1%'}}>
                         {
                             this.state.profilePicture != null ? 
                             <Image style={styles.profileImage} source={{uri:this.state.profilePicture}}/> 
@@ -442,17 +477,23 @@ export default class CreateVirtualAccount extends Component {
                     }
                     {
                         this.state.input ? 
-                        <View style={{ marginTop: '40%', marginBottom: '45%', height:'30%' }}>
-                            <TouchableOpacity style={styles.buttonPurchase} onPress={() => {this.verifyBVN()}}>
-                                <Text style={{ color: 'white', alignSelf: 'center' }}>Continue</Text>
+                        <View style={{ marginTop: '40%', height:'9%',  flexDirection:'row', alignSelf:'center'}}>
+                            <TouchableOpacity style={styles.buttonSkip} onPress={() => {this.backPressed()}}>
+                                <Text style={{ color: "#0C0C54", alignSelf: 'center', fontFamily: 'Roboto-Medium' }}>Back</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.buttonVerify} onPress={() => {this.verifyBVN()}}>
+                                <Text style={{ color: 'white', alignSelf: 'center', fontFamily: 'Roboto-Medium' }}>Verify</Text>
                             </TouchableOpacity>
                         </View>
                         :''
                     }
                     {
                         this.state.verify ? 
-                        <View style={{ marginTop: '40%', marginBottom: '45%', height:'30%' }}>
-                            <TouchableOpacity style={styles.buttonPurchase} onPress={() => {this.verifyBVNOtp()}}>
+                        <View style={{ marginTop: '27%', height:'9%', minHeight: Metrics.HEIGHT * 0.07, flexDirection:'row', alignSelf:'center'}}>
+                            <TouchableOpacity style={styles.buttonSkip} onPress={() => {this.cancel()}}>
+                                <Text style={{ color: "#0C0C54", alignSelf: 'center', fontFamily: 'Roboto-Medium' }}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.buttonVerify} onPress={() => {this.verifyBVNOtp()}}>
                                 <Text style={{ color: 'white', alignSelf: 'center' }}>Continue</Text>
                             </TouchableOpacity>
                         </View>

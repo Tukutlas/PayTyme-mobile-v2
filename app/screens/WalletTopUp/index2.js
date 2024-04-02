@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Image, View, StatusBar, TouchableOpacity, BackHandler, Text, TextInput , Platform} from "react-native";
+import { Image, View, StatusBar, TouchableOpacity, BackHandler, Text, TextInput , Platform, Modal } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import Spinner from "react-native-loading-spinner-overlay";
 import { CommonActions } from "@react-navigation/native";
 import { GlobalVariables } from "../../../global";
@@ -31,7 +31,7 @@ const WalletTopUp = ({ navigation }) => {
     const [paymentChannelValue, setPaymentChannelValue] = useState(null);
     const [channelError, setChannelError] = useState(false);
     const [amountError, setAmountError] = useState(false);
-    const [filteredCards, setFilteredCards] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -56,84 +56,7 @@ const WalletTopUp = ({ navigation }) => {
             }
             return true;
         });
-
-        // return () => {
-        //     backHandler.remove();
-        // };
     }, [navigation, transaction]);
-
-    const checkIfUserHasCard = () => {
-        if (!thereCards) {
-            fundWallet();
-        } else {
-            fundWalletWithCard();
-        }
-    };
-
-    const fundWallet = () => {
-        setIsLoading(true);
-        const formattedAmount = Math.floor(amount);
-        // console.log('funding')
-
-        // API call to fund wallet
-        // ...
-
-        fetch(GlobalVariables.apiURL+"/wallet/fund",
-        { 
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-                'Authorization': 'Bearer '+authToken, // <-- Specifying the Authorization
-            }),
-            body:  "amount="+amount
-                 
-             // <-- Post parameters
-        }) 
-        .then((response) => response.text())
-        .then((responseText) => {
-            setIsLoading(false)
-            let response_status = JSON.parse(responseText).status;
-            if(response_status == true){
-                let data = JSON.parse(responseText).data;  
-                if (data.payment_info) {
-                    this.setState({transaction:true});
-                    let datat = data.payment_info.data;
-                    navigation.navigate("Paystack", {datat});
-                }
-            }else if(response_status == false){
-                let message = JSON.parse(responseText).message;
-                alert(message);
-            }
-        })
-        .catch((error) => {
-            alert("An error occured. Pls try again");
-        });
-        // Example of handling response
-        // setIsLoading(false);
-        // if (response.status === true) {
-        //     const data = response.data;
-        //     if (data.payment_info) {
-        //         setTransaction(true);
-        //         navigation.navigate("Paystack", { datat: data.payment_info.data });
-        //     }
-        // } else if (response.status === false) {
-        //     const message = response.message;
-        //     alert(message);
-        // }
-    };
-
-    const fundWalletWithCard = () => {
-        setIsLoading(true);
-        // Navigate to DebitCardPayment screen with necessary data
-        // ...
-
-        // Example navigation
-        // navigation.navigate("DebitCardPayment", {
-        //     transaction_type: "WalletTopUp",
-        //     amount: amount,
-        //     url: "/wallet/fund",
-        // });
-    };
 
     const getUserCards = () => {
         setIsLoading(false)
@@ -190,16 +113,11 @@ const WalletTopUp = ({ navigation }) => {
                 url: "/wallet/fund"
             }); 
         }
-        // else if (paymentChannelValue === "paystack") {
-        //     setChannelError(false);
-        //     checkIfUserHasCard();
-        // } else if (paymentChannelValue === "flutterwave") {
-        //     setChannelError(false);
-        //     checkIfUserHasCard();
-        // } 
+       
         else if (paymentChannelValue === "virtual_account") {
             if(tier == '0'){
-                navigation.navigate('CreateVirtualAccount');
+                setModalVisible(true);
+                // navigation.navigate('CreateVirtualAccount');
             }else{
                 navigation.navigate('VirtualAccount');
             }
@@ -209,6 +127,11 @@ const WalletTopUp = ({ navigation }) => {
         }
     };
 
+    const proceedtoVirtualAccountCreation = () => {
+        setModalVisible(false);
+        navigation.navigate("CreateVirtualAccount");
+    }
+
     const setAmountValue = (amount) => {
         setAmount(amount)
         setAmountError(false)
@@ -217,14 +140,6 @@ const WalletTopUp = ({ navigation }) => {
     const setChannelValue = (value) => {
         setPaymentChannelValue(value)
         setChannelError(false)
-    }
-
-    const FilterCards = (gateway) => {
-        const filteredCards = cards.filter(card => card.payment_gateway === gateway);
-        setFilteredCards(filteredCards);
-        if(filteredCards.length != 0){
-            setDisplayCards(true)
-        }
     }
 
     return (
@@ -311,6 +226,44 @@ const WalletTopUp = ({ navigation }) => {
                 <TouchableOpacity style={styles.buttonPurchase} onPress={checkPaymentChannel}>
                     <Text style={{ color: 'white', alignSelf: 'center' }}>Next</Text>
                 </TouchableOpacity>
+            </View>
+            <View style={{ flex: 1, backgroundColor:'#ffff'}}>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={()=> setModalVisible(false)}
+                >
+                    <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
+                        <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 0, width: '100%', height: '50%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
+                            <View style={{ width: '95%', height: '15%', marginTop:'2%', alignItems:"flex-end" }}>
+                                <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '40%', width: '6%', alignItems:"center", justifyContent:"center"}} onPress={()=> setModalVisible(false)}>
+                                    <FontAwesome name={'times'} size={18} color={'#0C0C54'} style={{marginTop: '0%', }} />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ marginTop: '0%', alignItems: 'center'}}>
+                                <Text style={{fontFamily: "Lato-Bold", fontSize:16, color: "#393636"}}>Register your BVN for better experience</Text>
+                            </View>
+                            <View style={{ marginTop: '2%', alignItems: 'center', justifyContent:"center"}}>
+                                <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}>Kindly note that you would be required to register your BVN to have access to the Virtual account option for wallet funding and other services attached to this option. </Text>
+                            </View>
+                            <View style={{marginLeft: '3%', marginTop: '10%', }}>
+                                <TouchableOpacity info style={styles.proceedButton} onPress={ proceedtoVirtualAccountCreation }>
+                                    <Text autoCapitalize="words" style={styles.proceedText}>
+                                        Proceed
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{marginLeft: '3%', marginTop: '-15%', }}>
+                                <TouchableOpacity info style={styles.skipButton} onPress={() => setModalVisible(false) }>
+                                    <Text autoCapitalize="words" style={styles.skipText}>
+                                        Skip for now
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         </View>
     );
