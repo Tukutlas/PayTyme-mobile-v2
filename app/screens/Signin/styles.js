@@ -9,11 +9,11 @@ const styles = StyleSheet.create({
 
     header: {
         backgroundColor: Colors.transparent,
-        height: Metrics.HEIGHT * 0.15,
+        height: '15%',
         borderBottomWidth: 0,
         paddingTop: Metrics.HEIGHT * 0.0604,
-        marginTop: Metrics.HEIGHT * 0.0604,
-        elevation: 0,
+        marginTop: '10%',
+        // elevation: 0,
         flexDirection: 'row',
         flexWrap: 'wrap'
         // paddingLeft: Metrics.WIDTH * 0.05,
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         // flex: 0.5,
         paddingLeft: Metrics.WIDTH * 0.0421,
         paddingRight: Metrics.WIDTH * 0.01,
-        width: 164,
+        width: '50%',
     },
 
     login: {
@@ -41,10 +41,10 @@ const styles = StyleSheet.create({
     },
 
     right: {
-        alignSelf: "flex-end",
+        // alignSelf: "flex-end",
         paddingLeft: Metrics.WIDTH * 0.85,
         marginTop: Metrics.HEIGHT * -0.070,
-        width: 79,
+        width: '20%',
     },
 
     profileImage: {

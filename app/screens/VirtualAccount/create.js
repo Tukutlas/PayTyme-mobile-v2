@@ -477,7 +477,7 @@ export default class CreateVirtualAccount extends Component {
                     }
                     {
                         this.state.input ? 
-                        <View style={{ marginTop: '40%', height:'9%',  flexDirection:'row', alignSelf:'center'}}>
+                        <View style={{ marginTop: '20%', height:'9%',  flexDirection:'row', alignSelf:'center'}}>
                             <TouchableOpacity style={styles.buttonSkip} onPress={() => {this.backPressed()}}>
                                 <Text style={{ color: "#0C0C54", alignSelf: 'center', fontFamily: 'Roboto-Medium' }}>Back</Text>
                             </TouchableOpacity>
@@ -489,7 +489,7 @@ export default class CreateVirtualAccount extends Component {
                     }
                     {
                         this.state.verify ? 
-                        <View style={{ marginTop: '27%', height:'9%', minHeight: Metrics.HEIGHT * 0.07, flexDirection:'row', alignSelf:'center'}}>
+                        <View style={{ marginTop: '12%', height:'9%', minHeight: Metrics.HEIGHT * 0.07, flexDirection:'row', alignSelf:'center'}}>
                             <TouchableOpacity style={styles.buttonSkip} onPress={() => {this.cancel()}}>
                                 <Text style={{ color: "#0C0C54", alignSelf: 'center', fontFamily: 'Roboto-Medium' }}>Cancel</Text>
                             </TouchableOpacity>

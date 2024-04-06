@@ -320,7 +320,7 @@ export default class Profile extends Component {
     handleShareLink = async () => {
         try {
             var message = `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\n
-                    Android\r\nhttps://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp\r\nIOS\r\n` ;
+                    Android:\r\nhttps://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp\r\nIOS:\r\nhttps://apps.apple.com/us/app/paytyme/id6475634944` ;
             const result = await Share.share({
                 message: message
             });
@@ -426,7 +426,7 @@ export default class Profile extends Component {
                                 <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'7%', width:'40%', textAlign: 'right'}}>{this.state.wallet_id}</Text>
                             </View>
                             
-                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
+                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start' }}>
                                 <TouchableOpacity onPress={()=>{this.props.navigation.navigate("ForgotPassword")}} style={{marginLeft:'0%', flexDirection:'row'}}>
                                     <FontAwesome5 name={'lock'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/>
                                     <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'6%', width:'55%'}}>Change Password</Text>
@@ -434,16 +434,16 @@ export default class Profile extends Component {
                                 </TouchableOpacity>
                             </View>
                             
-                            <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
+                            <View style={{ flexDirection:'row', marginTop:'3%', marginLeft:'2%', justifyContent:'flex-start' }}>
                                 <FontAwesome5 name={'fingerprint'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/>
-                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%',width:'40%'}}>Biometric Login</Text>
+                                <Text style={{ fontSize:20, fontWeight:'bold', color:'#120A47', marginLeft:'5%', width:'40%', alignSelf:'center' }}>Biometric Login</Text>
                                 <Switch
                                     trackColor={{ false: "", true: "#120A47" }}
                                     thumbColor={this.state.isEnabled ? "#f4f3f4" : "#f4f3f4"}
                                     ios_backgroundColor="#3e3e3e"
                                     onValueChange={(isEnabled)=>this.setBiometricEnability({isEnabled})}
                                     value={this.state.isEnabled}
-                                    style={{marginLeft:'25%', marginTop:'-4%'}}
+                                    style={{ marginLeft:'25%', marginTop:'0%' }}
                                 />
                             </View>
                                 

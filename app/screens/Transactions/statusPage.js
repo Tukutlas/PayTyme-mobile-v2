@@ -130,7 +130,6 @@ export default class StatusPage extends Component {
                 </View>
                 <View style={{marginTop:'30%', marginBottom:'0%'}}>
                     <TouchableOpacity info style={{}} onPress={() => {
-                            this.setItemValue('showVirtualModal', false),
                             this.props.navigation.dispatch(
                                 CommonActions.reset({
                                     routes: [

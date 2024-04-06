@@ -175,7 +175,7 @@ export default class AccountVerification extends Component {
                 </View>
                 {this.state.otpError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.otpErrorMessage}</Text>}
                 
-                <View style={{marginTop:'95%'}}>
+                <View style={{marginTop:'25%'}}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => {this.verifyCode();}}>
                         <Text autoCapitalize="words" style={{color:'white'}}>
                             Next

@@ -39,11 +39,12 @@ export default class Home extends Component {
         if (JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null) {
             this.setState({ profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image })
         }
-
+        const lastShownDate = await AsyncStorage.getItem('lastShownDate');
+        
+        this.checkIfUserHasVirtualAccount(lastShownDate);
         this.loadWalletBalance();
         this.getTransactionHistory();
-        this.checkIfUserHasVirtualAccount();
-
+        
         let walletVisibility = await AsyncStorage.getItem('walletVisibility');
 
         if(walletVisibility != null && walletVisibility == "true"){
@@ -74,6 +75,7 @@ export default class Home extends Component {
         ]);
         return true;
     };
+
     componentWillUnmount() {
         // Clear the interval when the component is unmounted to avoid memory leaks
         clearInterval(this.reloadInterval);
@@ -257,13 +259,13 @@ export default class Home extends Component {
         }); 
     }
 
-    async checkIfUserHasVirtualAccount(){
-        if(Platform.OS == 'android'){
-            if(this.state.tier !== '1'){
-                const lastShownDate = await AsyncStorage.getItem('lastShownDate');
-                if (!lastShownDate) {
+    async checkIfUserHasVirtualAccount(lastShownDate){
+        // if(Platform.OS == 'android')
+            if(this.state.tier == 0){
+                if (!lastShownDate || lastShownDate === null) {
                     // Modal hasn't been shown yet
                     this.setModalVisible(true);
+                    console.log('trully')
                 } else {
                     const currentDate = new Date().toDateString();
                     if (currentDate !== lastShownDate) {
@@ -272,7 +274,7 @@ export default class Home extends Component {
                     }
                 }
             }
-        }
+        // }
     }
 
     closeVirtualAccountModal(){
@@ -508,8 +510,8 @@ export default class Home extends Component {
                         <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
                             <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 0, width: '100%', height: '50%', marginBottom: 0, borderTopLeftRadius: 20, borderTopEndRadius: 20}}>
                                 <View style={{ width: '95%', height: '15%', marginTop:'2%', alignItems:"flex-end" }}>
-                                    <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '40%', width: '6%', alignItems:"center", justifyContent:"center"}} onPress={()=> this.closeVirtualAccountModal()}>
-                                        <FontAwesome name={'times'} size={18} color={'#0C0C54'} style={{marginTop: '0%', }} />
+                                    <TouchableOpacity style={{ marginTop: '0%', backgroundColor: '#C4C4C4', borderRadius:20, height: '42%', width: '8%', alignItems:"center", justifyContent:"center"}} onPress={()=> this.closeVirtualAccountModal()}>
+                                        <FontAwesome name={'times'} size={20} color={'#0C0C54'} style={{marginTop: '0%', }} />
                                     </TouchableOpacity>
                                 </View>
                                 

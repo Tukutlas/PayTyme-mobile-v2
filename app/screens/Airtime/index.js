@@ -526,7 +526,7 @@ export default class Airtime extends Component {
                                     <Text style={styles.labeltexta}>₦500</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.flexb} onPress={()=>{this.setState({amount:1000});}}>
-                                    <Text style={styles.labeltexta}>₦1,000</Text>
+                                    <Text style={styles.labeltexta}>₦1000</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

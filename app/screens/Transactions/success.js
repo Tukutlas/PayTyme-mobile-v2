@@ -8,14 +8,10 @@ export default class SuccessPage extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            modalVisible1: false,
             isChecked: false,
-            
             amount:0,
             isLoading: false,
-            modalVisible: false,
             isProgress: false,
-
             result: '',
             auth_token: '',
         }
@@ -90,7 +86,6 @@ export default class SuccessPage extends Component {
                 </View>
                 <View style={{marginTop:'5%', marginBottom:'0%'}}>
                     <TouchableOpacity info style={[styles.buttonPurchase, {backgroundColor:'linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), #FFFFFF'}]} onPress={() => {
-                            this.setItemValue('showVirtualModal', false),
                             this.props.navigation.dispatch(
                                 CommonActions.reset({
                                     routes: [

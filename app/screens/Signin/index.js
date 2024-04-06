@@ -15,16 +15,13 @@ export default class Signin extends Component {
             signedIn: false,
             name: "",
             photoUrl: "",
-            modalVisible1: false,
             isChecked: false,
             email: "",
             phone: "",
             password: '',
             fullname: '',
             isLoading: false,
-            modalVisible: false,
             isProgress: false,
-
             compatible: false,
             fingerprints: false,
             hasfingerprint: false,
@@ -280,15 +277,12 @@ export default class Signin extends Component {
                 ],
                 { cancelable: true },
             );
-
-            // this.setState({modalVisible:true});
         } else {
             //post details to server 
             dis.openProgressbar();
             //this functions posts to the login API ; //#endregion
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
-
             fetch(GlobalVariables.apiURL + "/auth/login", {
                 method: 'POST',
                 headers: new Headers({
@@ -297,15 +291,16 @@ export default class Signin extends Component {
                 body: "email_address=" + email + "&password=" + password // <-- Post parameters
             })
             .then(async (response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                // console.log(response)
+                // if (!response.ok) {
+                //     throw new Error('Network response was not ok');
+                // }
                 const responseText = await response.text();
                 dis.closeProgressbar();
                 let response_status = JSON.parse(responseText).status;
                 this.setState({ isProgress: false });
 
-                if (response_status == true || response_status == 'success') {
+                if (response_status == true) {
                     let access_token = JSON.parse(responseText).authorisation.token;
                     let username = JSON.parse(responseText).data.username;
                     let firstname = JSON.parse(responseText).data.first_name;
@@ -314,6 +309,7 @@ export default class Signin extends Component {
                     let phone = JSON.parse(responseText).data.phone_number;
                     let email = JSON.parse(responseText).data.email_address;
                     let tier = JSON.parse(responseText).data.tier;
+                    // console.log(tier)
                     let response = {
                         "status": "ok",
                         "user": {
@@ -339,8 +335,6 @@ export default class Signin extends Component {
                     this.removeItemValue("login_response");
 
                     this._storeUserData(response);
-
-                    this.setState({ modalVisible1: false });
                     //Go to main dashboard
                     // this.props.navigation.navigate("DrawerSocial");
                     this.props.navigation.navigate("Tabs");
@@ -391,9 +385,9 @@ export default class Signin extends Component {
                 }
             })
             .catch((error) => {
+                console.log(error); 
                 dis.closeProgressbar();
                 if (error.name === 'AbortError') {
-                    console.log('Request timed out');
                     Alert.alert(
                         'Network Error',
                         'Request timed out',
@@ -409,7 +403,6 @@ export default class Signin extends Component {
                     )
                     // Handle timeout error
                 } else {
-                    // console.error('Error:', error);
                     // Handle other errors
                     Alert.alert(
                         'Network Error',
@@ -430,8 +423,7 @@ export default class Signin extends Component {
                 clearTimeout(timeoutId); // Clear the timeout
                 controller.abort(); // Cancel the fetch request
             });
-            //end post details to server
-
+            //end post details to server"
         }
     }
 
@@ -491,10 +483,6 @@ export default class Signin extends Component {
                 }
             )
         });
-    }
-
-    setModalVisible(visible) {
-        this.setState({ modalVisible1: visible });
     }
 
     render() {
