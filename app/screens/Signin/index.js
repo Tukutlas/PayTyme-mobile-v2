@@ -358,7 +358,7 @@ export default class Signin extends Component {
                             JSON.parse(responseText).message,
                             [
                                 {
-                                    text: 'Ok',
+                                    text: 'Verify Account',
                                     onPress: () => {
                                         this.verifyAccount(JSON.parse(responseText).data.phone);
                                     },
@@ -511,7 +511,7 @@ export default class Signin extends Component {
                             <Text style={styles.labeltext}>Email-Address</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'envelope'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="email-address" ref="email" onChangeText={(email) => this.setState({ email })}/>
+                                <TextInput placeholder="Enter your email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="email-address" autoCapitalize="none" ref="email" onChangeText={(email) => this.setState({ email })}/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>

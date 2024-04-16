@@ -434,7 +434,7 @@ export default class Profile extends Component {
                                 </TouchableOpacity>
                             </View>
                             
-                            <View style={{ flexDirection:'row', marginTop:'3%', marginLeft:'2%', justifyContent:'flex-start' }}>
+                            <View style={{ flexDirection:'row', marginTop:'2%', marginLeft:'2%', justifyContent:'flex-start' }}>
                                 <FontAwesome5 name={'fingerprint'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/>
                                 <Text style={{ fontSize:20, fontWeight:'bold', color:'#120A47', marginLeft:'5%', width:'40%', alignSelf:'center' }}>Biometric Login</Text>
                                 <Switch
@@ -449,7 +449,7 @@ export default class Profile extends Component {
                                 
                             <View 
                                 style={{
-                                    marginTop: '2%',
+                                    marginTop: '1.5%',
                                     borderBottomColor: 'black',
                                     borderBottomWidth: 1,
                                 }}

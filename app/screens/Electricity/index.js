@@ -19,7 +19,6 @@ export default class Electricity extends Component {
             phoneNo: "",
             selectedValue:"",
             modalVisible: false,
-            email: "",
             meterno:"",
             meternoLength: 11,
             balance:0,

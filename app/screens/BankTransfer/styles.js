@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     },
 
     accountRight: {
-        marginLeft: '9%',
+        marginLeft: '5%',
         flexDirection:'row',
     },
 

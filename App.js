@@ -10,6 +10,7 @@ import Signin from './app/screens/Signin';
 import Signup from './app/screens/Signup';
 import AccountVerification from './app/screens/Signup/accountVerification';
 import Home from './app/screens/Home';
+// import Home from './app/screens/Home/index2';
 import Profile from './app/screens/Profile';
 import ViewPicture from './app/screens/Profile/viewPicture';
 import AboutUs from './app/screens/Profile/aboutUs';

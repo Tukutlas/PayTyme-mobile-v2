@@ -17,7 +17,6 @@ export default class TvSubscription extends Component {
         this.state = {
             selectedValue:"",
             modalVisible: false,
-            email: "",
             decoderinformation:"",
             cableoption:"GOTV",
             isProcessing:false,

@@ -39,6 +39,8 @@ export default class Home extends Component {
         if (JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null) {
             this.setState({ profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image })
         }
+
+        // await AsyncStorage.removeItem('lastShownDate');
         const lastShownDate = await AsyncStorage.getItem('lastShownDate');
         
         this.checkIfUserHasVirtualAccount(lastShownDate);
@@ -259,13 +261,13 @@ export default class Home extends Component {
         }); 
     }
 
-    async checkIfUserHasVirtualAccount(lastShownDate){
+    checkIfUserHasVirtualAccount = (lastShownDate) =>{
         // if(Platform.OS == 'android')
             if(this.state.tier == 0){
-                if (!lastShownDate || lastShownDate === null) {
+                if (lastShownDate === null) {
                     // Modal hasn't been shown yet
                     this.setModalVisible(true);
-                    console.log('trully')
+                    console.log('setting modal visible');
                 } else {
                     const currentDate = new Date().toDateString();
                     if (currentDate !== lastShownDate) {
@@ -277,20 +279,19 @@ export default class Home extends Component {
         // }
     }
 
-    closeVirtualAccountModal(){
+    closeVirtualAccountModal = () => {
         const currentDate = new Date().toDateString();
         AsyncStorage.setItem('lastShownDate', currentDate);
-        this.setModalVisible(false)
+        this.setState({ modalVisible: false });
+    }
+
+    navigateToCreateVirtualAccountPage = () => {
+        this.setState({ modalVisible: false });
+        this.props.navigation.navigate("CreateVirtualAccount")
     }
 
     setModalVisible = (visible) => {
         this.setState({ modalVisible: visible });
-    }
-
-    noopChange() {
-        this.setState({
-            changeVal: Math.random()
-        });
     }
 
     numberFormat = x => {
@@ -523,7 +524,7 @@ export default class Home extends Component {
                                 </View>
                                 
                                 <View style={{marginLeft: '3%', marginTop: '10%', }}>
-                                    <TouchableOpacity info style={styles.proceedButton} onPress={()=> this.props.navigation.navigate("CreateVirtualAccount") }>
+                                    <TouchableOpacity info style={styles.proceedButton} onPress={()=> this.navigateToCreateVirtualAccountPage() }>
                                         <Text autoCapitalize="words" style={styles.proceedText}>
                                             Proceed
                                         </Text>

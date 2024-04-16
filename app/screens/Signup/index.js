@@ -12,24 +12,36 @@ export default class Signup extends Component {
         super(props)
         this.state = {
             signedIn: false,
-            name: "",
-            photoUrl: "",
             email: "",
+            emailError: false,
+            emailErrorMessage: '',
             emailVerified: false,
             confirmationCode: '',
             phone: "",
-            password: '',
-            confirm_password: '',
+            phoneError: false,
+            phoneErrorMessage: '',
             fullname: '',
             firstname: '',
+            firstnameError: false,
+            firstnameErrorMessage: '',
             username: '',
+            usernameError: false,
+            usernameErrorMessage: '',
             lastname: '',
+            lastnameError: false,
+            lastnameErrorMessage: '',
             isLoading: false,
             modalVisible: false,
             isProgress: false,
             isProcessing: false,
+            password: '',
             hidePassword: true,
+            passwordError: false,
+            passwordErrorMessage: '',
+            confirmPassword: '',
             hideConfirmPassword: true,
+            confirmPasswordError: false,
+            confirmPasswordErrorMessage: '',
             isKeyboardOpen: false
         }
     }
@@ -104,92 +116,83 @@ export default class Signup extends Component {
         let username = this.state.username.replace(/^\s+|\s+$/g, "");
         let firstname = this.state.firstname.replace(/^\s+|\s+$/g, "");
         let lastname = this.state.lastname.replace(/^\s+|\s+$/g, "");
-
         let email = this.state.email.replace(/^\s+|\s+$/g, "");
         let password = this.state.password.replace(/^\s+|\s+$/g, "");
-        let confirm_password = this.state.confirm_password.replace(/^\s+|\s+$/g, "");
-        let emailVerified = this.state.emailVerified;
-        if(emailVerified == false){
-            alert('Email has not been verified');
-            return;
+        let confirmPassword = this.state.confirmPassword.replace(/^\s+|\s+$/g, "");
+        // let emailVerified = this.state.emailVerified;
+        // if(emailVerified == false){
+        //     alert('Email has not been verified');
+        //     return;
+        // }
+        let error = 0;
+
+        if(firstname == ''){
+            this.setState({firstnameError: true});
+            this.setState({firstnameErrorMessage: 'First name must be inserted'});
+            error++;
+        }
+
+        if(lastname == ''){
+            this.setState({lastnameError: true});
+            this.setState({lastnameErrorMessage: 'Last name must be inserted'});
+            error++;
+        }
+
+        if(email == ''){
+            this.setState({emailError: true});
+            this.setState({emailErrorMessage: 'Email must be inserted'});
+            error++;
+        }
+
+        if(phone == ''){
+            this.setState({phoneError: true});
+            this.setState({phoneErrorMessage: 'Phone number must be inserted'});
+            error++;
+        }
+
+        if(password == ''){
+            this.setState({passwordError: true});
+            this.setState({passwordErrorMessage: 'Password must be inserted'});
+            error++;
+        }
+
+        if(confirmPassword == ''){
+            this.setState({confirmPasswordError: true});
+            this.setState({confirmPasswordErrorMessage: 'Confirm password must be inserted'});
+            error++;
+        }
+
+        if(password != '' && password !== confirmPassword){
+            this.setState({confirmPasswordError: true});
+            this.setState({confirmPasswordErrorMessage: 'Password and Confirm Password must be the same'});
+            error++;
         }
 
         const checkEmail = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/.test(email)
-        if (email.length < 1) {
-            Alert.alert(
-                'Oops....',
-                'Email field Cannot be empty',
-                [
-                    {
-                        text: 'OK',
-                        style: 'cancel'
-                    }
-                ],
-                {
-                    cancelable: true
-                }
-            )
-            dis.closeProgressbar();
-        } else if (!checkEmail) {
-            Alert.alert(
-                'Oops .... ',
-                'Email format is invalid',
-                [
-                    {
-                        text: 'OK',
-                        style: 'cancel'
-                    }
-                ],
-                {
-                    cancelable: true
-                }
-            )
-            dis.closeProgressbar();
-        } else if (phone.length <= 2 || email.length <= 2) {
-            Alert.alert(
-                'Oops... ',
-                'Enter your email and phone number to continue',
-                [
-                    {
-                        text: 'OK',
-                        style: 'cancel',
-                    },
-                ],
-                { cancelable: true },
-            );
-            dis.closeProgressbar();
-            // this.setState({modalVisible:true});
-        } else if (this.state.password.length < 1) {
-            Alert.alert(
-                'Oops... ',
-                'Password field cannot be empty',
-                [
-                    {
-                        text: 'OK',
-                        style: 'cancel',
-                    },
-                ],
-                { cancelable: true },
-            );
+        if(email !== '' & !checkEmail){
+            this.setState({emailError: true});
+            this.setState({emailErrorMessage: 'Email is invalid'});
+            error++;
+        }
 
-            // this.setState({modalVisible:true});
-            dis.closeProgressbar();
-        } else if (password !== confirm_password) {
-            Alert.alert(
-                'Oops... ',
-                'Password and Confirm Password must be the same',
-                [
-                    {
-                        text: 'OK',
-                        style: 'cancel',
-                    },
-                ],
-                { cancelable: true },
-            );
+        if(email !== '' & checkEmail){
+            const domainsToCheck = ['aol.com', 'gmail.com', 'hotmail.com', 'hotmail.co.uk', 'msn.com', 'yahoo.com', 'yahoo.co.uk'];
 
-            // this.setState({modalVisible:true});
-            dis.closeProgressbar();
-        } else {
+            if (!this.isEmailWithDomains(email, domainsToCheck)) {
+                let message = 'Email must be from one of these specified domains:';
+
+                for (let i = 0; i < domainsToCheck.length; i++) {
+                    const domain = domainsToCheck[i];
+                    message += i < domainsToCheck.length - 1 ? ` ${domain},` : ` ${domain}.`;
+                }
+                
+                this.setState({emailError: true});
+                this.setState({emailErrorMessage: message});
+                error++;
+            }
+        }
+
+        if (error == 0)  {
             //this.props.onPressFBsms(this.phone.getValue().replace('234',''), this.state.email) //temp hardcoded
             dis.openProgressbar();
 
@@ -205,7 +208,7 @@ export default class Signup extends Component {
                     + "&phone_number=" + phone
                     + "&email_address=" + email
                     + "&password=" + password
-                    + "&password_confirmation=" + confirm_password
+                    + "&password_confirmation=" + confirmPassword
                     + "&username=" + username
                 // +"&url=https://paytyme.org/appbackend/email-verification"
 
@@ -214,25 +217,8 @@ export default class Signup extends Component {
             .then((response) => response.text())
             .then((responseText) => {
                 dis.closeProgressbar();
-                let api_response = JSON.parse(responseText);
-                let response_status = JSON.parse(responseText).status;
-                dis.closeProgressbar();
-
-                this.setState({ isProgress: false });
-                if (api_response.status == false) {
-                    Alert.alert(
-                        'Oops... Registration issues',
-                        api_response.message,
-                        [
-                            {
-                                text: 'Try Again',
-                                style: 'cancel',
-                            },
-
-                        ],
-                        { cancelable: false },
-                    );
-                } else if (response_status == true) {
+                let res = JSON.parse(responseText);
+                if (res.status == true) {
                     Alert.alert(
                         'Successful!',
                         'Your registration on Paytyme is successful.',
@@ -248,25 +234,38 @@ export default class Signup extends Component {
                         ],
                         { cancelable: false },
                     );
-                } else {
-                    let response_message = JSON.parse(responseText).message;
+                }else {
                     Alert.alert(
                         'Oops... Registration issues',
-                        response_message,
+                        res.message,
                         [
                             {
                                 text: 'Try Again',
                                 style: 'cancel',
                             },
+
                         ],
                         { cancelable: false },
                     );
-                    this.setState({ isProgress: false });
-                }
+                }  
             })
             .catch((error) => {
+                Alert.alert(
+                    'Error!',
+                    'Oops... Registration issues',
+                    [
+                        {
+                            text: 'Try Again',
+                            style: 'cancel',
+                        },
+
+                    ],
+                    { cancelable: false },
+                );
                 dis.closeProgressbar();
             });
+        }else{
+            dis.closeProgressbar();
         }
     }
 
@@ -557,6 +556,7 @@ export default class Signup extends Component {
                                     </TouchableOpacity> : ''
                                 }
                             </View>
+                            {this.state.firstnameError && <Text style={{ color: 'red' }}>{this.state.firstnameErrorMessage}</Text>}
                         </View>
                     </View>
 
@@ -574,6 +574,7 @@ export default class Signup extends Component {
                                     </TouchableOpacity> : ''
                                 }
                             </View>
+                            {this.state.lastnameError && <Text style={{ color: 'red' }}>{this.state.lastnameErrorMessage}</Text>}
                         </View>
                     </View>
 
@@ -582,15 +583,17 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Email-Address</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'envelope'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="email-address" ref="email" onChangeText={(email) => this.setState({ email, emailVerified:false })}/>
+                                <TextInput placeholder="Enter your email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="email-address" autoCapitalize="none" ref="email" onChangeText={(email) => this.setState({ email })}/>
+                                {/* <TextInput placeholder="Enter your email-address" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="email-address" ref="email" onChangeText={(email) => this.setState({ email, emailVerified:false })}/>
                                 <TouchableOpacity style={styles.verifyButton} onPress={() => {this.sendVerificationEmail()}}>
-                                    <Text style={styles.verifyButtonText}>Verify</Text>
-                                </TouchableOpacity>
+                                        <Text style={styles.verifyButtonText}>Verify</Text>
+                                    </TouchableOpacity> */}
                             </View>
+                            {this.state.emailError && <Text style={{ color: 'red' }}>{this.state.emailErrorMessage}</Text>}
                         </View>
                     </View>
                     
-                    <View style={[styles.formLine, { paddingTop: 5 }]}>
+                    {/* <View style={[styles.formLine, { paddingTop: 5 }]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Confirmation Code</Text>
                             <View roundedc style={styles.inputitem}>
@@ -601,7 +604,7 @@ export default class Signup extends Component {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    </View>
+                    </View> */}
  
                     <View style={[styles.formLine, { paddingTop: 5 }]}>
                         <View style={styles.formCenter}>
@@ -617,6 +620,7 @@ export default class Signup extends Component {
                                     </TouchableOpacity> : ''
                                 }
                             </View>
+                            {this.state.phoneError && <Text style={{ color: 'red' }}>{this.state.phoneErrorMessage}</Text>}
                         </View>
                     </View>
                     
@@ -634,6 +638,7 @@ export default class Signup extends Component {
                                     </TouchableOpacity> : ''
                                 }
                             </View>
+                            {this.state.usernameError && <Text style={{ color: 'red' }}>{this.state.usernameErrorMessage}</Text>}
                         </View>
                     </View>
 
@@ -647,6 +652,7 @@ export default class Signup extends Component {
                                     <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                                 </TouchableOpacity>
                             </View>
+                            {this.state.passwordError && <Text style={{ color: 'red' }}>{this.state.passwordErrorMessage}</Text>}
                         </View>
                     </View>
 
@@ -655,11 +661,12 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Confirm Password</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Confirm Password" secureTextEntry={this.state.hideConfirmPassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="confirm_password" onChangeText={(confirm_password) => this.setState({ confirm_password })}/>
+                                <TextInput placeholder="Confirm Password" secureTextEntry={this.state.hideConfirmPassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="confirmPassword" onChangeText={(confirmPassword) => this.setState({ confirmPassword })}/>
                                 <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setConfirmPasswordVisibility}>
                                     <Image source={(this.state.hideConfirmPassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
                                 </TouchableOpacity>
                             </View>
+                            {this.state.confirmPasswordError && <Text style={{ color: 'red' }}>{this.state.confirmPasswordErrorMessage}</Text>}
                         </View>
                     </View>
 

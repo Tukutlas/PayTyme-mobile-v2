@@ -778,7 +778,7 @@ export default class Insurance extends Component {
                         <Text style={styles.labeltext}>Owner's Email-address</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'envelope'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Type in vehicle owner's email-address" style={styles.textBox} keyboardType="email-address" placeholderTextColor={"#A9A9A9"} ref="platenumber" onChangeText={(email) => this.setEmail(email)}/>
+                            <TextInput placeholder="Type in vehicle owner's email-address" style={styles.textBox} keyboardType="email-address" autoCapitalize="none" placeholderTextColor={"#A9A9A9"} ref="platenumber" onChangeText={(email) => this.setEmail(email)}/>
                         </View>
                         {this.state.emailError && <Text style={{ color: 'red' }}>{this.state.emailErrorMessage}</Text>}
                     </View>
