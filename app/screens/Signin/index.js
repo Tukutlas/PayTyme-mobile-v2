@@ -358,7 +358,7 @@ export default class Signin extends Component {
                             JSON.parse(responseText).message,
                             [
                                 {
-                                    text: 'Verify Account',
+                                    text: 'Verify',
                                     onPress: () => {
                                         this.verifyAccount(JSON.parse(responseText).data.phone);
                                     },
@@ -385,7 +385,7 @@ export default class Signin extends Component {
                 }
             })
             .catch((error) => {
-                console.log(error); 
+                // console.log(error); 
                 dis.closeProgressbar();
                 if (error.name === 'AbortError') {
                     Alert.alert(
@@ -428,61 +428,10 @@ export default class Signin extends Component {
     }
 
     verifyAccount = (phone) => {
-        this.openProgressbar();
-        //send verification request
-        fetch(GlobalVariables.apiURL + "/auth/verify",
-        {
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
-            }),
-            body: "phone=" + phone
-            // <-- Post parameters
+        this.props.navigation.navigate('AccountVerification',{
+            routeName: 'Signin',
+            phonenumber: phone
         })
-        .then((response) => response.text())
-        .then((responseText) => {
-            this.closeProgressbar();
-            let response_status = JSON.parse(responseText).status;
-            this.setState({ isProgress: false });
-            
-            if (response_status == true) {
-                this.props.navigation.navigate('Otp',{
-                    routeName: 'Signin',
-                    phonenumber: phone
-                })
-            }else{
-                this.closeProgressbar();
-                Alert.alert(
-                    'Error',
-                    JSON.parse(responseText).message,
-                    [
-                        {
-                            text: 'OK',
-                            style: 'cancel'
-                        }
-                    ],
-                    {
-                        cancelable: true
-                    }
-                )
-            }
-        })
-        .catch((error) => {
-            this.closeProgressbar();
-            Alert.alert(
-                'Network Error',
-                'Couldn\'t connect to our server. Check your network settings and Try Again ',
-                [
-                    {
-                        text: 'OK',
-                        style: 'cancel'
-                    }
-                ],
-                {
-                    cancelable: true
-                }
-            )
-        });
     }
 
     render() {
@@ -506,7 +455,7 @@ export default class Signin extends Component {
                             <Image style={styles.profileImage} source={require('../../../assets/logo.png')} />
                         </View>
                     </View>
-                    <View style={[styles.formLine, { paddingTop: 10 }]}>
+                    <View style={[styles.formLine, { marginTop: 10 }]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Email-Address</Text>
                             <View roundedc style={styles.inputitem}>

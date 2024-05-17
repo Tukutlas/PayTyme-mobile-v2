@@ -84,7 +84,7 @@ export default class StatusPage extends Component {
                     </View>: <></>
                 }{ this.props.route.params.status == 'failed' ? 
                     <View style={{backgroundColor: '#FFA500', borderRadius: 50, width: 51, height: 51, alignSelf:'center', alignItems: 'center', justifyContent:'center', marginTop:'40%'}}>
-                        <FontAwesome5 name={'clock'} color={'#ffff'} size={25}  style={{width: 18, height: 25, }}/>
+                        <FontAwesome5 name={'times'} color={'#ffff'} size={25}  style={{width: 18, height: 25, }}/>
                     </View> : <></>
                 }{
                     this.props.route.params.status == 'progress' ?

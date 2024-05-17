@@ -414,10 +414,14 @@ export default class Home extends Component {
                 </View>
                 
                 <View style={styles.gridb}>
-                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }} >
-                        <FontAwesome5 name={'plane-departure'} color={'#FF7D00'} size={30}/>
-                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Flight Booking</Text>
-                    </TouchableOpacity>
+                    {/*
+                        Platform.OS == 'ios' ? 
+                        <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }} >
+                            <FontAwesome5 name={'plane-departure'} color={'#FF7D00'} size={30}/>
+                            <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Flight Booking</Text>
+                        </TouchableOpacity> : 
+                        <></>
+                    */}
                     <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("Betting") }} >
                         <FontAwesome5 name={'volleyball-ball'} color={'#AA4088'} size={30} />
                         <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Sports Betting</Text>
@@ -430,6 +434,10 @@ export default class Home extends Component {
                         <FontAwesome5 name={'car'} color={'#F03434'} size={30} />
                         <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Insurance</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { this.props.navigation.navigate("WalletTopUp") }} >
+                        <FontAwesome5 name={'wallet'} color={'#FF7D00'} size={30}/>
+                        <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Fund Wallet</Text>
+                    </TouchableOpacity> 
                 </View>
 
                 {/* <View style={styles.grid}>
@@ -520,7 +528,7 @@ export default class Home extends Component {
                                     <Text style={{fontFamily: "Lato-Bold", fontSize:16, color: "#393636"}}>Register your BVN for better experience</Text>
                                 </View>
                                 <View style={{ marginTop: '2%', alignItems: 'center', justifyContent:"center"}}>
-                                    <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}>Kindly note that you would be required to register your BVN to have access to the Virtual account option for wallet funding and other services attached to this option. </Text>
+                                    <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}> Kindly verify your BVN to have access to the Virtual account option for wallet funding and other services attached to this option. </Text>
                                 </View>
                                 
                                 <View style={{marginLeft: '3%', marginTop: '10%', }}>

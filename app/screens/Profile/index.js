@@ -293,10 +293,10 @@ export default class Profile extends Component {
     }
 
     handleRateButtonPress = async () => {
-        var fallbackURL = Platform.OS == 'android' ? 'https://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp' : 'https://www.paytyme.com.ng';
+        var fallbackURL = Platform.OS == 'android' ? 'https://play.google.com/store/apps/details?id=com.app.paytyme' : 'https://www.paytyme.com.ng';
         const options = {
             AppleAppID: '6475634944',
-            GooglePackageName: 'com.victorel.paytymemobileapp',
+            GooglePackageName: 'com.app.paytyme',
             AmazonPackageName:"",
             OtherAndroidURL:"",
             preferredAndroidMarket: AndroidMarket.Google,
@@ -319,8 +319,7 @@ export default class Profile extends Component {
 
     handleShareLink = async () => {
         try {
-            var message = `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\n
-                    Android:\r\nhttps://play.google.com/store/apps/details?id=com.victorel.paytymemobileapp\r\nIOS:\r\nhttps://apps.apple.com/us/app/paytyme/id6475634944` ;
+            var message = `I use Paytyme to sort all my bills.\r\n"Save time and skip the hassle of traditional billing methods by using PAYTYME, a convenient bill payment app today!"\r\nAndroid:\r\nhttps://play.google.com/store/apps/details?id=com.app.paytyme\r\nIOS:\r\nhttps://apps.apple.com/us/app/paytyme/id6475634944` ;
             const result = await Share.share({
                 message: message
             });
@@ -401,7 +400,7 @@ export default class Profile extends Component {
                                         <Text style={{fontSize:20, fontWeight:'bold',  marginTop:'0%', color:"#fff",  fontFamily: "SFUIDisplay-Medium"}}>₦****</Text>
                                     }
                                 </View>
-                                <View style={{alignItems: "flex-end", paddingTop:10, marginRight: -10.4}}>
+                                <View style={{alignItems: "flex-end", paddingTop:10, marginRight: -7.4}}>
                                     {
                                         this.state.view==true ?
                                         <TouchableOpacity style={[styles.cleft,{padding:5, justifyContent:'center', alignItems: "center"}]} onPress={()=>{this.setWalletVisibility(false)}}>
@@ -434,7 +433,7 @@ export default class Profile extends Component {
                                 </TouchableOpacity>
                             </View>
                             
-                            <View style={{ flexDirection:'row', marginTop:'2%', marginLeft:'2%', justifyContent:'flex-start' }}>
+                            <View style={{ flexDirection:'row', marginTop:'1%', marginLeft:'2%', justifyContent:'flex-start' }}>
                                 <FontAwesome5 name={'fingerprint'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/>
                                 <Text style={{ fontSize:20, fontWeight:'bold', color:'#120A47', marginLeft:'5%', width:'40%', alignSelf:'center' }}>Biometric Login</Text>
                                 <Switch
@@ -449,7 +448,7 @@ export default class Profile extends Component {
                                 
                             <View 
                                 style={{
-                                    marginTop: '1.5%',
+                                    marginTop: '1%',
                                     borderBottomColor: 'black',
                                     borderBottomWidth: 1,
                                 }}

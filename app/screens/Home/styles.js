@@ -90,6 +90,7 @@ module.exports = StyleSheet.create({
         padding:1,
         width:'100%',
         marginTop: '1%',
+        alignItems: 'center'
     },
 
     flexx:{
@@ -124,6 +125,17 @@ module.exports = StyleSheet.create({
                 elevation: 8,
             },
         }),
+    },
+
+    flexz: {
+        height: 68,
+        width: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: '4%',
+        borderRadius: 10,
+        // flex:3,
+        // backgroundColor: '#E0EBEC',
     },
     
 

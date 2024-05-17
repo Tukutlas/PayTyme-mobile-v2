@@ -274,6 +274,7 @@ export default class Electricity extends Component {
                         this.props.navigation.navigate("StatusPage",
                         {
                             transaction_id:resultjson.data.transaction.id,
+                            status: 'successful',
                             Screen: 'Electricity'
                         }); 
                     }else{

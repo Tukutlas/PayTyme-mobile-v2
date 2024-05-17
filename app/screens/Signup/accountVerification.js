@@ -113,7 +113,7 @@ export default class AccountVerification extends Component {
                                 text: 'Proceed to Sign in',
                                 onPress: () => this.props.navigation.navigate(this.props.route.params.routeName),
                                 style: 'cancel',
-                            }, 
+                            },
                         ],
                         {cancelable: false},
                     );

@@ -744,10 +744,9 @@ export default class Education extends Component {
                     </View>
                 </View>
                 <View style={[styles.grid,{marginTop:'-3%'}]}>
-                    <TouchableOpacity style={[styles.flexb]}>
-                    </TouchableOpacity>
-                    {/* <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.waec) ? "#445cc4" : "#f5f5f5"}]}  */}
-                    <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.waec) ? "#0C0C54" : "#f5f5f5"}]} 
+                    <View style={[styles.flexb]}>
+                    </View>
+                   <TouchableOpacity style={[styles.flexx,{backgroundColor:'#ffff', borderWidth:3, borderColor:(this.state.waec) ? "#0C0C54" : "#f5f5f5"}]} 
                         onPress={()=>{
                             this.setState({waec:true});
                             this.setState({jamb:false});
@@ -770,8 +769,8 @@ export default class Education extends Component {
                     >
                         <Image source={require('../../Images/Education/jamb.png')} style={{height:65, width:65, borderRadius:10}} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexb]}>
-                    </TouchableOpacity>
+                    <View style={[styles.flexb]}>
+                    </View>
                 </View>
                 
                 {/* {
