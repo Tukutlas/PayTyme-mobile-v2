@@ -39,7 +39,8 @@ export default class SingleTransaction extends Component {
             plate_number: "",
             vehicle_model: "",
             vehicle_make: "",
-            tv_type: ""
+            tv_type: "",
+            reference: ""
         };
     }
 
@@ -83,14 +84,12 @@ export default class SingleTransaction extends Component {
                 if(transaction.type == 'Airtime' || transaction.type == 'Airtime Recharge'){
                     this.setState({
                         transaction_type: transaction.type,
-                        amount: this.numberFormat(transaction.amount), 
                         recipient: data.airtime_info.phone_number, 
                         network: data.airtime_info.network
                     });
                 }else if(transaction.type == 'Data' || transaction.type == 'Data Services'){
                     this.setState({
                         transaction_type: transaction.type,
-                        amount: this.numberFormat(transaction.amount), 
                         recipient: data.data_info.phone_number, 
                         network: data.data_info.network,
                         other_details: data.data_info.bundle
@@ -98,43 +97,38 @@ export default class SingleTransaction extends Component {
                 }else if(transaction.type == 'Betting'){
                     this.setState({
                         transaction_type: transaction.type,
-                        amount: this.numberFormat(transaction.amount), 
                         bet_wallet_id: data.betting_info.customer_id, 
                         betting_platform: data.betting_info.type
                     });
                 }else if(transaction.type == 'TV Subscription'){
                     this.setState({
                         transaction_type: transaction.type,
-                        amount: this.numberFormat(transaction.amount), 
                         card_no: data.tv_info.smart_card_no, 
                         package_name: data.tv_info.package_name,
                         tv_type: data.tv_info.type
                     });
                 }else if(transaction.type == 'WAEC'){
                     this.setState({
-                        amount: this.numberFormat(transaction.amount), 
                         no_of_pins: data.waec_info.pins, 
                     });
                 }else if(transaction.type == 'JAMB'){
                     this.setState({
-                        amount: this.numberFormat(transaction.amount), 
                         profile_code: data.jamb_info.profile_code, 
                     });
                 }else if(transaction.type == 'Electricity Bill'){
                     this.setState({
                         transaction_type: transaction.type,
-                        amount: this.numberFormat(transaction.amount), 
                         metre_no: data.electricity_info.meter_no, 
                         disco: data.electricity_info.company,
                         name: data.electricity_info.customer_name,
                         address: data.electricity_info.customer_address,
                         token: data.electricity_info.token,
                         unit: data.electricity_info.unit,
+                        other_details: transaction.description
                     });
                 }else if(transaction.type == 'Insurance'){
                     this.setState({
                         transaction_type: transaction.type,
-                        amount: this.numberFormat(transaction.amount),
                         vehicle_model: data.insurance_info.vehicle_model,
                         vehicle_make: data.insurance_info.vehicle_make,
                         plate_number: data.insurance_info.plate_number
@@ -142,21 +136,27 @@ export default class SingleTransaction extends Component {
                 }else if(transaction.type == 'TRANSFER'){
                     this.setState({
                         transaction_type: transaction.type,
-                        amount: this.numberFormat(transaction.amount), 
                         wallet_id: data.wallet_id,
                         other_details: transaction.description
                     });
                 }else if(transaction.type == 'fund_wallet'){
                     this.setState({
                         transaction_type: 'Fund Wallet',
-                        amount: this.numberFormat(transaction.amount)
+                        other_details: transaction.description
+                    });
+                }else if(transaction.type =='Funding'){
+                    this.setState({
+                        transaction_type: 'Wallet Funding via Wallet to Wallet',
+                        other_details: transaction.description
                     });
                 }
 
                 this.setState({
+                    amount: this.numberFormat(transaction.amount),
                     status: transaction.status,
                     transactionDate: transaction.created_at, 
                     payment_channel: transaction.payment_channel,
+                    reference: transaction.reference
                 });
                 this.setState({isLoading:false});
             }else if(response_status == false){
@@ -381,6 +381,10 @@ export default class SingleTransaction extends Component {
                     <View style={{flexDirection:'row', marginTop: '4%'}}>
                         <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Payment Channel:</Text>
                         <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.payment_channel}</Text>
+                    </View>
+                    <View style={{flexDirection:'row', marginTop: '4%'}}>
+                        <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Reference:</Text>
+                        <Text style={{width:'50%', fontSize:14, fontFamily: 'Lato-Regular', color:'#777777'}}>{this.state.reference}</Text>
                     </View>
                     <View style={{flexDirection:'row', marginTop: '4%'}}>
                         <Text style={{width:'35%', fontSize:14, fontFamily: 'Lato-Regular', color:'#120A47', marginLeft:'6%'}}>Status:</Text>

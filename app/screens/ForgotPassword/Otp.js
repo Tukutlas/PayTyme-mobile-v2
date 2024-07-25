@@ -30,12 +30,13 @@ export default class OTP extends Component {
             result: '',
             auth_token: '', 
             phone: '',
-            otp: ''
+            otp: '',
+            timer: 60,
         }
     }
 
     async componentDidMount() {
-
+        this.startTimer()
     }
 
     showLoader () {
@@ -134,6 +135,92 @@ export default class OTP extends Component {
         }
     }
 
+    startTimer = () => {
+        this.interval = setInterval(() => {
+            this.setState((prevState) => ({
+                timer: prevState.timer - 1,
+            }));
+        }, 1000);
+    };
+
+    handleResendPress = () => {
+        this.setState({timer:60})
+        Alert.alert(
+            'OTP',
+            'Select where you want to receive the otp',
+            [
+                {
+                    text: 'sms',
+                    style: 'cancel',
+                    onPress: () => this.sendOtp('sms'),
+                },
+                {
+                    text: 'WhatsApp',
+                    style: 'cancel',
+                    onPress: () => this.sendOtp('WhatsApp'),
+                }
+            ],
+            {cancelable: false},
+        );
+    };
+
+    sendOtp(channel){
+        let myHeaders = new Headers();
+        // myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+        myHeaders.append("Content-Type", "application/json");
+
+        let raw = JSON.stringify({
+            "phone": this.state.phone,
+            "channel": channel
+        });
+
+        let requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw
+        };
+            
+        this.setState({isLoading:true});
+        
+        fetch(GlobalVariables.apiURL+'/auth/send-otp', requestOptions)
+        .then(response => response.text())
+        .then(responseText => 
+        {
+            this.setState({isLoading:false});
+            let result = JSON.parse(responseText);
+            if(result.status == true){
+                this.startTimer()
+                Alert.alert(
+                    'Successful',
+                    result.message,
+                    [
+                        {
+                            text: 'OK',
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }else {
+                Alert.alert(
+                    'Error',
+                    result.message,
+                    [
+                        {
+                            text: 'OK',
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }
+        })
+        .catch((error) => {
+            this.setState({isLoading:false});
+            alert("Network error. Please check your connection settings");
+        });   
+    }
+
     render(){
         StatusBar.setBarStyle("dark-content", true);
         
@@ -166,6 +253,19 @@ export default class OTP extends Component {
                         </View> */}
                         <OtpInput numberOfDigits={6} focusColor="#0C0C54" onTextChange={(otp) => this.setOtp(otp)} theme={{containerStyle:styles.otpContainer, pinCodeContainerStyle:styles.otpItem}} />
                     </View>
+                </View>
+                <View style={{ width: '97%', alignItems: 'center', marginTop: '10%' }}>
+                    {this.state.timer > 0 ? (
+                    <Text style={{ marginLeft: '3%', fontStyle: 'italic', color: '#777777' }}>
+                        Resend Code in {this.state.timer} seconds
+                    </Text>
+                    ) : (
+                    <TouchableOpacity onPress={this.handleResendPress}>
+                        <Text style={{ marginLeft: '3%', fontStyle: 'italic', color: '#222222', textDecorationLine: 'underline' }}>
+                            Resend Code
+                        </Text>
+                    </TouchableOpacity>
+                    )}
                 </View>
                 
                 <View style={{marginTop:'40%'}}>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "PayTyme",
     "slug": "PayTyme",
-    "version": "1.2.0",
+    "version": "1.4.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,7 @@
         "NSDocumentPickerUsageDescription": "This app requires access to documents for file selection.",
         "NSTouchIDUsageDescription": "We use Touch ID to secure your data."
       },
-      "buildNumber": "2",
+      "buildNumber": "1",
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {
@@ -64,7 +64,7 @@
         "READ_EXTERNAL_STORAGE"
       ],
       "package": "com.app.paytyme",
-      "versionCode": 3
+      "versionCode": 6
     },
     "web": {
       "favicon": "./assets/favicon.png"

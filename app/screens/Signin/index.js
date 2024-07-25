@@ -8,6 +8,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { FontAwesome5, MaterialCommunityIcons} from "@expo/vector-icons";
+import DeviceInfo from 'react-native-device-info';
+
 export default class Signin extends Component {
     constructor(props) {
         super(props)
@@ -21,7 +23,6 @@ export default class Signin extends Component {
             password: '',
             fullname: '',
             isLoading: false,
-            isProgress: false,
             compatible: false,
             fingerprints: false,
             hasfingerprint: false,
@@ -178,13 +179,7 @@ export default class Signin extends Component {
         this.setState({ isLoading: true });
     };
 
-    openProgressbar() {
-        this.setState({ isProgress: true })
-        this.setState({ isLoading: true });
-    }
-
-    closeProgressbar() {
-        this.setState({ isProgress: false });
+    hideLoader(){
         this.setState({ isLoading: false });
     }
 
@@ -230,7 +225,21 @@ export default class Signin extends Component {
         }
     }
 
-    signInUser = (dis) => {
+    async getDeviceUniqueId() {
+        try {
+            const uniqueId = await DeviceInfo.getUniqueId();
+            return uniqueId;
+        } catch (error) {
+            console.error('Error getting device unique ID:', error);
+        }
+    }
+
+    signInUser = async (dis) => {
+        const deviceName = await DeviceInfo.getDeviceName();
+        const deviceId = await this.getDeviceUniqueId();
+        const deviceModel = DeviceInfo.getModel();
+        const deviceBrand = DeviceInfo.getBrand();
+        
         let email = this.state.email.replace(/^\s+|\s+$/g, "");
         let password = this.state.password.replace(/^\s+|\s+$/g, "");
 
@@ -279,7 +288,7 @@ export default class Signin extends Component {
             );
         } else {
             //post details to server 
-            dis.openProgressbar();
+            dis.showLoader();
             //this functions posts to the login API ; //#endregion
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
@@ -288,7 +297,13 @@ export default class Signin extends Component {
                 headers: new Headers({
                     'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
                 }),
-                body: "email_address=" + email + "&password=" + password // <-- Post parameters
+                body: "email_address=" + email
+                    + "&password=" + password // <-- Post parameters
+                    + "&device_name=" + deviceName 
+                    + "&device_type=" + Platform.OS 
+                    + "&device_id=" + deviceId 
+                    + "&device_model=" + deviceModel 
+                    + "&device_brand=" + deviceBrand
             })
             .then(async (response) => {
                 // console.log(response)
@@ -296,9 +311,9 @@ export default class Signin extends Component {
                 //     throw new Error('Network response was not ok');
                 // }
                 const responseText = await response.text();
-                dis.closeProgressbar();
+                dis.hideLoader();
                 let response_status = JSON.parse(responseText).status;
-                this.setState({ isProgress: false });
+                // console.log(JSON.parse(responseText))
 
                 if (response_status == true) {
                     let access_token = JSON.parse(responseText).authorisation.token;
@@ -309,6 +324,7 @@ export default class Signin extends Component {
                     let phone = JSON.parse(responseText).data.phone_number;
                     let email = JSON.parse(responseText).data.email_address;
                     let tier = JSON.parse(responseText).data.tier;
+                    let has_bank = JSON.parse(responseText).data.has_bank;
                     // console.log(tier)
                     let response = {
                         "status": "ok",
@@ -319,18 +335,30 @@ export default class Signin extends Component {
                             "image": image,
                             "tier": tier,
                             "email": email,
-                            "phone": phone
+                            "phone": phone,
+                            "has_bank": has_bank
                         }
                     };
+
+                    if(has_bank == true){
+                        let account_name = JSON.parse(responseText).data.bank_account.account_name;
+                        let account_number = JSON.parse(responseText).data.bank_account.account_number;
+                        let bank_name = JSON.parse(responseText).data.bank_account.bank_name;
+                        let bank_details = {
+                            'account_name': account_name,
+                            'account_number': account_number,
+                            'bank': bank_name
+                        }
+
+                        this.setItemValue('bank_details', JSON.stringify(bank_details))
+                    }
+
+                    this.setItemValue('tier', tier);
 
                     if (this.state.compatible) {
                         this.setPersonalDetails(email, password)
                     }
-                    if (tier == '0') {
-                        this.setItemValue('showVirtualModal', true)
-                    } else {
-                        this.setItemValue('showVirtualModal', false)
-                    }
+                    
                     //remove previous records: 
                     this.removeItemValue("login_response");
 
@@ -339,7 +367,7 @@ export default class Signin extends Component {
                     // this.props.navigation.navigate("DrawerSocial");
                     this.props.navigation.navigate("Tabs");
                 } else {
-                    let account_status = JSON.parse(responseText).account_status;
+                    let account_status = JSON.parse(responseText).account_status ?? '';
                     if (account_status == 'disabled') {
                         Alert.alert(
                             'Oops',
@@ -367,7 +395,22 @@ export default class Signin extends Component {
                             ],
                             { cancelable: false },
                         );
-                    } else {
+                    } else if(JSON.parse(responseText).device_status == 'unauthenticated'){
+                        Alert.alert(
+                            'Oops',
+                            JSON.parse(responseText).message,
+                            [
+                                {
+                                    text: 'Register Device',
+                                    onPress: () => {
+                                        this.registerDevice(JSON.parse(responseText).data);
+                                    },
+                                    style: 'cancel',
+                                },
+                            ],
+                            { cancelable: false },
+                        );
+                    }else {
                         Alert.alert(
                             'Oops',
                             'Invalid Login Credentials',
@@ -381,12 +424,12 @@ export default class Signin extends Component {
                         );
                     }
                     //sign in was not successful
-                    dis.closeProgressbar();
+                    dis.hideLoader();
                 }
             })
             .catch((error) => {
                 // console.log(error); 
-                dis.closeProgressbar();
+                dis.hideLoader();
                 if (error.name === 'AbortError') {
                     Alert.alert(
                         'Network Error',
@@ -432,6 +475,100 @@ export default class Signin extends Component {
             routeName: 'Signin',
             phonenumber: phone
         })
+    }
+
+    registerDevice = async (user_id) => {
+        this.showLoader()
+        const deviceName = await DeviceInfo.getDeviceName();
+        const deviceId = await this.getDeviceUniqueId();
+        const deviceModel = DeviceInfo.getModel();
+        const deviceBrand = DeviceInfo.getBrand();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
+        fetch(`${GlobalVariables.apiURL}/auth/register-device/${user_id}`, {
+            method: 'POST',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+            }),
+            body:"device_name=" + deviceName 
+            + "&device_type=" + Platform.OS 
+            + "&device_id=" + deviceId 
+            + "&device_model=" + deviceModel 
+            + "&device_brand=" + deviceBrand
+        })
+        .then(async (response) => {
+            const responseText = await response.text();
+            this.hideLoader();
+            let res = JSON.parse(responseText);
+
+            if (res.status == true) {
+                Alert.alert(
+                    'Successful',
+                    'Device registered successfully',
+                    [
+                        {
+                            text: 'Proceed to Login',
+                            onPress: () => {
+                                this.signInUser(this);
+                            },
+                            style: 'cancel',
+                        },
+                    ],
+                    { cancelable: false },
+                );
+            } else {
+                Alert.alert(
+                    'Oops',
+                    res.message,
+                    [
+                        {
+                            text: 'Try Again',
+                            style: 'cancel',
+                        },
+                    ],
+                    { cancelable: false },
+                );
+            }
+        })
+        .catch((error) => {
+            // console.log(error); 
+            this.hideLoader();
+            if (error.name === 'AbortError') {
+                Alert.alert(
+                    'Network Error',
+                    'Request timed out',
+                    [
+                        {
+                            text: 'OK',
+                            style: 'cancel'
+                        }
+                    ],
+                    {
+                        cancelable: true
+                    }
+                )
+                // Handle timeout error
+            } else {
+                // Handle other errors
+                Alert.alert(
+                    'Network Error',
+                    'Couldn\'t connect to our server. Check your network settings and Try Again ',
+                    [
+                        {
+                            text: 'OK',
+                            style: 'cancel'
+                        }
+                    ],
+                    {
+                        cancelable: true
+                    }
+                )
+            }
+        })
+        .finally(() => {
+            clearTimeout(timeoutId); // Clear the timeout
+            controller.abort(); // Cancel the fetch request
+        });
     }
 
     render() {

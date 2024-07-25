@@ -103,7 +103,7 @@ export default class Transactions extends Component {
     
     getTransactionHistory(){
         this.setState({isLoading:true});   
-        fetch(GlobalVariables.apiURL+"/transactions?perpage=20",
+        fetch(GlobalVariables.apiURL+"/transactions?perpage=40",
         { 
             method: 'GET',
             headers: new Headers({

@@ -180,7 +180,7 @@ export default class ResetPassword extends Component {
                 <Spinner visible={this.state.isLoading} textContent={''} color={'blue'} />
                 <View style={styles.header}>
                     <View style={styles.left}>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate("Tabs")}>
+                        <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
                             <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
                         </TouchableOpacity>
                     </View>

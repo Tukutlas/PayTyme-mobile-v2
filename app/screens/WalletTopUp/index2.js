@@ -31,6 +31,7 @@ const WalletTopUp = ({ navigation }) => {
     const [paymentChannelValue, setPaymentChannelValue] = useState(null);
     const [channelError, setChannelError] = useState(false);
     const [amountError, setAmountError] = useState(false);
+    const [amountErrorMessage, setAmountErrorMessage] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
@@ -39,7 +40,7 @@ const WalletTopUp = ({ navigation }) => {
             setAuthToken(token);
             // Fetch user cards if necessary
             // ...
-            const tier = JSON.parse(await AsyncStorage.getItem('login_response')).user.tier;
+            const tier = await AsyncStorage.getItem('tier');
             setTier(tier);
         };
         fetchData();
@@ -103,8 +104,15 @@ const WalletTopUp = ({ navigation }) => {
         if (!paymentChannelValue) {
             setChannelError(true);
         } else if(paymentChannelValue === 'card'){
+            let error = 0;
             if (!amount) {
                 setAmountError(true);
+                setAmountErrorMessage('Please input the amount');
+                return;
+            }
+            if(amount < 100){
+                setAmountError(true);
+                setAmountErrorMessage('Amount cannot be less than 100');
                 return;
             }
             navigation.navigate("DebitCardPayment",{
@@ -209,7 +217,7 @@ const WalletTopUp = ({ navigation }) => {
                         />
                     </View>
                     <View>
-                        {amountError ? <Text style={{ marginTop: '1.2%', marginLeft: '2.5%', color: 'red' }}>Please input the amount</Text> : <></>}
+                        {amountError ? <Text style={{ marginTop: '1.2%', marginLeft: '2.5%', color: 'red' }}>{this.state.amountErrorMessage}</Text> : <></>}
                     </View>
                 </>: 
                 <></>
@@ -242,10 +250,10 @@ const WalletTopUp = ({ navigation }) => {
                                 </TouchableOpacity>
                             </View>
                             <View style={{ marginTop: '0%', alignItems: 'center'}}>
-                                <Text style={{fontFamily: "Lato-Bold", fontSize:16, color: "#393636"}}>Register your BVN for better experience</Text>
+                                <Text style={{fontFamily: "Lato-Bold", fontSize:16, color: "#393636"}}>Verify your BVN for better experience</Text>
                             </View>
                             <View style={{ marginTop: '2%', alignItems: 'center', justifyContent:"center"}}>
-                                <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}>Kindly note that you would be required to register your BVN to have access to the Virtual account option for wallet funding and other services attached to this option. </Text>
+                                <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}>Kindly verify your BVN to create your Virtual account - the easiest way to fund your wallet.</Text>
                             </View>
                             <View style={{marginLeft: '3%', marginTop: '10%', }}>
                                 <TouchableOpacity info style={styles.proceedButton} onPress={ proceedtoVirtualAccountCreation }>

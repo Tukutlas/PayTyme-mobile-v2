@@ -22,16 +22,14 @@ export default class AccountVerification extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            modalVisible1: false,
-            isChecked: false,
             isLoading: false,
-            modalVisible: false,
             result: '',
             auth_token: '', 
             phone: '',
             otp: '',
             otpError: false,
             otpErrorMessage: '',
+            timer: 60,
         }
     }
 
@@ -43,30 +41,17 @@ export default class AccountVerification extends Component {
         this.setState({ isLoading: true });
     };
 
-    openProgressbar () {
-        this.setState({ isProgress: true })
-        this.setState({ isLoading: true });
-    }
-
-    closeProgressbar () {
-        this.setState({ isProgress: false });
-        this.setState({ isLoading: false });
-    }
-
     async UNSAFE_componentWillMount() {
         // this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});//, phone:await AsyncStorage.getItem('phone')});  
         this.setState({phone: this.props.route.params.phonenumber})      
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
+        this.startTimer();
     }
 
     backPressed = () => {
         this.props.navigation.goBack();
         return true;  
     };
-
-    setModalVisible(visible) {
-        this.setState({ modalVisible1: visible });
-    }
 
     setOtp = (otp) => {
         this.setState({
@@ -141,11 +126,98 @@ export default class AccountVerification extends Component {
         }
     }
 
+    startTimer = () => {
+        this.interval = setInterval(() => {
+            this.setState((prevState) => ({
+                timer: prevState.timer - 1,
+            }));
+        }, 1000);
+    };
+
+    handleResendPress = () => {
+        this.setState({timer:60})
+        
+        Alert.alert(
+            'OTP',
+            'Select where you want to receive the otp',
+            [
+                {
+                    text: 'WhatsApp',
+                    style: 'cancel',
+                    onPress: () => this.sendOtp('WhatsApp'),
+                },
+                {
+                    text: 'sms',
+                    style: 'cancel',
+                    onPress: () => this.sendOtp('sms'),
+                } 
+            ],
+            {cancelable: false},
+        );
+    };
+
+    sendOtp(channel){
+        this.startTimer()
+        let myHeaders = new Headers();
+        // myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
+        myHeaders.append("Content-Type", "application/json");
+
+        let raw = JSON.stringify({
+            "phone": this.state.phone,
+            "channel": channel
+        });
+
+        let requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw
+        };
+            
+        this.setState({isLoading:true});
+        
+        fetch(GlobalVariables.apiURL+'/auth/send-otp', requestOptions)
+        .then(response => response.text())
+        .then(responseText => 
+        {
+            this.setState({isLoading:false});
+            let result = JSON.parse(responseText);
+            if(result.status == true){
+                Alert.alert(
+                    'Successful',
+                    result.message,
+                    [
+                        {
+                            text: 'OK',
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }else {
+                Alert.alert(
+                    'Error',
+                    result.message,
+                    [
+                        {
+                            text: 'OK',
+                            style: 'cancel',
+                        }, 
+                    ],
+                    {cancelable: false},
+                );
+            }
+        })
+        .catch((error) => {
+            this.setState({isLoading:false});
+            alert("Network error. Please check your connection settings");
+        });   
+    }
+
     render(){
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#ffff", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#ffff", true);
+            StatusBar.setTranslucent(true);
         }
         return (
             <View style={{backgroundColor: 'white'}}>
@@ -174,6 +246,19 @@ export default class AccountVerification extends Component {
                     </View>
                 </View>
                 {this.state.otpError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.otpErrorMessage}</Text>}
+                <View style={{ width: '97%', alignItems: 'center', marginTop: '10%' }}>
+                    {this.state.timer > 0 ? (
+                    <Text style={{ marginLeft: '3%', fontStyle: 'italic', color: '#777777' }}>
+                        Resend Code in {this.state.timer} seconds
+                    </Text>
+                    ) : (
+                    <TouchableOpacity onPress={this.handleResendPress}>
+                        <Text style={{ marginLeft: '3%', fontStyle: 'italic', color: '#222222', textDecorationLine: 'underline' }}>
+                            Resend Code
+                        </Text>
+                    </TouchableOpacity>
+                    )}
+                </View>
                 
                 <View style={{marginTop:'25%'}}>
                     <TouchableOpacity info style={styles.buttonPurchase} onPress={() => {this.verifyCode();}}>

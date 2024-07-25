@@ -7,6 +7,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 // import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import DeviceInfo from 'react-native-device-info';
+
 export default class Signup extends Component {
     constructor(props) {
         super(props)
@@ -42,7 +44,10 @@ export default class Signup extends Component {
             hideConfirmPassword: true,
             confirmPasswordError: false,
             confirmPasswordErrorMessage: '',
-            isKeyboardOpen: false
+            isKeyboardOpen: false,
+            referralCode: '',
+            referralCodeError: false,
+            referralCodeErrorMessage: ''
         }
     }
 
@@ -119,6 +124,10 @@ export default class Signup extends Component {
         let email = this.state.email.replace(/^\s+|\s+$/g, "");
         let password = this.state.password.replace(/^\s+|\s+$/g, "");
         let confirmPassword = this.state.confirmPassword.replace(/^\s+|\s+$/g, "");
+        let referralCode = this.state.referralCode.replace(/^\s+|\s+$/g, "");
+        // let deviceId = DeviceInfo.getDeviceId();
+        // let deviceType = DeviceInfo.getDeviceType();
+        // let deviceIpAddress = DeviceInfo.getIpAddress();
         // let emailVerified = this.state.emailVerified;
         // if(emailVerified == false){
         //     alert('Email has not been verified');
@@ -210,6 +219,13 @@ export default class Signup extends Component {
                     + "&password=" + password
                     + "&password_confirmation=" + confirmPassword
                     + "&username=" + username
+                    + "&referral_code="+ referralCode
+                    + "&device_name=" + DeviceInfo.getDeviceName()
+                    + "&device_type=" + Platform.OS
+                    + "&device_id="+ DeviceInfo.getUniqueId()
+                    + "&device_model="+ DeviceInfo.getDeviceId()
+                    + "&device_brand="+ DeviceInfo.getBrand()
+                    // + "&device_ipaddress="+
                 // +"&url=https://paytyme.org/appbackend/email-verification"
 
                 // <-- Post parameters
@@ -218,6 +234,7 @@ export default class Signup extends Component {
             .then((responseText) => {
                 dis.closeProgressbar();
                 let res = JSON.parse(responseText);
+                console.log(res)
                 if (res.status == true) {
                     Alert.alert(
                         'Successful!',
@@ -235,18 +252,56 @@ export default class Signup extends Component {
                         { cancelable: false },
                     );
                 }else {
-                    Alert.alert(
-                        'Oops... Registration issues',
-                        res.message,
-                        [
-                            {
-                                text: 'Try Again',
-                                style: 'cancel',
-                            },
+                    const { data } = res; // Destructure to get the data object inside res.data
+                    console.log(data)
+                    const usernameError = data.username ? data.username[0] : null;
+                    const emailError = data.email_address ? data.email_address[0] : null;
+                    const phoneNumberError = data.phone_number ? data.phone_number[0] : null;
+                    const referralCodeError = data.referral_code ? data.referral_code[0] : null;
 
-                        ],
-                        { cancelable: false },
-                    );
+                    if(emailError == 'The email address has already been taken.'){
+                        Alert.alert(
+                            'Oops... Registration issues',
+                            res.message,
+                            [
+                                {
+                                    text: 'Cancel',
+                                    style: 'cancel',
+                                },
+                                {
+                                    text: 'Procceed to Login.',
+                                    onPress: () => this.props.navigation.navigate('Signin'),
+                                    style: 'cancel',
+                                },
+
+                            ],
+                            { cancelable: false },
+                        );
+                    }
+
+                    this.setState({
+                        usernameError: !!usernameError,
+                        emailError: !!emailError,
+                        phoneError: !!phoneNumberError,
+                        referralCodeError: !!referralCodeError,
+                        usernameErrorMessage: usernameError,
+                        emailErrorMessage: emailError,
+                        phoneErrorMessage: phoneNumberError,
+                        referralCodeErrorMessage: referralCodeError
+                    });
+
+                    // Alert.alert(
+                    //     'Oops... Registration issues',
+                    //     res.message,
+                    //     [
+                    //         {
+                    //             text: 'Try Again',
+                    //             style: 'cancel',
+                    //         },
+
+                    //     ],
+                    //     { cancelable: false },
+                    // );
                 }  
             })
             .catch((error) => {
@@ -639,6 +694,24 @@ export default class Signup extends Component {
                                 }
                             </View>
                             {this.state.usernameError && <Text style={{ color: 'red' }}>{this.state.usernameErrorMessage}</Text>}
+                        </View>
+                    </View>
+
+                    <View style={[styles.formLine, { paddingTop: 5 }]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Referral Code</Text>
+                            <View roundedc style={styles.inputitem}>
+                                <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Input a referral code" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="referralCode" onChangeText={(referralCode) => this.setState({ referralCode })} />
+                                { 
+                                    this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
+                                        {/* <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} /> */}
+                                        <MaterialCommunityIcons name={'keyboard-off'} color={'#A9A9A9'} size={22} style={[styles.keyboardIcon]}/>
+                                    </TouchableOpacity> : ''
+                                }
+                            </View>
+                            {this.state.referralCodeError && <Text style={{ color: 'red' }}>{this.state.referralCodeErrorMessage}</Text>}
                         </View>
                     </View>
 

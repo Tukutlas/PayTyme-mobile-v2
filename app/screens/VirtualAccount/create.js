@@ -13,7 +13,6 @@ export default class CreateVirtualAccount extends Component {
         super(props, context);
         this.state = {
             auth_token:"",
-            modalVisible: false,
             balance:"...",
             wallet_id: "",
             view: false,
@@ -330,6 +329,7 @@ export default class CreateVirtualAccount extends Component {
                         "account_number": "" + account_number + "",
                     };
                     AsyncStorage.setItem('bank_details', JSON.stringify(bank_details))
+                    AsyncStorage.setItem('tier', '1');
                     // result.message
                     Alert.alert(
                         'Successful',

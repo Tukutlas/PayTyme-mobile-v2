@@ -33,7 +33,7 @@ export default class Home extends Component {
         this.setState({
             auth_token: JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token,
             username: JSON.parse(await AsyncStorage.getItem('login_response')).user.username,
-            tier: JSON.parse(await AsyncStorage.getItem('login_response')).user.tier
+            tier: await AsyncStorage.getItem('tier')
         });
 
         if (JSON.parse(await AsyncStorage.getItem('login_response')).user.image !== null) {
@@ -42,10 +42,12 @@ export default class Home extends Component {
 
         // await AsyncStorage.removeItem('lastShownDate');
         const lastShownDate = await AsyncStorage.getItem('lastShownDate');
-        
-        this.checkIfUserHasVirtualAccount(lastShownDate);
         this.loadWalletBalance();
         this.getTransactionHistory();
+
+        setTimeout(async () => {    
+            this.checkIfUserHasVirtualAccount(lastShownDate);
+        }, 5000);
         
         let walletVisibility = await AsyncStorage.getItem('walletVisibility');
 
@@ -267,7 +269,7 @@ export default class Home extends Component {
                 if (lastShownDate === null) {
                     // Modal hasn't been shown yet
                     this.setModalVisible(true);
-                    console.log('setting modal visible');
+                    // console.log('setting modal visible');
                 } else {
                     const currentDate = new Date().toDateString();
                     if (currentDate !== lastShownDate) {
@@ -528,7 +530,7 @@ export default class Home extends Component {
                                     <Text style={{fontFamily: "Lato-Bold", fontSize:16, color: "#393636"}}>Register your BVN for better experience</Text>
                                 </View>
                                 <View style={{ marginTop: '2%', alignItems: 'center', justifyContent:"center"}}>
-                                    <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}> Kindly verify your BVN to have access to the Virtual account option for wallet funding and other services attached to this option. </Text>
+                                    <Text style={{fontFamily: "Lato-Regular", fontSize:14, color: "#676767"}}> Kindly verify your BVN to create your Virtual account - the easiest way to fund your wallet.</Text>
                                 </View>
                                 
                                 <View style={{marginLeft: '3%', marginTop: '10%', }}>

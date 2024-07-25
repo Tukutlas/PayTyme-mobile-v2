@@ -94,7 +94,7 @@ export default class ForgotPassword extends Component {
             }) 
             .then((response) => response.text())
             .then((responseText) => { 
-                console.log(responseText)
+                // console.log(responseText)
                 this.setState({isLoading:false});
                 let response_status = JSON.parse(responseText).status;
                 // console.log(JSON.parse(responseText).message);

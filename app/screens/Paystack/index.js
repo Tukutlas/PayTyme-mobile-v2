@@ -44,9 +44,9 @@ export default class Paystack extends Component {
     
     _onNavigationStateChange = async (webViewState) => {
         const url = webViewState.url;
-        console.log(url);
+        // console.log(url);
         const string = url.split("?");
-        console.log(string[0]);
+        // console.log(string[0]);
       
         if (string[0] === "https://api.paytyme.com.ng/verify") {
     //         const params = queryString.parse(url);

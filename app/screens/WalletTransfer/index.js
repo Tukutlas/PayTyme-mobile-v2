@@ -265,7 +265,8 @@ export default class WalletTransfer extends Component {
                 this.props.navigation.navigate("StatusPage",
                 {
                     transaction_id:response.data.transaction.id,
-                    Screen: 'WalletTransfer'
+                    Screen: 'WalletTransfer',
+                    status: 'successful'
                 });
             }else if(response.status == false){
                 this.setState({isLoading:false});
