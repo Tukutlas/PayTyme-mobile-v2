@@ -10,6 +10,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import * as DocumentPicker from 'expo-document-picker';
 import Rate, { AndroidMarket } from 'react-native-rate';
 import { Camera } from 'expo-camera';
+import DeviceInfo from 'react-native-device-info';
 
 export default class Profile extends Component {
     constructor(props, context) {
@@ -32,7 +33,8 @@ export default class Profile extends Component {
             fileSize: null,
             fileMimeType: null,
             // profilePicture: '../../../assets/logo.png'
-            profilePicture: null 
+            profilePicture: null,
+            appVersion: DeviceInfo.getVersion()
         };
     }
     
@@ -365,8 +367,8 @@ export default class Profile extends Component {
     render(){
         StatusBar.setBarStyle("light-content", true);
         if (Platform.OS === "android") {
-          StatusBar.setBackgroundColor("#120A47", true);
-          StatusBar.setTranslucent(true);
+            StatusBar.setBackgroundColor("#120A47", true);
+            StatusBar.setTranslucent(true);
         }
 
         return (
@@ -492,7 +494,7 @@ export default class Profile extends Component {
                             </View>
                             <View style={{flexDirection:'row', marginTop: '3%', marginLeft: '2%', justifyContent:'flex-start'}}>
                                 <FontAwesome5 name={'info-circle'} color={'#120A47'} size={15} style={{ alignSelf:'center' }}/> 
-                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%'}}>Version 1.0</Text>
+                                <Text style={{fontSize:20, fontWeight: 'bold', color:'#120A47', marginLeft:'5%'}}>Version {this.state.appVersion}</Text>
                             </View>
                         </View>
                         
