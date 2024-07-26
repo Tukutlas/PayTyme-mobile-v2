@@ -194,7 +194,7 @@ export default class ResetPassword extends Component {
                 </View>
                 <View style={[styles.formLine, { paddingTop: 10 }]}>
                     <View style={styles.formCenter}>
-                        <Text style={styles.labeltext}>Enter your Password</Text>
+                        <Text style={styles.labeltext}>Input New Password</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                             <TextInput placeholder="Type in the new Password" secureTextEntry={this.state.hidePassword} style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="password" onChangeText={(password) => this.setState({ password })}/>
