@@ -397,11 +397,15 @@ export default class Signin extends Component {
                         );
                     } else if(JSON.parse(responseText).device_status == 'unauthenticated'){
                         Alert.alert(
-                            'Oops',
+                            'Note',
                             JSON.parse(responseText).message,
                             [
                                 {
-                                    text: 'Register Device',
+                                    text: 'No',
+                                    style: 'cancel',
+                                },
+                                {
+                                    text: 'Yes',
                                     onPress: () => {
                                         this.registerDevice(JSON.parse(responseText).data);
                                     },
@@ -412,8 +416,8 @@ export default class Signin extends Component {
                         );
                     }else {
                         Alert.alert(
-                            'Oops',
                             'Invalid Login Credentials',
+                            'Kindly check your email address and password and try again!',
                             [
                                 {
                                     text: 'Try Again',

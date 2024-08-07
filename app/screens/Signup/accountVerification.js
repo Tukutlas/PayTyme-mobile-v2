@@ -173,7 +173,7 @@ export default class AccountVerification extends Component {
             body: raw
         };
             
-        this.setState({isLoading:true});
+        this.setState({isLoading:true}); 
         
         fetch(GlobalVariables.apiURL+'/auth/send-otp', requestOptions)
         .then(response => response.text())

@@ -202,7 +202,6 @@ export default class Signup extends Component {
         }
 
         if (error == 0)  {
-            //this.props.onPressFBsms(this.phone.getValue().replace('234',''), this.state.email) //temp hardcoded
             dis.openProgressbar();
 
             //post data to backend api
@@ -226,15 +225,12 @@ export default class Signup extends Component {
                     + "&device_model="+ DeviceInfo.getDeviceId()
                     + "&device_brand="+ DeviceInfo.getBrand()
                     // + "&device_ipaddress="+
-                // +"&url=https://paytyme.org/appbackend/email-verification"
-
                 // <-- Post parameters
             })
             .then((response) => response.text())
             .then((responseText) => {
                 dis.closeProgressbar();
                 let res = JSON.parse(responseText);
-                console.log(res)
                 if (res.status == true) {
                     Alert.alert(
                         'Successful!',
@@ -253,7 +249,6 @@ export default class Signup extends Component {
                     );
                 }else {
                     const { data } = res; // Destructure to get the data object inside res.data
-                    console.log(data)
                     const usernameError = data.username ? data.username[0] : null;
                     const emailError = data.email_address ? data.email_address[0] : null;
                     const phoneNumberError = data.phone_number ? data.phone_number[0] : null;
@@ -289,19 +284,6 @@ export default class Signup extends Component {
                         phoneErrorMessage: phoneNumberError,
                         referralCodeErrorMessage: referralCodeError
                     });
-
-                    // Alert.alert(
-                    //     'Oops... Registration issues',
-                    //     res.message,
-                    //     [
-                    //         {
-                    //             text: 'Try Again',
-                    //             style: 'cancel',
-                    //         },
-
-                    //     ],
-                    //     { cancelable: false },
-                    // );
                 }  
             })
             .catch((error) => {
