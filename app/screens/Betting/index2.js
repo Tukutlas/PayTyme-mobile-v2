@@ -27,10 +27,10 @@ export default class Betting extends Component {
             bettingOptions: [
                 { label: '1xbet', value: '1xBet', icon: () => <Image source={require('../../Images/Betting/1xbet.png')} style={{ width: 30, height: 30 }} /> },
                 { label: 'BangBet', value: 'BangBet', icon: () => <Image source={require('../../Images/Betting/bangbet.png')} style={{ width: 30, height: 30 }} /> },
+                { label: 'Bet9ja', value: 'Bet9ja', icon: () => <Image source={require('../../Images/Betting/bet9ja.png')} style={{ width: 30, height: 30 }} /> },
                 { label: 'BetKing', value: 'BetKing', icon: () => <Image source={require('../../Images/Betting/betking.jpg')} style={{ width: 30, height: 30 }} /> },
                 { label: 'BetLand', value: 'BetLand', icon: () => <Image source={require('../../Images/Betting/betland.jpeg')} style={{ width: 30, height: 30 }} /> },
                 { label: 'BetLion', value: 'BetLion', icon: () => <Image source={require('../../Images/Betting/betlion.png')} style={{ width: 30, height: 30 }} /> },
-                { label: 'BetNaija', value: 'Bet9', icon: () => <Image source={require('../../Images/Betting/bet9ja.png')} style={{ width: 30, height: 30 }} /> },
                 { label: 'BetWay', value: 'BetWay', icon: () => <Image source={require('../../Images/Betting/betway.png')} style={{ width: 30, height: 30 }} /> },
                 { label: 'CloudBet', value: 'CloudBet', icon: () => <Image source={require('../../Images/Betting/cloudbet.jpg')} style={{ width: 30, height: 30 }} /> },
                 { label: 'LiveScoreBet', value: 'LiveScoreBet', icon: () => <Image source={require('../../Images/Betting/livescorebet.jpg')} style={{ width: 30, height: 30 }} /> },
