@@ -1,0 +1,3 @@
+npx expo start 
+npx expo start --dev-client 
+npx expo start --dev-client --tunnel
