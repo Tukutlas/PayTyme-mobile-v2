@@ -171,7 +171,7 @@ export default class Airtime extends Component {
         })
         .then((response) => response.text())
         .then((responseText) => {
-            this.setState({ isLoading: false });
+            // this.setState({ isLoading: false });
             let res = JSON.parse(responseText);
             if (res.status == true) {
                 let data = res.data;
@@ -179,7 +179,7 @@ export default class Airtime extends Component {
             }
         })
         .catch((error) => {
-            this.setState({ isLoading: false });
+            // this.setState({ isLoading: false });
             // alert("Network error. Please check your connection settings");
         });
     }
