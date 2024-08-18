@@ -63,7 +63,7 @@ export default class Data extends Component {
             }
         );
         this.loadWalletBalance();
-        // this.getDataNumbers();
+        this.getDataNumbers();
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
 
         this.keyboardDidShowListener = Keyboard.addListener(

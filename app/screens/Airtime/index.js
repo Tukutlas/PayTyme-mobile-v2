@@ -43,9 +43,7 @@ export default class Airtime extends Component {
             transaction: false,
             there_cards: false,
             isKeyboardOpen: false,
-            prevPhoneNumbers:[
-                '08123456789', '09064893038','09071654480', '08101086106', '08035606188', '08034895264'
-            ]
+            prevPhoneNumbers:[]
         };
     }
 
@@ -59,6 +57,7 @@ export default class Airtime extends Component {
             }
         );
         this.loadWalletBalance();
+        this.getAirtimeNumbers();
         this.getUserCards();
        
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
@@ -181,7 +180,7 @@ export default class Airtime extends Component {
         })
         .catch((error) => {
             this.setState({ isLoading: false });
-            alert("Network error. Please check your connection settings");
+            // alert("Network error. Please check your connection settings");
         });
     }
 
