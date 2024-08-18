@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         backgroundColor: '#fff',
         width: '97%',
-        paddingTop: 0,
+        // paddingTop: 0,
     },
 
     formCenter: {
@@ -149,8 +149,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         padding: 1,
         width: '100%',
-        // marginTop: 50
-        paddingTop: Metrics.HEIGHT * 0.015,
+        marginTop: '2%',
+        // paddingTop: Metrics.HEIGHT * 0.015,
     },
 
     flexx: {
@@ -227,7 +227,6 @@ const styles = StyleSheet.create({
         borderWidth: 4,
         borderColor: '#f5f5f5'
     },
-
 });
 
 export default styles;

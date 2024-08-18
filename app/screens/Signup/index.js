@@ -248,7 +248,7 @@ export default class Signup extends Component {
                         { cancelable: false },
                     );
                 }else {
-                    const { data } = res; // Destructure to get the data object inside res.data
+                    const { data, message } = res; // Destructure to get the data object inside res.data
                     const usernameError = data.username ? data.username[0] : null;
                     const emailError = data.email_address ? data.email_address[0] : null;
                     const phoneNumberError = data.phone_number ? data.phone_number[0] : null;
@@ -257,7 +257,7 @@ export default class Signup extends Component {
                     if(emailError == 'The email address has already been taken.'){
                         Alert.alert(
                             'Oops... Registration issues',
-                            res.message,
+                            message,
                             [
                                 {
                                     text: 'Cancel',
@@ -584,7 +584,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>First Name</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your first name" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="firstname" onChangeText={(firstname) => this.setState({ firstname })} />
+                                <TextInput placeholder="Enter your first name" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="firstname" onChangeText={(firstname) => this.setState({ firstname })} autoComplete="given-name"/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
@@ -602,7 +602,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Last Name</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your last name" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="lastname" onChangeText={(lastname) => this.setState({ lastname })} />
+                                <TextInput placeholder="Enter your last name" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="lastname" onChangeText={(lastname) => this.setState({ lastname })} autoComplete="family-name"/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
@@ -648,7 +648,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Phone</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="+234" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" returnKeyType="done" onChangeText={(phone) => this.setState({ phone })} />
+                                <TextInput placeholder="+234" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType="numeric" returnKeyType="done" onChangeText={(phone) => this.setState({ phone })} autoComplete="tel"/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
@@ -666,7 +666,7 @@ export default class Signup extends Component {
                             <Text style={styles.labeltext}>Username</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Input a preferred username" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="username" onChangeText={(username) => this.setState({ username })} />
+                                <TextInput placeholder="Input a preferred username" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="username" onChangeText={(username) => this.setState({ username })} autoComplete="username"/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>

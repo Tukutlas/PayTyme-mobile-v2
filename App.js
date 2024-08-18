@@ -22,6 +22,7 @@ import SingleTransaction from './app/screens/Transactions/singleTransaction';
 import WalletTransfer from './app/screens/WalletTransfer';
 import WalletTopUp from './app/screens/WalletTopUp/index2';
 import Airtime from './app/screens/Airtime';
+// import Airtime from './app/screens/Airtime/index2';
 import Data from './app/screens/Data';
 import TvSubscription from './app/screens/TvSubscription';
 import Insurance from './app/screens/Insurance';

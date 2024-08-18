@@ -8,6 +8,7 @@ import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
+import AutocompleteComponent from "../../components/AutocompleteComponent";
 
 export default class Airtime extends Component {
     constructor(props) {
@@ -41,7 +42,10 @@ export default class Airtime extends Component {
             isLoading:false,
             transaction: false,
             there_cards: false,
-            isKeyboardOpen: false
+            isKeyboardOpen: false,
+            prevPhoneNumbers:[
+                '08123456789', '09064893038','09071654480', '08101086106', '08035606188', '08034895264'
+            ]
         };
     }
 
@@ -155,9 +159,39 @@ export default class Airtime extends Component {
         });     
     }
 
+    getAirtimeNumbers() {
+        fetch(GlobalVariables.apiURL + "/topup/airtime/numbers",
+        {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body: ""
+            // <-- Post parameters
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            this.setState({ isLoading: false });
+            let res = JSON.parse(responseText);
+            if (res.status == true) {
+                let data = res.data;
+                this.setState({ prevPhoneNumbers: data });
+            }
+        })
+        .catch((error) => {
+            this.setState({ isLoading: false });
+            alert("Network error. Please check your connection settings");
+        });
+    }
+
     numberFormat = x => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
+
+    handleSelect= (item) => {
+        this.setState({phonenumber_value:item});
+    }
 
     getUserCards(){
         this.setState({isLoading:true});
@@ -451,12 +485,13 @@ export default class Airtime extends Component {
                             <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
                         </View> 
                     </View>
-                    <View style={[styles.formLine]}>
+                    <View style={[styles.formLine, { zIndex: 1}]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Enter Phone Number</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setState({phonenumber_value})} value={this.state.phonenumber_value}  />
+                                {/* <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setState({phonenumber_value})} value={this.state.phonenumber_value}  autoComplete="tel"/> */}
+                                <AutocompleteComponent placeholder="Type in Phone Number" data={this.state.prevPhoneNumbers} onSelect={this.handleSelect}/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>

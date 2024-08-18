@@ -9,6 +9,7 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import { CommonActions } from '@react-navigation/native';
+import AutocompleteComponent from "../../components/AutocompleteComponent";
 
 export default class Data extends Component {
     constructor(props) {
@@ -47,7 +48,8 @@ export default class Data extends Component {
             phoneError: false,
             phoneErrorMessage: '',
             bundleError: false,
-            bundleErrorMessage: ''
+            bundleErrorMessage: '',
+            prevPhoneNumbers: []
         };
     }
 
@@ -61,6 +63,7 @@ export default class Data extends Component {
             }
         );
         this.loadWalletBalance();
+        // this.getDataNumbers();
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
 
         this.keyboardDidShowListener = Keyboard.addListener(
@@ -145,6 +148,32 @@ export default class Data extends Component {
                     ],
                     { cancelable: false },
                 );
+            }
+        })
+        .catch((error) => {
+            this.setState({ isLoading: false });
+            alert("Network error. Please check your connection settings");
+        });
+    }
+
+    getDataNumbers() {
+        fetch(GlobalVariables.apiURL + "/topup/data/numbers",
+        {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body: ""
+            // <-- Post parameters
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            this.setState({ isLoading: false });
+            let res = JSON.parse(responseText);
+            if (res.status == true) {
+                let data = res.data;
+                this.setState({ prevPhoneNumbers: data });
             }
         })
         .catch((error) => {
@@ -483,6 +512,10 @@ export default class Data extends Component {
         }
     }
 
+    handleSelect= (item) => {
+        this.setState({phonenumber_value:item});
+    }
+
     setBundleOpen = (bundleOpen) => {
         this.setState({
             bundleOpen
@@ -560,12 +593,13 @@ export default class Data extends Component {
                             <Image style={styles.logo} source={require('../../../assets/logo.png')} />
                         </View>
                     </View>
-                    <View style={[styles.formLine, {marginTop: '-2%'}]}>
+                    <View style={[styles.formLine, {marginTop: '-2%', zIndex: 1}]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Enter Phone Number</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon} />
-                                <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setPhone(phonenumber_value)} />
+                                {/* <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setPhone(phonenumber_value)} /> */}
+                                <AutocompleteComponent placeholder="Type in Phone Number" data={this.state.prevPhoneNumbers} onSelect={this.handleSelect}/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
