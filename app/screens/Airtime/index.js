@@ -43,7 +43,8 @@ export default class Airtime extends Component {
             transaction: false,
             there_cards: false,
             isKeyboardOpen: false,
-            prevPhoneNumbers:[]
+            prevPhoneNumbers:[],
+            phoneNumbersWithNetwork: []
         };
     }
 
@@ -174,8 +175,12 @@ export default class Airtime extends Component {
             // this.setState({ isLoading: false });
             let res = JSON.parse(responseText);
             if (res.status == true) {
-                let data = res.data;
-                this.setState({ prevPhoneNumbers: data });
+                let phoneNumbersWithNetwork = res.data;
+                let phoneNumbers = [];
+                phoneNumbersWithNetwork.forEach(data => {
+                    phoneNumbers.push(data.phone_number);
+                });
+                this.setState({ prevPhoneNumbers: phoneNumbers, phoneNumbersWithNetwork: phoneNumbersWithNetwork});
             }
         })
         .catch((error) => {
@@ -188,8 +193,49 @@ export default class Airtime extends Component {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
 
-    handleSelect= (item) => {
-        this.setState({phonenumber_value:item});
+    handleSelect= (phoneNumber) => {
+        this.setState({phonenumber_value:phoneNumber});
+        const selectedNumber = this.state.phoneNumbersWithNetwork.find(item => item.phone_number === phoneNumber);
+        if (selectedNumber) {
+            switch (selectedNumber.network.toLowerCase()) {
+                case 'airtel':
+                    this.setState({mtn: false, glo: false, airtel: true, etisalat: false});
+                    break;
+                case 'etisalat':
+                case '9mobile':
+                    this.setState({mtn: false, glo: false, airtel: false, etisalat: true});
+                    break;
+                case 'glo':
+                    this.setState({mtn: false, glo: true, airtel: false, etisalat: false});
+                    break;
+                case 'mtn':
+                    this.setState({mtn: true, glo: false, airtel: false, etisalat: false});
+                    break;
+                default:
+                    this.setState({mtn: false, glo: false, airtel: false, etisalat: false});
+            }
+        } else {
+            // If no match found in phoneNumbersWithNetwork, determine network by prefix
+            let networkPrefix = phoneNumber.startsWith('2340') ? phoneNumber.slice(4, 7) :
+                        phoneNumber.startsWith('234') ? phoneNumber.slice(3, 6) : phoneNumber.slice(1, 4);
+            const mtnPrefixes = ['703', '706', '803', '806', '810', '813', '814', '816', '903', '906', '913', '916'];
+
+            const airtelPrefixes = ['701', '708', '802', '808', '812', '901', '902', '904', '907', '911', '912'];
+            const gloPrefixes = ['805', '807', '705', '815', '811', '905'];
+            const etisalatPrefixes = ['809', '817', '818', '909', '908'];
+
+            if (mtnPrefixes.some(prefix => networkPrefix.startsWith(prefix))) {
+                this.setState({mtn: true, glo: false, airtel: false, etisalat: false});
+            } else if (airtelPrefixes.some(prefix => networkPrefix.startsWith(prefix))) {
+                this.setState({mtn: false, glo: false, airtel: true, etisalat: false});
+            } else if (gloPrefixes.some(prefix => networkPrefix.startsWith(prefix))) {
+                this.setState({mtn: false, glo: true, airtel: false, etisalat: false});
+            } else if (etisalatPrefixes.some(prefix => networkPrefix.startsWith(prefix))) {
+                this.setState({mtn: false, glo: false, airtel: false, etisalat: true});
+            } else {
+                this.setState({mtn: false, glo: false, airtel: false, etisalat: false});
+            }
+        }
     }
 
     getUserCards(){
@@ -241,7 +287,7 @@ export default class Airtime extends Component {
         let phonenumber_value = this.state.phonenumber_value;
         let network ="";
         
-        if(this.state.mtn ==true){
+        if(this.state.mtn == true){
             network="MTN";
         }else if(this.state.airtel == true){
             network="AIRTEL";

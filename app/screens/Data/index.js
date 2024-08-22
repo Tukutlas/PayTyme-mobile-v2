@@ -49,7 +49,8 @@ export default class Data extends Component {
             phoneErrorMessage: '',
             bundleError: false,
             bundleErrorMessage: '',
-            prevPhoneNumbers: []
+            prevPhoneNumbers:[],
+            phoneNumbersWithNetwork: []
         };
     }
 
@@ -172,8 +173,12 @@ export default class Data extends Component {
             // this.setState({ isLoading: false });
             let res = JSON.parse(responseText);
             if (res.status == true) {
-                let data = res.data;
-                this.setState({ prevPhoneNumbers: data });
+                let phoneNumbersWithNetwork = res.data;
+                let phoneNumbers = [];
+                phoneNumbersWithNetwork.forEach(data => {
+                    phoneNumbers.push(data.phone_number);
+                });
+                this.setState({ prevPhoneNumbers: phoneNumbers, phoneNumbersWithNetwork: phoneNumbersWithNetwork});
             }
         })
         .catch((error) => {
@@ -182,9 +187,9 @@ export default class Data extends Component {
         });
     }
 
-    getDataPlans(network) {
+    getDataPlans(network, loader = true) {
         if (network != "") {
-            this.setState({ isLoading: true });
+            this.setState({ isLoading: loader });
 
             fetch(GlobalVariables.apiURL + "/topup/data/bundles?network=" + network,
             {
@@ -512,9 +517,78 @@ export default class Data extends Component {
         }
     }
 
-    handleSelect= (item) => {
-        this.setState({phonenumber_value:item});
-    }
+    handleSelect = (phoneNumber) => {
+        this.setState({ phonenumber_value: phoneNumber });
+    
+        const selectedNumber = this.state.phoneNumbersWithNetwork.find(
+            (item) => item.phone_number === phoneNumber
+        );
+    
+        const networks = {
+            mtn: false,
+            glo: false,
+            airtel: false,
+            etisalat: false,
+        };
+    
+        const setNetworkState = (networkKey) => {
+            this.setState({
+                ...networks,
+                [networkKey]: true,
+            });
+        };
+    
+        const networkPrefix = phoneNumber.startsWith('2340')
+            ? phoneNumber.slice(4, 7)
+            : phoneNumber.startsWith('234')
+            ? phoneNumber.slice(3, 6)
+            : phoneNumber.slice(1, 4);
+    
+        let network = '';
+    
+        if (selectedNumber) {
+            network = selectedNumber.network.toLowerCase();
+            switch (network) {
+                case 'airtel':
+                    setNetworkState('airtel');
+                    break;
+                case 'etisalat':
+                case '9mobile':
+                    setNetworkState('etisalat');
+                    break;
+                case 'glo':
+                    setNetworkState('glo');
+                    break;
+                case 'mtn':
+                    setNetworkState('mtn');
+                    break;
+                default:
+                    this.setState(networks);
+            }
+        } else {
+            const prefixNetworks = {
+                mtn: ['703', '706', '803', '806', '810', '813', '814', '816', '903', '906', '913', '916'],
+                airtel: ['701', '708', '802', '808', '812', '901', '902', '904', '907', '911', '912'],
+                glo: ['805', '807', '705', '815', '811', '905'],
+                etisalat: ['809', '817', '818', '909', '908'],
+            };
+    
+            for (const [networkKey, prefixes] of Object.entries(prefixNetworks)) {
+                if (prefixes.some((prefix) => networkPrefix.startsWith(prefix))) {
+                    network = networkKey;
+                    setNetworkState(networkKey);
+                    break;
+                }
+            }
+        }
+    
+        // Only fetch data plans if the prefix has changed
+        if (networkPrefix !== this.state.lastNetworkPrefix) {
+            this.setState({ lastNetworkPrefix: networkPrefix });
+            this.getDataPlans(network, false);
+        }
+    };
+    
 
     setBundleOpen = (bundleOpen) => {
         this.setState({

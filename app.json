@@ -2,7 +2,7 @@
   "expo": {
     "name": "PayTyme",
     "slug": "PayTyme",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -64,7 +64,7 @@
         "READ_EXTERNAL_STORAGE"
       ],
       "package": "com.app.paytyme",
-      "versionCode": 6
+      "versionCode": 7
     },
     "web": {
       "favicon": "./assets/favicon.png"

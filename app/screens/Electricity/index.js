@@ -8,6 +8,7 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
+import AutocompleteComponent from "../../components/AutocompleteComponent";
 
 export default class Electricity extends Component {
     constructor(props) {
@@ -58,6 +59,7 @@ export default class Electricity extends Component {
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
 
         this.loadWalletBalance();
+        this.getElectrictyMeterNumbers();
 
         this.keyboardDidShowListener = Keyboard.addListener(
             'keyboardDidShow',
@@ -120,6 +122,10 @@ export default class Electricity extends Component {
             alert("Network error. Please check your connection settings");
         });      
     }
+
+    getElectrictyMeterNumbers(){
+        
+    };
 
     backPressed = () => {
         if(this.state.transaction){

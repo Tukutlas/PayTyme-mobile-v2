@@ -234,7 +234,7 @@ export default class Signin extends Component {
         }
     }
 
-    signInUser = async (dis) => {
+    signInUser = async () => {
         const deviceName = await DeviceInfo.getDeviceName();
         const deviceId = await this.getDeviceUniqueId();
         const deviceModel = DeviceInfo.getModel();
@@ -288,7 +288,7 @@ export default class Signin extends Component {
             );
         } else {
             //post details to server 
-            dis.showLoader();
+            this.showLoader();
             //this functions posts to the login API ; //#endregion
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
@@ -311,7 +311,7 @@ export default class Signin extends Component {
                 //     throw new Error('Network response was not ok');
                 // }
                 const responseText = await response.text();
-                dis.hideLoader();
+                this.hideLoader();
                 let response_status = JSON.parse(responseText).status;
                 // console.log(JSON.parse(responseText))
 
@@ -414,7 +414,7 @@ export default class Signin extends Component {
                             ],
                             { cancelable: false },
                         );
-                    }else {
+                    } else {
                         Alert.alert(
                             'Invalid Login Credentials',
                             'Kindly check your email address and password and try again!',
@@ -428,12 +428,12 @@ export default class Signin extends Component {
                         );
                     }
                     //sign in was not successful
-                    dis.hideLoader();
+                    this.hideLoader();
                 }
             })
             .catch((error) => {
                 // console.log(error); 
-                dis.hideLoader();
+                this.hideLoader();
                 if (error.name === 'AbortError') {
                     Alert.alert(
                         'Network Error',
@@ -634,7 +634,7 @@ export default class Signin extends Component {
                         </View>
                     </View>
                     <View>
-                        <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.signInUser(this); this.setState({ isProcessing: true }); }}>
+                        <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.signInUser();}}>
                             <Text autoCapitalize="words" style={styles.loginbutton}>
                                 Login
                             </Text>
