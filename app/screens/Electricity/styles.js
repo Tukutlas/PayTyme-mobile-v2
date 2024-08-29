@@ -106,7 +106,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#0C0C54',
     padding: 5,
     borderRadius: 25,
-    marginLeft: 10,
+    // marginLeft: 10
+    marginLeft: '75.5%'
   },
 
   verifyButtonText: {

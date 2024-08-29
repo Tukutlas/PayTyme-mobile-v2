@@ -50,7 +50,9 @@ export default class Electricity extends Component {
             amountError: false,
             amountErrorMessage: '',
             phoneError: false,
-            phoneNoErrorMessage: ''
+            phoneNoErrorMessage: '',
+            meters: [],
+            electricityMeters: []
         };
     }
 
@@ -124,8 +126,52 @@ export default class Electricity extends Component {
     }
 
     getElectrictyMeterNumbers(){
-        
+        fetch(GlobalVariables.apiURL + "/electricity/meters",
+        {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body: ""
+            // <-- Post parameters
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            // this.setState({ isLoading: false });
+            let res = JSON.parse(responseText);
+            if (res.status == true) {
+                let electricityMeters = res.data;
+                let meters = [];
+                electricityMeters.forEach(meter => {
+                    meters.push(meter.meter_no);
+                });
+                this.setState({ meters: meters, electricityMeters: electricityMeters});
+            }
+        })
+        .catch((error) => {
+            // this.setState({ isLoading: false });
+            // alert("Network error. Please check your connection settings");
+        });
     };
+
+    handleSelect = (meterNumber) => {
+        this.setState({meterno:meterNumber, meterError: false});
+        const selectedMeter = this.state.electricityMeters.find(
+            item => item.meter_no === meterNumber
+        );
+        if(selectedMeter){
+            this.setState({
+                typeValue: selectedMeter.meter_type, 
+                discoValue: selectedMeter.company,
+                phoneNo: selectedMeter.phone_number, 
+                phoneError:false,
+                customerName: selectedMeter.customer_name, 
+                serviceProvider: selectedMeter.provider, 
+                isValidated:true
+            });
+        }
+    }
 
     backPressed = () => {
         if(this.state.transaction){
@@ -588,12 +634,13 @@ export default class Electricity extends Component {
                         </View>
                     }
                     {this.state.meterTypeError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select the meter type</Text>}
-                    <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                    <View style={[styles.formLine, {marginTop:'1.2%', zIndex: 1}]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Enter Meter Number</Text>
                             <View roundedc style={[styles.inputitem]}>
                                 <FontAwesome5 name={'tachometer-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/>
+                                {/* <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/> */}
+                                <AutocompleteComponent placeholder="Type your Meter number" data={this.state.meters} onSelect={this.handleSelect} width={'74%'} keyboardType={'numeric'} />
                                 <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
                                     <Text style={styles.verifyButtonText}>Verify</Text>
                                 </TouchableOpacity>
@@ -617,7 +664,7 @@ export default class Electricity extends Component {
                             <Text style={styles.labeltext}>Customer Phone Number</Text>
                             <View roundedc style={[styles.inputitem]}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
+                                <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)} value={this.state.phoneNo}/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>

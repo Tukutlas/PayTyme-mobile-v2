@@ -43,7 +43,7 @@ export default class AccountVerification extends Component {
 
     async UNSAFE_componentWillMount() {
         // this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});//, phone:await AsyncStorage.getItem('phone')});  
-        this.setState({phone: this.props.route.params.phonenumber})      
+        this.setState({phone: this.props.route.params.phone})      
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.startTimer();
     }

@@ -83,6 +83,25 @@ const styles = StyleSheet.create({
     height: 45
   },
 
+  buttonMediumCenter: {
+    borderWidth: 1,
+    borderColor: "#8493d5",
+    backgroundColor: "#0C0C54",
+    alignSelf: "center",
+    paddingTop: 15,
+    paddingBottom: 15,
+    marginTop: 30,
+    borderRadius: 50,
+    width: Metrics.WIDTH * 0.70
+},
+
+buttonText: {
+  fontFamily: Fonts.type.robotoMedium,
+  color: "#fff",
+
+  alignSelf: "center"
+},
+
   buttonPurchase: {
     borderWidth: 1,
     borderColor: "#8493d5",
@@ -215,7 +234,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#445cc4',
+    backgroundColor: '#0C0C54',
   },
 
   buttonpaymentmethod: {

@@ -5,9 +5,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Signin from './app/screens/Signin';
 import Signup from './app/screens/Signup';
+import VerificationMenu from './app/screens/Signup/verificationMenu';
 import AccountVerification from './app/screens/Signup/accountVerification';
 import Home from './app/screens/Home';
 // import Home from './app/screens/Home/index2';
@@ -90,6 +92,7 @@ const Tabs = () => (
 
 const RootStack = () => {
     const [fontLoaded, setFontLoaded] = useState(false);
+    const [initialRoute, setInitialRoute] = useState(null);
 
     useEffect(() => {
         // Preload fonts before rendering components
@@ -100,7 +103,7 @@ const RootStack = () => {
                 'Roboto-Bold': require('./app/Fonts/Roboto-Bold.ttf'),
                 'SFUIDisplay-Medium': require('./app/Fonts/ProximaNova-Regular.ttf'),
                 // 'SFUIDisplay-Light': require('./app/Fonts/ProximaNovaThin.ttf'),
-                // 'SFUIDisplay-Regular': require('./app/Fonts/SF-UI-Text-Regular.ttf'),
+                'SFProText-Regular': require('./app/Fonts/SFProText-Regular.ttf'),
                 // 'SFUIDisplay-Semibold': require('./app/Fonts/ProximaNovaAltBold.ttf'),
                 // 'HelveticaNeue-Bold': require('./app/Fonts/HelveticaNeue-Bold.ttf'),
                 // 'HelveticaNeue-Light': require('./app/Fonts/HelveticaNeue-Light.ttf'),
@@ -119,14 +122,34 @@ const RootStack = () => {
             }, 3000);
         }        
         prepare();
+
+        const checkLoginStatus = async () => {
+            try {
+                const email = await AsyncStorage.getItem('email');
+                const signed_up = await AsyncStorage.getItem('signed_up');
+                if (email != null) {
+                    setInitialRoute('Signin');
+                } else if (signed_up == 'true') {
+                    setInitialRoute('Signin');
+                } else {
+                    setInitialRoute('Signup');
+                }
+            } catch (error) {
+                console.error('Error checking login status:', error);
+                setInitialRoute('Signup'); // Default to Signup if there's an error
+            }
+        };
+      
+        checkLoginStatus();
     }, []);
 
     return (
         fontLoaded ? (
             <NavigationContainer>
-                <Stack.Navigator initialRouteName="Signin" screenOptions={{ headerShown: false }}>
+                <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Signin" component={Signin} />
                     <Stack.Screen name="Signup" component={Signup} />
+                    <Stack.Screen name='VerificationMenu' component={VerificationMenu}/>
                     <Stack.Screen name='AccountVerification' component={AccountVerification}/>
                     <Stack.Screen name="ViewPicture" component={ViewPicture} />
                     <Stack.Screen name="AboutUs" component={AboutUs} />

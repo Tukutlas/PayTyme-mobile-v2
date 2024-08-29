@@ -7,6 +7,7 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import { CommonActions } from '@react-navigation/native';
+import AutocompleteComponent from "../../components/AutocompleteComponent";
    
 export default class Betting extends Component {
     constructor(props) {
@@ -51,7 +52,9 @@ export default class Betting extends Component {
             bettingError: false,
             bettingErrorMessage: '',
             customerName: '',
-            verified: false
+            verified: false,
+            walletIDs: [],
+            bettingWalletIDs: []
         };
     }
 
@@ -64,6 +67,7 @@ export default class Betting extends Component {
             }
         );
         this.loadWalletBalance();
+        // this.getBettingWalletIDs();
        
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
 
@@ -171,7 +175,6 @@ export default class Betting extends Component {
         }
 
         if(error == 0){
-            
             let amount ="";
             //send api for betting wallet funding
             let subtext = "";
@@ -356,6 +359,53 @@ export default class Betting extends Component {
         }));
     }
 
+    getBettingWalletIDs(){
+        fetch(GlobalVariables.apiURL + "/betting/wallet-ids",
+        {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body: ""
+            // <-- Post parameters
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            // this.setState({ isLoading: false });
+            let res = JSON.parse(responseText);
+            if (res.status == true) {
+                let bettingWalletIDs = res.data;
+                let walletIDs = [];
+                bettingWalletIDs.forEach(wallet => {
+                    walletIDs.push(wallet.meter_no);
+                });
+                this.setState({ walletIDs: walletIDs, bettingWalletIDs: bettingWalletIDs});
+            }
+        })
+        .catch((error) => {
+            // this.setState({ isLoading: false });
+            // alert("Network error. Please check your connection settings");
+        });
+    };
+
+    handleSelect = (accountId) => {
+        this.setState({account_id:accountId, bettingError: false});
+        const wallet = this.state.bettingWalletIDs.find(
+            item => item.customer_id === accountId
+        );
+        if(wallet){
+            this.setState({
+                // 'smart_card_no', 'type', 'customer_name', 'customer_number', 'provider'
+                // accountId: .customer_id 
+                bettingValue: selectedCard.type,
+                customerName: selectedCard.customer_name, 
+                // service_provider: selectedCard.provider, 
+                verified:true
+            });
+        }
+    }
+    
     verifyBettingID = () => {
         let betplatform = this.state.bettingValue;
         let account_id = this.state.account_id;
@@ -501,7 +551,8 @@ export default class Betting extends Component {
                         <Text style={styles.labeltext}>Enter Account ID</Text>
                         <View roundedc style={styles.inputitem}>
                             <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput placeholder="Enter account id" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id, verified:false, accountError:false})}  />
+                            {/* <TextInput placeholder="Enter account id" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="account_id" onChangeText={(account_id) => this.setState({account_id, verified:false, accountError:false})}  /> */}
+                            <AutocompleteComponent placeholder="Enter account id" data={this.state.walletIDs} onSelect={this.handleSelect} width={'74%'} keyboardType={'numeric'} />
                             <TouchableOpacity style={styles.verifyButton} onPress={() => {this.verifyBettingID()}}>
                                 <Text style={styles.verifyButtonText}>Verify</Text>
                             </TouchableOpacity>

@@ -536,7 +536,7 @@ export default class Airtime extends Component {
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                                 {/* <TextInput placeholder="Type in Phone Number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phonenumber_value" onChangeText={(phonenumber_value) => this.setState({phonenumber_value})} value={this.state.phonenumber_value}  autoComplete="tel"/> */}
-                                <AutocompleteComponent placeholder="Type in Phone Number" data={this.state.prevPhoneNumbers} onSelect={this.handleSelect}/>
+                                <AutocompleteComponent placeholder="Type in Phone Number" data={this.state.prevPhoneNumbers} onSelect={this.handleSelect} width={'87%'} keyboardType={'numeric'} />
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
