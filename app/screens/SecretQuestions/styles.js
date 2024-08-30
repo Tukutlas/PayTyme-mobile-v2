@@ -9,18 +9,17 @@ const styles = StyleSheet.create({
 
     header: {
         backgroundColor: Colors.transparent,
-        height: '15%',
+        height: '7%',
         borderBottomWidth: 0,
-        paddingTop: Metrics.HEIGHT * 0.0604,
-        marginTop: '10%',
+        marginTop: '15%',
         flexDirection: 'row',
         flexWrap: 'wrap'
     },
 
     left: {
-        paddingLeft: Metrics.WIDTH * 0.0421,
-        paddingRight: Metrics.WIDTH * 0.01,
-        width: '50%',
+        // paddingLeft: Metrics.WIDTH * 0.0421,
+        marginLeft: '5%',
+        width: '70%',
     },
 
     login: {
@@ -67,12 +66,12 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         backgroundColor: '#fff',
         width: '100%',
-        paddingTop: 0,
+        // paddingTop: 0,
     },
     
     formCenter: {
-        marginLeft: '4%', // Adjust the padding according to your requirement
-        width: '92%',
+        marginLeft: '2.5%', // Adjust the padding according to your requirement
+        width: '95%',
     },
     
     inputitem: {
@@ -80,7 +79,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 25,
         height: 40,
         marginTop: '1%',
         backgroundColor: '#F6F6F6',
@@ -99,7 +98,7 @@ const styles = StyleSheet.create({
         height: 35,
         paddingVertical: 0,
         paddingHorizontal: 10, // Adjust the padding according to your requirement
-        borderRadius: 2,
+        borderRadius: 25,
         backgroundColor: '#F6F6F6',
     },
     
@@ -228,21 +227,14 @@ const styles = StyleSheet.create({
         color: "white"
     },   
     
-    circle: {
-        height: 20,
-        width: 20,
-        borderRadius: 10,  
-        borderWidth: 1,
-        borderColor: '#ACACAC',
-        alignItems: 'center',
-        justifyContent: 'center',
+    dropdown:{
+        minHeight: 40, 
+        backgroundColor:'#F6F6F6',
+        borderRadius: 25
     },
-    
-    checkedCircle: {  
-        width: 14,
-        height: 14,
-        borderRadius: 7,
-        backgroundColor: '#445cc4',
-    },
+
+    dropdownPlaceholder:{
+        color:"#A9A9A9"
+    }
 });
 export default styles;

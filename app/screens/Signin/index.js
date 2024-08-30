@@ -304,7 +304,7 @@ export default class Signin extends Component {
             //this functions posts to the login API ; //#endregion
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
-            fetch(GlobalVariables.apiURL + "/auth/login", {
+            fetch(GlobalVariables.apiURL + "/auth/login-v2", {
                 method: 'POST',
                 headers: new Headers({
                     'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
@@ -316,6 +316,7 @@ export default class Signin extends Component {
                     + "&device_id=" + deviceId 
                     + "&device_model=" + deviceModel 
                     + "&device_brand=" + deviceBrand
+                    // +
             })
             .then(async (response) => {
                 // console.log(response)
@@ -380,6 +381,7 @@ export default class Signin extends Component {
                     this.props.navigation.navigate("Tabs");
                 } else {
                     let account_status = JSON.parse(responseText).account_status ?? '';
+                    let device_status = JSON.parse(responseText).device_status ?? '';
                     if (account_status == 'disabled') {
                         Alert.alert(
                             'Oops',
@@ -399,15 +401,30 @@ export default class Signin extends Component {
                             [
                                 {
                                     text: 'Verify',
-                                    onPress: () => {
-                                        this.verifyAccount(JSON.parse(responseText).data.phone);
-                                    },
+                                    // onPress: () => {
+                                    //     this.verifyAccount(JSON.parse(responseText).data.phone);
+                                    // },
+                                    onPress: () => this.props.navigation.navigate('VerificationMenu', {
+                                        routeName: 'Signin',
+                                        status: account_status,
+                                        user_id: JSON.parse(responseText).data.user_id,
+                                        phone: JSON.parse(responseText).data.phone,
+                                        email: JSON.parse(responseText).data.email_address
+                                    }),
                                     style: 'cancel',
                                 },
                             ],
                             { cancelable: false },
                         );
-                    } else if(JSON.parse(responseText).device_status == 'unauthenticated'){
+                    } else if (account_status == 'unverified2') {
+                        this.props.navigation.navigate('SecurityQuestions', {
+                            status: account_status,
+                            routeName: 'Signin',
+                            user_id: JSON.parse(responseText).data.user_id,
+                            phone: JSON.parse(responseText).data.phone,
+                            email: JSON.parse(responseText).data.email_address
+                        })
+                    } else if(device_status == 'unauthenticated'){
                         Alert.alert(
                             'Note',
                             JSON.parse(responseText).message,
@@ -418,9 +435,39 @@ export default class Signin extends Component {
                                 },
                                 {
                                     text: 'Yes',
-                                    onPress: () => {
-                                        this.registerDevice(JSON.parse(responseText).data);
-                                    },
+                                    // onPress: () => {
+                                    //     this.registerDevice(JSON.parse(responseText).data);
+                                    // },
+                                    onPress: () => this.props.navigation.navigate('SecurityQuestions', {
+                                        status: device_status,
+                                        routeName: 'Signin',
+                                        user_id: JSON.parse(responseText).data.user_id,
+                                        phone: JSON.parse(responseText).data.phone,
+                                        email: JSON.parse(responseText).data.email_address
+                                    }),
+                                    style: 'cancel',
+                                },
+                            ],
+                            { cancelable: false },
+                        );
+                    } else if(device_status == 'unauthenticated2'){
+                        Alert.alert(
+                            'Note',
+                            JSON.parse(responseText).message,
+                            [
+                                {
+                                    text: 'No',
+                                    style: 'cancel',
+                                },
+                                {
+                                    text: 'Yes',
+                                    onPress: () => this.props.navigation.navigate('AnswerSecurityQuestions', {
+                                        status: device_status,
+                                        routeName: 'Signin',
+                                        user_id: JSON.parse(responseText).data.user_id,
+                                        phone: JSON.parse(responseText).data.phone,
+                                        email_address: JSON.parse(responseText).data.email_address
+                                    }),
                                     style: 'cancel',
                                 },
                             ],

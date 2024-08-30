@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { 
     Image, View, StatusBar, Platform, TouchableOpacity, Alert, Text, 
-    TextInput, Keyboard, TouchableWithoutFeedback, BackHandler 
+    TextInput, Keyboard, TouchableWithoutFeedback, BackHandler, 
+    ScrollView
 } from "react-native";
 // Screen Styles
 import styles from "./styles";
@@ -11,33 +12,48 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import DeviceInfo from 'react-native-device-info';
 import DropDownPicker from "react-native-dropdown-picker";
 
-export default class SecretQuestions extends Component {
+export default class SecurityQuestions extends Component {
     constructor(props) {
         super(props)
         this.state = {
             isLoading: false,
-            secretQuestions: [],
-            dropdowns: {
-                question1: { open: false, value: null, items: [] },
-                question2: { open: false, value: null, items: [] },
-                question3: { open: false, value: null, items: [] }
-            },
+            securityQuestions: [],
+            question1: { open: false, value: null, items: [] },
+            question2: { open: false, value: null, items: [] },
+            question3: { open: false, value: null, items: [] },
             answers: {
-                answer1: '',
-                answer2: '',
-                answer3: ''
-            }
+                answer1: { value: '', error: false, errorMessage: '' },
+                answer2: { value: '', error: false, errorMessage: '' },
+                answer3: { value: '', error: false, errorMessage: '' }
+            },
+            questions: null,
+            email: '',
+            phone: '',
+            user_id: '',
+            status: '',
+            question1Error: false,
+            question2Error: false,
+            question3Error: false,
+            question1ErrorMessage: '',
+            question2ErrorMessage: '',
+            question3ErrorMessage: '',
         }
     }
 
     async componentDidMount() {
+        this.setState({
+            phone: this.props.route.params.phone,
+            email: this.props.route.params.email_address,
+            user_id: this.props.route.params.user_id,
+            status: this.props.route.params.status
+        });
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
-        // this.fetchSecretQuestions();
+        this.fetchSecurityQuestions();
     }
 
     backPressed = () => {
         this.props.navigation.goBack();
-        // return true;
+        return true;
     };
 
     handleKeyboardDidShow = () => {
@@ -59,6 +75,15 @@ export default class SecretQuestions extends Component {
 
     hideLoader(){
         this.setState({ isLoading: false });
+    }
+
+    async getDeviceUniqueId() {
+        try {
+            const uniqueId = await DeviceInfo.getUniqueId();
+            return uniqueId;
+        } catch (error) {
+            console.error('Error getting device unique ID:', error);
+        }
     }
 
     registerDevice = async (user_id) => {
@@ -93,7 +118,7 @@ export default class SecretQuestions extends Component {
                         {
                             text: 'Proceed to Login',
                             onPress: () => {
-                                this.signInUser(this);
+                                this.props.navigation.navigate('Signin')
                             },
                             style: 'cancel',
                         },
@@ -155,34 +180,6 @@ export default class SecretQuestions extends Component {
         });
     }
 
-    setDropdownState = (key, property, value) => {
-        this.setState(prevState => ({
-            dropdowns: {
-                ...prevState.dropdowns,
-                [key]: {
-                    ...prevState.dropdowns[key],
-                    [property]: value
-                }
-            }
-        }));
-    }
-
-    handleDropdownOpen = (key) => {
-        this.setDropdownState(key, 'open', true);
-        // Close other dropdowns
-        Object.keys(this.state.dropdowns).forEach(k => {
-            if (k !== key) this.setDropdownState(k, 'open', false);
-        });
-    }
-
-    handleDropdownValue = (key, value) => {
-        this.setDropdownState(key, 'value', value);
-    }
-
-    handleDropdownItems = (key, items) => {
-        this.setDropdownState(key, 'items', items);
-    }
-
     dismissKeyboard = () => {
         Keyboard.dismiss();
     }
@@ -198,66 +195,138 @@ export default class SecretQuestions extends Component {
     handleSubmit = async () => {
         // Implement submit logic here
         // Validate inputs
-        const { question1, question2, question3 } = this.state.dropdowns;
+        let user_id = this.state.user_id
+        const { question1, question2, question3 } = this.state;
+        
         if (!question1.value || !question2.value || !question3.value) {
             Alert.alert('Error', 'Please select all three secret questions.');
             return;
         }
 
-        const answer1 = this.state.answers.answer1?.trim();
-        const answer2 = this.state.answers.answer2?.trim();
-        const answer3 = this.state.answers.answer3?.trim();
+        // Check if any two questions are the same
+        if (question1.value === question2.value || question2.value === question3.value || question1.value === question3.value) {
+            Alert.alert('Error', 'Secret questions must be different from each other. Please choose unique questions for each.');
+            return;
+        }
+        
+        let hasError = false;
+        ['answer1', 'answer2', 'answer3'].forEach(key => {
+            if (!this.state.answers[key].value.trim()) {
+                this.setState(prevState => ({
+                    answers: {
+                        ...prevState.answers,
+                        [key]: {
+                            ...prevState.answers[key],
+                            error: true,
+                            errorMessage: 'This answer is required'
+                        }
+                    }
+                }));
+                hasError = true;
+            }
+        });
 
-        if (!answer1 || !answer2 || !answer3) {
-            Alert.alert('Error', 'Please provide answers for all questions.');
+        if (hasError) {
+            // Alert.alert('Error', 'Please provide answers for all questions.');
             return;
         }
 
+        const { answer1, answer2, answer3 } = Object.fromEntries(
+            Object.entries(this.state.answers)
+                .map(([key, { value }]) => [key, value.trim()])
+        );
+
+        // console.log(answer1, answer2, answer3)
+
         this.showLoader();
 
-        try {
-            const response = await fetch(`${GlobalVariables.apiURL}/auth/secret-questions/set`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.state.auth_token}`,
-                },
-                body: JSON.stringify({
-                    question1: question1.value,
-                    answer1,
-                    question2: question2.value,
-                    answer2,
-                    question3: question3.value,
-                    answer3,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                Alert.alert('Success', 'Secret questions have been set successfully.');
+        fetch(`${GlobalVariables.apiURL}/auth/secret-questions/set/${user_id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${this.state.auth_token}`,
+            },
+            body: JSON.stringify({
+                question_1: question1.value,
+                answer_1: answer1,
+                question_2: question2.value,
+                answer_2: answer2,
+                question_3: question3.value,
+                answer_3: answer3,
+            }),
+        }).then((response) => response.text())
+        .then((responseText) => {
+            res = JSON.parse(responseText);
+            if(res.status == true){
+                // Alert.alert('Success', 'Secret questions have been set successfully.');
                 // Navigate to the next screen or perform any other action
-                this.props.navigation.navigate('Home');
+                if(this.state.status == 'unauthenticated' || 'unverified'){
+                    this.registerDevice(user_id)
+                }else{
+                    this.props.navigation.navigate('Signin');
+                }
+                 
             } else {
                 Alert.alert('Error', data.message || 'Failed to set secret questions. Please try again.');
             }
-        } catch (error) {
-            console.error('Error setting secret questions:', error);
+        }).catch ((error) => {
+            // console.error('Error setting secret questions:', error);
             Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-        } finally {
+        }).finally((event) => {
             this.hideLoader();
+        })
+    }
+
+    fetchSecurityQuestions = async () => {
+        // Implement API call to fetch secret questions
+        fetch(`${GlobalVariables.apiURL}/auth/secret-questions`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${this.state.auth_token}`,
+            },
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            const response = JSON.parse(responseText);
+            const questions = response.data;
+            const secretQuestions = questions.map(question => ({
+                label: question.question,
+                value: question.question
+            }));
+            this.setState({ securityQuestions: secretQuestions });
+        }).catch((error) => {
+            this.setState({ isLoading: false });
+            alert("Network error. Please check your connection settings");
+        });
+
+    }
+
+    compareSelectedQuestion = async (questionKey, value) => {
+        const currentValue = value;
+        if (currentValue === null) return; // Skip comparison if current value is null
+
+        const otherQuestions = ['question1', 'question2', 'question3'].filter(q => q !== questionKey);
+        
+        for (let otherQuestion of otherQuestions) {
+            const otherValue = this.state[otherQuestion].value;
+            if (otherValue !== null && otherValue === currentValue) {
+                // Alert.alert('Duplicate Question', 'Please select a different question for each field.');\
+                let message ='Duplicate Question, Please select a different question for each field.';
+                this.setState({
+                    [`${questionKey}Error`]: true,
+                    [`${questionKey}ErrorMessage`]: message
+                });
+            }else{
+                this.removeError(otherQuestion)
+            }
         }
     }
 
-    fetchSecretQuestions = async () => {
-        try {
-            // Implement API call to fetch secret questions
-            const questions = await api.getSecretQuestions();
-            this.setState({ secretQuestions: questions });
-        } catch (error) {
-            console.error('Failed to fetch secret questions:', error);
-            Alert.alert('Error', 'Failed to load secret questions. Please try again.');
-        }
+    removeError = (questionKey) => {
+        this.setState({
+            [`${questionKey}Error`]: false,
+        });
     }
 
     render() {
@@ -270,147 +339,292 @@ export default class SecretQuestions extends Component {
 
         return (
             <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
-                <View style={styles.container}>
+                <ScrollView style={styles.container}>
                     <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>
                     <View style={styles.header}>
                         <View style={styles.left}>
-                            <Text style={styles.login}>Secret Questions</Text>
+                            <Text style={styles.login}>Set Secret Questions</Text>
                             <Text style={styles.text}>Answer the security questions below</Text>
                         </View>
                         <View style={styles.right}>
                             <Image style={styles.profileImage} source={require('../../../assets/logo.png')} />
                         </View>
                     </View>
-                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
+                    <View style={[styles.formLine, {marginTop:'-1%',}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Question 1</Text>
+                        </View>
+                    </View>
+                    <View style={{minHeight:'40',width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%', zIndex:1000}}>
                         <DropDownPicker
-                            placeholder={'Select a Secret Question'}
-                            open={this.state.dropdowns.question1.open}
-                            value={this.state.dropdowns.question1.value}
-                            style={[styles.dropdown]}
-                            items={this.state.dropdowns.question1.items}
-                            setOpen={(open) => this.handleDropdownOpen('question1')}
-                            setValue={(callback) => this.handleDropdownValue('question1', callback)}
-                            setItems={(callback) => this.handleDropdownItems('question1', callback)}
-                            onSelectItem={this.handleQuestionSelect}
+                            placeholder="Select a Secret Question"
+                            placeholderStyle={styles.dropdownPlaceholder}
+                            open={this.state.question1.open}
+                            value={this.state.question1.value}
+                            items={this.state.securityQuestions}
+                            style={styles.dropdown}
+                            setOpen={(open) => {
+                                this.setState(prevState => ({
+                                    question1: {
+                                        ...prevState.question1,
+                                        open: open
+                                    },
+                                    question2: {
+                                        ...prevState.question2,
+                                        open: false
+                                    },
+                                    question3: {
+                                        ...prevState.question3,
+                                        open: false
+                                    }
+                                }));
+                            }}
+                            setValue={(callback) => {
+                                const newValue = callback(this.state.question1.value);
+                                this.setState(prevState => ({
+                                    question1: {
+                                        ...prevState.question1,
+                                        value: newValue
+                                    }
+                                }));
+                            }}
+                            setItems={(callback) => {
+                                const newItems = callback(this.state.securityQuestions);
+                                this.setState({ securityQuestions: newItems });
+                            }}
+                            onSelectItem={(item) => {
+                                this.removeError('question1');
+                                this.compareSelectedQuestion('question1', item.value);
+                            }}
+                            // onChangeValue={(value) => {
+                            //     // this.setState(prevState => ({
+                            //     //     question1: {
+                            //     //         ...prevState.question1,
+                            //     //         value: value
+                            //     //     }
+                            //     // }));
+                            // }}
+                            // onSelectItem={(item) => {
+                            //     this.setState(prevState => ({
+                            //         question1: {
+                            //             ...prevState.question1,
+                            //             value: item.value
+                            //         }
+                            //     }));
+                            // }}
                             listMode="SCROLLVIEW"
                             scrollViewProps={{
                                 nestedScrollEnabled: true,
                                 persistentScrollbar: true,
                             }}
                             dropDownContainerStyle={{
-                                width:'97%',
-                                marginLeft:'1.5%',
+                                width: '97%',
+                                marginLeft: '1.5%',
                                 position: 'relative',
-                                top: 0
-                            }}           
+                                top: 0,
+                            }}
                         />
+                        {this.state.question1Error && <Text style={{ color: 'red' }}>{this.state.question1ErrorMessage}</Text>}
                     </View>
-                    <View style={[styles.formLine, { paddingTop: 10 }]}>
+                    <View style={[styles.formLine, { marginTop:'2%' }]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Answer</Text>
                             <View roundedc style={styles.inputitem}>
-                                <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <FontAwesome5 name={'comment'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                                 <TextInput 
                                     placeholder="Enter your answer" 
                                     style={styles.textBox} 
                                     placeholderTextColor={"#A9A9A9"} 
-                                    ref="answer1" 
+                                    ref="answer1"
+                                    returnKeyType="done" 
                                     onChangeText={(answer1) => this.setState(prevState => ({
                                         answers: {
                                             ...prevState.answers,
-                                            answer1
+                                            answer1: {
+                                                ...prevState.answers.answer1,
+                                                value: answer1,
+                                                error: false,
+                                                errorMessage: ''
+                                            }
                                         }
                                     }))}
                                 />
                             </View>
+                            {this.state.answers.answer1.error && <Text style={{ color: 'red' }}>{this.state.answers.answer1.errorMessage}</Text>}
+                        </View>
+                    </View>
+                    <View style={[styles.formLine, {marginTop:'3%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Question 2</Text>
                         </View>
                     </View>
                     <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
                         <DropDownPicker
-                            placeholder={'Select a Secret Question'}
-                            open={this.state.dropdowns.question2.open}
-                            value={this.state.dropdowns.question2.value}
-                            style={[styles.dropdown]}
-                            items={this.state.dropdowns.question2.items}
-                            setOpen={(open) => this.handleDropdownOpen('question2')}
-                            setValue={(callback) => this.handleDropdownValue('question2', callback)}
-                            setItems={(callback) => this.handleDropdownItems('question2', callback)}
-                            onSelectItem={this.handleQuestionSelect}
+                            placeholder="Select a Secret Question"
+                            placeholderStyle={styles.dropdownPlaceholder}
+                            open={this.state.question2.open}
+                            value={this.state.question2.value}
+                            items={this.state.securityQuestions}
+                            style={styles.dropdown}
+                            setOpen={(open) => {
+                                this.setState(prevState => ({
+                                    question1: {
+                                        ...prevState.question1,
+                                        open: false
+                                    },
+                                    question2: {
+                                        ...prevState.question2,
+                                        open: open
+                                    },
+                                    question3: {
+                                        ...prevState.question3,
+                                        open: false
+                                    }
+                                }));
+                            }}
+                            setValue={(callback) => {
+                                const newValue = callback(this.state.question2.value);
+                                this.setState(prevState => ({
+                                    question2: {
+                                        ...prevState.question2,
+                                        value: newValue
+                                    }
+                                }));
+                            }}
+                            setItems={(callback) => {
+                                const newItems = callback(this.state.securityQuestions);
+                                this.setState({ securityQuestions: newItems });
+                            }}
+                            onSelectItem={(item) => {
+                                this.removeError('question2');
+                                this.compareSelectedQuestion('question2', item.value);
+                            }}
                             listMode="SCROLLVIEW"
                             scrollViewProps={{
                                 nestedScrollEnabled: true,
                                 persistentScrollbar: true,
                             }}
                             dropDownContainerStyle={{
-                                width:'97%',
-                                marginLeft:'1.5%',
+                                width: '97%',
+                                marginLeft: '1.5%',
                                 position: 'relative',
-                                top: 0
-                            }}           
+                                top: 0,
+                            }}
                         />
+                        {this.state.question2Error && <Text style={{ color: 'red' }}>{this.state.question2ErrorMessage}</Text>}
                     </View>
-                    <View style={[styles.formLine, { paddingTop: 10 }]}>
+                    <View style={[styles.formLine, { marginTop:'2%' }]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Answer</Text>
                             <View roundedc style={styles.inputitem}>
-                                <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <FontAwesome5 name={'comment'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                                 <TextInput 
                                     placeholder="Enter your answer" 
                                     style={styles.textBox} 
                                     placeholderTextColor={"#A9A9A9"} 
                                     ref="answer2" 
+                                    returnKeyType="done"
                                     onChangeText={(answer2) => this.setState(prevState => ({
                                         answers: {
                                             ...prevState.answers,
-                                            answer2
+                                            answer2: {
+                                                ...prevState.answers.answer2,
+                                                value: answer2,
+                                                error: false,
+                                                errorMessage: ''
+                                            }
                                         }
                                     }))}
                                 />
                             </View>
+                            {this.state.answers.answer2.error && <Text style={{ color: 'red' }}>{this.state.answers.answer2.errorMessage}</Text>}
+                        </View>
+                    </View>
+                    <View style={[styles.formLine, {marginTop:'3%'}]}>
+                        <View style={styles.formCenter}>
+                            <Text style={styles.labeltext}>Question 3</Text>
                         </View>
                     </View>
                     <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
                         <DropDownPicker
-                            placeholder={'Select a Secret Question'}
-                            open={this.state.dropdowns.question3.open}
-                            value={this.state.dropdowns.question3.value}
-                            style={[styles.dropdown]}
-                            items={this.state.dropdowns.question3.items}
-                            setOpen={(open) => this.handleDropdownOpen('question3')}
-                            setValue={(callback) => this.handleDropdownValue('question3', callback)}
-                            setItems={(callback) => this.handleDropdownItems('question3', callback)}
-                            onSelectItem={this.handleQuestionSelect}
+                            placeholder="Select a Secret Question"
+                            placeholderStyle={styles.dropdownPlaceholder}
+                            open={this.state.question3.open}
+                            value={this.state.question3.value}
+                            items={this.state.securityQuestions}
+                            style={styles.dropdown}
+                            setOpen={(open) => {
+                                this.setState(prevState => ({
+                                    question1: {
+                                        ...prevState.question1,
+                                        open: false
+                                    },
+                                    question2: {
+                                        ...prevState.question2,
+                                        open: false
+                                    },
+                                    question3: {
+                                        ...prevState.question3,
+                                        open: open
+                                    }
+                                }));
+                            }}
+                            setValue={(callback) => {
+                                const newValue = callback(this.state.question3.value);
+                                this.setState(prevState => ({
+                                    question3: {
+                                        ...prevState.question3,
+                                        value: newValue
+                                    }
+                                }));
+                            }}
+                            setItems={(callback) => {
+                                const newItems = callback(this.state.securityQuestions);
+                                this.setState({ securityQuestions: newItems });
+                            }}
+                            onSelectItem={(item) => {
+                                this.removeError('question3');
+                                this.compareSelectedQuestion('question3', item.value);
+                            }}
                             listMode="SCROLLVIEW"
                             scrollViewProps={{
                                 nestedScrollEnabled: true,
                                 persistentScrollbar: true,
                             }}
                             dropDownContainerStyle={{
-                                width:'97%',
-                                marginLeft:'1.5%',
+                                width: '97%',
+                                marginLeft: '1.5%',
                                 position: 'relative',
-                                top: 0
-                            }}           
+                                top: 0,
+                            }}
                         />
+                        {this.state.question3Error && <Text style={{ color: 'red' }}>{this.state.question3ErrorMessage}</Text>}
                     </View>
-                    <View style={[styles.formLine, { paddingTop: 10 }]}>
+                    <View style={[styles.formLine, { marginTop:'2%' }]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Answer</Text>
                             <View roundedc style={styles.inputitem}>
-                                <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <FontAwesome5 name={'comment'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                                 <TextInput 
                                     placeholder="Enter your answer" 
                                     style={styles.textBox} 
                                     placeholderTextColor={"#A9A9A9"} 
                                     ref="answer3" 
+                                    returnKeyType="done"
                                     onChangeText={(answer3) => this.setState(prevState => ({
                                         answers: {
                                             ...prevState.answers,
-                                            answer3
+                                            answer3: {
+                                                ...prevState.answers.answer3,
+                                                value: answer3,
+                                                error: false,
+                                                errorMessage: ''
+                                            }
                                         }
                                     }))}
                                 />
                             </View>
+                            {this.state.answers.answer3.error && <Text style={{ color: 'red' }}>{this.state.answers.answer3.errorMessage}</Text>}
                         </View>
                     </View>
                     <View>
@@ -424,7 +638,7 @@ export default class SecretQuestions extends Component {
                         
                     </View>
                     
-                </View>
+                </ScrollView>
             </TouchableWithoutFeedback>
         );
     }

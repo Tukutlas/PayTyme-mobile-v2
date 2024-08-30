@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { 
     Image, View, StatusBar, Platform, TouchableOpacity, Alert, Text, 
-    TextInput, Keyboard, TouchableWithoutFeedback, Linking, BackHandler 
+    TextInput, Keyboard, TouchableWithoutFeedback, Linking, BackHandler, 
+    KeyboardAvoidingView
 } from "react-native";
 // Screen Styles
 import styles from "./styles";
@@ -9,22 +10,32 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import { FontAwesome5 } from "@expo/vector-icons";
 import DeviceInfo from 'react-native-device-info';
-import DropDownPicker from "react-native-dropdown-picker";
 
-export default class AnswerSecretQuestions extends Component {
+export default class AnswerSecurityQuestions extends Component {
     constructor(props) {
         super(props)
         this.state = {
             isLoading: false,
             question: '',
-            question_id: '',
-            answer: ''
+            answer: '',
+            answerError: false,
+            answerErrorMessage: '',
+            email: '',
+            phone: '',
+            user_id: '',
+            status: ''
         }
     }
 
     async componentDidMount() {
+        this.setState({
+            phone: this.props.route.params.phone, 
+            email: this.props.route.params.email_address, 
+            user_id: this.props.route.params.user_id, 
+            status: this.props.route.params.status
+        });
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
-        // this.fetchSecretQuestions();
+        this.fetchSecurityQuestion(this.props.route.params.user_id);
     }
 
     backPressed = () => {
@@ -51,6 +62,15 @@ export default class AnswerSecretQuestions extends Component {
 
     hideLoader(){
         this.setState({ isLoading: false });
+    }
+
+    async getDeviceUniqueId() {
+        try {
+            const uniqueId = await DeviceInfo.getUniqueId();
+            return uniqueId;
+        } catch (error) {
+            console.error('Error getting device unique ID:', error);
+        }
     }
 
     registerDevice = async (user_id) => {
@@ -85,7 +105,7 @@ export default class AnswerSecretQuestions extends Component {
                         {
                             text: 'Proceed to Login',
                             onPress: () => {
-                                this.signInUser(this);
+                                this.props.navigation.navigate('Signin');
                             },
                             style: 'cancel',
                         },
@@ -188,47 +208,76 @@ export default class AnswerSecretQuestions extends Component {
     }
 
     handleSubmit = async () => {
+        // Implement submit logic here
+        // Validate inputs
+        let user_id = this.state.user_id
+        const { question, answer } = this.state;
+
+        if (!answer) {
+            this.setState({answerError:true, answerErrorMessage: 'Please input an answer to the question.' })
+            return;
+        }
+
         this.showLoader();
 
-        try {
-            const response = await fetch(`${GlobalVariables.apiURL}/auth/secret-questions/answer`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.state.auth_token}`,
-                },
-                body: JSON.stringify({
-                    question_id: this.state.question,
-                    answer: this.state.answer
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                Alert.alert('Success', 'Device has been registered successfully.');
+        fetch(`${GlobalVariables.apiURL}/auth/secret-questions/validate/${user_id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${this.state.auth_token}`,
+            },
+            body: JSON.stringify({
+                question: question,
+                answer: answer,
+            }),
+        }).then((response) => response.text())
+        .then((responseText) => {
+            console.log(responseText)
+            res = JSON.parse(responseText);
+            console.log(res)
+            if(res.status == true){
+                // Alert.alert('Success', 'Secret questions have been set successfully.');
                 // Navigate to the next screen or perform any other action
-                // this.props.navigation.navigate('Home');
+                console.log(this.state.status)
+                if(this.state.status == 'unauthenticated2'){
+                    this.registerDevice(user_id)
+                }else{
+                    this.props.navigation.navigate('Signin');
+                }
             } else {
-                Alert.alert('Error', data.message || 'Error answering secret question. Please try again.');
+                Alert.alert('Error', data.message || 'Failed to set secret questions. Please try again.');
             }
-        } catch (error) {
-            // console.error('Error answering secret question:', error);
+        }).catch ((error) => {
+            console.error('Error setting secret questions:', error);
             Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-        } finally {
+        }).finally((event) => {
             this.hideLoader();
-        }
+        })
     }
 
-    fetchSecretQuestions = async () => {
-        try {
-            // Implement API call to fetch secret questions
-            const questions = await api.getSecretQuestions();
-            this.setState({ secretQuestions: questions });
-        } catch (error) {
-            console.error('Failed to fetch secret questions:', error);
-            Alert.alert('Error', 'Failed to load secret questions. Please try again.');
-        }
+    fetchSecurityQuestion = async (user_id) => {
+        // Implement API call to fetch secret questions
+        fetch(`${GlobalVariables.apiURL}/auth/secret-questions/one/${user_id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${this.state.auth_token}`,
+            },
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            const response = JSON.parse(responseText);
+            console.log(response)
+            if(response.status == true){
+                const question = response.data;
+                this.setState({ question: question });
+            }else{
+                alert("An error occurred")
+            }
+        }).catch((error) => {
+            this.setState({ isLoading: false });
+            alert("Network error. Please check your connection settings");
+        });
     }
 
     render() {
@@ -240,7 +289,7 @@ export default class AnswerSecretQuestions extends Component {
         }
 
         return (
-            <TouchableWithoutFeedback style={{ flex: 1 }} onPress={this.dismissKeyboard}>
+            <TouchableWithoutFeedback onPress={this.dismissKeyboard}>
                 <View style={styles.container}>
                     <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>
                     <View style={styles.header}>
@@ -252,18 +301,13 @@ export default class AnswerSecretQuestions extends Component {
                             <Image style={styles.profileImage} source={require('../../../assets/logo.png')} />
                         </View>
                     </View>
-                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
-                        <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20, flexWrap: 'wrap'}}>{this.state.question}</Text>
-                    </View>
-                    <View style={[styles.formLine, { paddingTop: 10 }]}>
+
+                    <View style={[styles.formLine, {marginTop:'4%'}]}>
                         <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Answer</Text>
-                            <View roundedc style={styles.inputitem}>
-                                <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your password" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="answer1" onChangeText={(password) => this.setState({ password })}/>
-                                <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
-                                    <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
-                                </TouchableOpacity>
+                            <Text style={styles.labeltext}>Question</Text>
+                            <View roundedc style={[styles.inputitem]}>
+                                <FontAwesome5 name={'question-circle'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <Text style={{fontSize:13, color:'black', backgroundColor:'#F6F6F6', height:20}}>{this.state.question}</Text>
                             </View>
                         </View>
                     </View>
@@ -272,25 +316,19 @@ export default class AnswerSecretQuestions extends Component {
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Answer</Text>
                             <View roundedc style={styles.inputitem}>
-                                <FontAwesome5 name={'lock'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Enter your password" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="answer1" onChangeText={(password) => this.setState({ password })}/>
-                                <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.setPasswordVisibility}>
-                                    <Image source={(this.state.hidePassword) ? require('../../Images/hide.png') : require('../../Images/view.png')} style={styles.buttonImage} />
-                                </TouchableOpacity>
+                                <FontAwesome5 name={'comment'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
+                                <TextInput placeholder="Enter the answer" style={styles.textBox} placeholderTextColor={"#A9A9A9"} ref="answer" returnKeyType="done" onChangeText={(answer) => this.setState({ answer })}/>
                             </View>
+                            {this.state.answerError && <Text style={{ color: 'red' }}>{this.state.answerErrorMessage}</Text>}
                         </View>
                     </View>
                     <View>
-                        <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.signInUser();}}>
+                        <TouchableOpacity info style={styles.buttonlogin} onPress={() => {this.handleSubmit();}}>
                             <Text autoCapitalize="words" style={styles.loginbutton}>
-                                Login
+                                Submit
                             </Text>
                         </TouchableOpacity>
                     </View>
-                    <View>
-                        
-                    </View>
-                    
                 </View>
             </TouchableWithoutFeedback>
         );

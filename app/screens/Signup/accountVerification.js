@@ -70,7 +70,10 @@ export default class AccountVerification extends Component {
         let otp = this.state.otp;
 
         if (otp == '') {
-            this.setState({otpError: true, otpErrorMessage: 'Please Kindly insert the verification code'})
+            this.setState({
+                otpError: true, 
+                otpErrorMessage: 'Please Kindly insert the verification code'
+            });
         }else if(otp != ''){ 
             fetch(GlobalVariables.apiURL+"/auth/verify-sent-code",
             { 
@@ -88,20 +91,26 @@ export default class AccountVerification extends Component {
                 this.setState({isLoading:false});
                 //  console.log(JSON.parse(responseText).data.payment_info.data.access_code)
                 let response_status = JSON.parse(responseText).status;
-                
                 if(response_status == true){
-                    Alert.alert(
-                        'Account Verification Successful!',
-                        'Your account on Paytyme has been verified successfully.',
-                        [
-                            {
-                                text: 'Proceed to Sign in',
-                                onPress: () => this.props.navigation.navigate(this.props.route.params.routeName),
-                                style: 'cancel',
-                            },
-                        ],
-                        {cancelable: false},
-                    );
+                    this.props.navigation.navigate('SecurityQuestions', {
+                        status: this.props.route.params.status,
+                        routeName: 'Signin',
+                        user_id: this.props.route.params.user_id,
+                        phone: this.props.route.params.phone,
+                        email_address: this.props.route.params.email_address
+                    })
+                    // Alert.alert(
+                    //     'Account Verification Successful!',
+                    //     'Your account on Paytyme has been verified successfully.',
+                    //     [
+                    //         {
+                    //             text: 'Proceed to Sign in',
+                    //             onPress: () => this.props.navigation.navigate(this.props.route.params.routeName),
+                    //             style: 'cancel',
+                    //         },
+                    //     ],
+                    //     {cancelable: false},
+                    // );
                 }else if(response_status == false){
                     let message = JSON.parse(responseText).message;
                     Alert.alert(

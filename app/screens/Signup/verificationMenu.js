@@ -88,7 +88,10 @@ export default class VerificationMenu extends Component {
             if(result.status == true){
                 this.props.navigation.navigate('AccountVerification', {
                     phone: this.state.phone,
-                    channel: channel
+                    user_id: this.props.route.params.user_id,
+                    email_address: this.props.route.params.email_address,
+                    channel: channel,
+                    status: 'unverified'
                 });
             }else {
                 Alert.alert(

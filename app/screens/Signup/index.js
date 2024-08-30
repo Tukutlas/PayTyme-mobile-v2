@@ -240,16 +240,19 @@ const Signup = ({ navigation }) => {
                 closeProgressbar();
                 let res = JSON.parse(responseText);
                 if (res.status === true) {
+                    let user = res.data
+                    AsyncStorage.setItem('signed_up', 'true');
                     Alert.alert(
                         'Successful!',
                         'Your registration on Paytyme is successful.',
                         [
                             {
                                 text: 'Proceed to Verification',
-                                onPress: () => navigation.navigate('AccountVerification', {
+                                onPress: () => navigation.navigate('VerificationMenu', {
                                     routeName: 'Signin',
-                                    phone: phone,
-                                    email: email
+                                    user_id: user.user_id,
+                                    phone: user.phone_number,
+                                    email_address: user.email_address
                                 }),
                                 style: 'cancel',
                             },

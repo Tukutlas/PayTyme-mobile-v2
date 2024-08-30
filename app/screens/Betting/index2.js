@@ -67,7 +67,7 @@ export default class Betting extends Component {
             }
         );
         this.loadWalletBalance();
-        // this.getBettingWalletIDs();
+        this.getBettingWalletIDs();
        
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
 
@@ -178,8 +178,8 @@ export default class Betting extends Component {
             let amount ="";
             //send api for betting wallet funding
             let subtext = "";
-            amount = ":  N"+this.state.amount;
-            subtext=" to this ";
+            amount = ": N"+this.state.amount;
+            subtext=" to this account id ";
             
             if(thetype=="wallet"){
                 Alert.alert(
@@ -372,13 +372,13 @@ export default class Betting extends Component {
         })
         .then((response) => response.text())
         .then((responseText) => {
-            // this.setState({ isLoading: false });
+            this.setState({ isLoading: false });
             let res = JSON.parse(responseText);
             if (res.status == true) {
                 let bettingWalletIDs = res.data;
                 let walletIDs = [];
                 bettingWalletIDs.forEach(wallet => {
-                    walletIDs.push(wallet.meter_no);
+                    walletIDs.push(wallet.customer_id);
                 });
                 this.setState({ walletIDs: walletIDs, bettingWalletIDs: bettingWalletIDs});
             }
@@ -396,11 +396,8 @@ export default class Betting extends Component {
         );
         if(wallet){
             this.setState({
-                // 'smart_card_no', 'type', 'customer_name', 'customer_number', 'provider'
-                // accountId: .customer_id 
-                bettingValue: selectedCard.type,
-                customerName: selectedCard.customer_name, 
-                // service_provider: selectedCard.provider, 
+                bettingValue: wallet.type,
+                customerName: wallet.name, 
                 verified:true
             });
         }
@@ -546,7 +543,7 @@ export default class Betting extends Component {
                 </View>
                 {this.state.bettingError && <Text style={{ marginTop: '1.2%', marginLeft: '3%', color: 'red' }}>{this.state.bettingErrorMessage}</Text>}
 
-                <View style={[styles.formLine,{marginTop: '1%'}]}>
+                <View style={[styles.formLine,{marginTop: '1%', zIndex: 1}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter Account ID</Text>
                         <View roundedc style={styles.inputitem}>

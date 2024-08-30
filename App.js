@@ -43,6 +43,8 @@ import Otp from './app/screens/ForgotPassword/Otp';
 import BankTransfer from './app/screens/BankTransfer';
 import FAQ from './app/screens/Profile/faq';
 import CameraSection from './app/screens/Profile/camera';
+import SecurityQuestions from './app/screens/SecretQuestions';
+import AnswerSecurityQuestions from './app/screens/SecretQuestions/validate';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -151,6 +153,8 @@ const RootStack = () => {
                     <Stack.Screen name="Signup" component={Signup} />
                     <Stack.Screen name='VerificationMenu' component={VerificationMenu}/>
                     <Stack.Screen name='AccountVerification' component={AccountVerification}/>
+                    <Stack.Screen name='SecurityQuestions' component={SecurityQuestions}/>
+                    <Stack.Screen name='AnswerSecurityQuestions' component={AnswerSecurityQuestions}/>
                     <Stack.Screen name="ViewPicture" component={ViewPicture} />
                     <Stack.Screen name="AboutUs" component={AboutUs} />
                     <Stack.Screen name="ContactUs" component={ContactUs} />
