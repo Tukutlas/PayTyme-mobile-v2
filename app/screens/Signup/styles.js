@@ -220,6 +220,19 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
     },
+
+    phoneContainer: {
+        width: '99%',
+        height: '99%',
+        backgroundColor: '#F6F6F6',
+    },
+
+    textInput: {
+        paddingVertical: 0,
+        backgroundColor: '#F6F6F6',
+        fontFamily: "Roboto-Regular",
+        fontSize: 14,
+    },
 });
 
 export default styles;

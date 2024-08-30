@@ -6,6 +6,7 @@ import styles from "./styles";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
+import PhoneInput from "react-native-phone-number-input";
 
 export default class ForgotPassword extends Component {
     constructor(props) {
@@ -20,7 +21,8 @@ export default class ForgotPassword extends Component {
 
             result: '',
             auth_token: '', 
-            phone: ''
+            phone: '',
+            phoneInput: null
         }
     }
 
@@ -169,9 +171,23 @@ export default class ForgotPassword extends Component {
                 <View style={[styles.formLine, {marginTop: '2%'}]}>
                     <View style={styles.formCenter}>
                         <Text style={styles.labeltext}>Enter your Phone Number</Text>
-                        <View roundedc style={styles.inputitem}>
-                            <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                            <TextInput  placeholder="Type in phone Number" style={styles.input} keyboardType={'numeric'} returnKeyType="done" placeholderTextColor={"#A9A9A9"} ref="phone" onChangeText={(phone) => this.setState({phone})} value={this.state.phone} />
+                        <View roundedc style={[styles.inputitem, { justifyContent: 'center' }]}>
+                            {/* <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/> */}
+                            {/* <TextInput  placeholder="Type in phone Number" style={styles.input} keyboardType={'numeric'} returnKeyType="done" placeholderTextColor={"#A9A9A9"} ref="phone" onChangeText={(phone) => this.setState({phone})} value={this.state.phone} /> */}
+                            <PhoneInput
+                                ref={this.state.phoneInput}
+                                defaultValue={this.state.phone}
+                                defaultCode="NG"
+                                layout="first"
+                                withShadow
+                                autoFocus
+                                containerStyle={styles.phoneContainer}
+                                textContainerStyle={styles.textInput}
+                                placeholderTextColor={"#A9A9A9"}
+                                textStyle={{ fontSize: 13, fontFamily: "Roboto-Regular" }}
+                                returnKeyType="done" 
+                                onChangeFormattedText={(phone) => this.setState({phone})}
+                            />
                         </View>
                     </View>
                 </View>
