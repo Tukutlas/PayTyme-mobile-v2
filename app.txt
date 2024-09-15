@@ -92,6 +92,7 @@
         }
       ],
       "./plugins/screen.js"
-    ]
+    ],
+    "owner": "victorel"
   }
 }

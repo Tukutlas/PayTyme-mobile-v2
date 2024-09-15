@@ -13,11 +13,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0,
         paddingTop: Metrics.HEIGHT * 0.0604,
         marginTop: '10%',
-        // elevation: 0,
         flexDirection: 'row',
         flexWrap: 'wrap'
-        // paddingLeft: Metrics.WIDTH * 0.05,
-        // paddingRight: Metrics.WIDTH * 0.05
     },
 
     left: {
@@ -360,5 +357,18 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333333',
     },
+
+    otpItem: {
+        // backgroundColor: '#F6F6F6',
+        // height: 10,
+        // width: 43,
+        borderColor: '#0C0C54',
+        minHeight: 50, 
+        minWidth:39
+    },
+    
+      otpContainer: {
+        marginTop: '3%'
+      }
 });
 export default styles;

@@ -5,6 +5,7 @@ import Spinner from "react-native-loading-spinner-overlay";
 import { FontAwesome } from '@expo/vector-icons';
 import { GlobalVariables } from '../../../global';
 import { CommonActions } from '@react-navigation/native';
+
 export default class ViewPicture extends Component {
     constructor(props, context) {
         super(props, context);

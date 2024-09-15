@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Image, View, StatusBar, Platform, TouchableOpacity, BackHandler, Alert, Text, TextInput} from "react-native";
+import { Image, View, StatusBar, Platform, TouchableOpacity, BackHandler, Alert, Text } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Screen Styles
 import styles from "./styles";  
@@ -24,10 +24,6 @@ export default class ForgotPassword extends Component {
             phone: '',
             phoneInput: null
         }
-    }
-
-    async componentDidMount() {
-
     }
 
     _storePhoneNumber(phone){ 
@@ -69,6 +65,7 @@ export default class ForgotPassword extends Component {
             return false;
         }
     }
+    
     backPressed = () => {
         this.props.navigation.goBack();
         return true;  

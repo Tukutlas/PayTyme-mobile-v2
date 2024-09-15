@@ -31,7 +31,6 @@ const Home = ({ navigation }) => {
         async function fetchData () {
             const loginResponse = await AsyncStorage.getItem('login_response');
             const user = JSON.parse(loginResponse).user;
-            console.log('User:');
             setAuthToken(user.access_token);
             setUsername(user.username);
             setTier(user.tier);

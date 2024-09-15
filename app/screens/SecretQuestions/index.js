@@ -350,7 +350,7 @@ export default class SecurityQuestions extends Component {
                             <Image style={styles.profileImage} source={require('../../../assets/logo.png')} />
                         </View>
                     </View>
-                    <View style={[styles.formLine, {marginTop:'-1%',}]}>
+                    <View style={[styles.formLine, {marginTop:'0%'}]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Question 1</Text>
                         </View>

@@ -239,7 +239,7 @@ const Signup = ({ navigation }) => {
             .then((responseText) => {
                 closeProgressbar();
                 let res = JSON.parse(responseText);
-                if (res.status === true) {
+                if (res.status == true) {
                     let user = res.data
                     AsyncStorage.setItem('signed_up', 'true');
                     Alert.alert(
@@ -260,7 +260,7 @@ const Signup = ({ navigation }) => {
                         { cancelable: false },
                     );
                 } else {
-                    const { data, message } = res;
+                    const { data = {}, message } = res;
                     const usernameError = data.username ? data.username[0] : null;
                     const emailError = data.email_address ? data.email_address[0] : null;
                     const phoneNumberError = data.phone_number ? data.phone_number[0] : null;
@@ -277,25 +277,9 @@ const Signup = ({ navigation }) => {
                         phoneErrorMessage: phoneNumberError,
                         referralCodeErrorMessage: referralCodeError
                     }));
-
-                    if(emailError === 'The email address has already been taken.'){
-                        Alert.alert(
-                            'Oops... Registration issues',
-                            message,
-                            [
-                                {
-                                    text: 'Cancel',
-                                    style: 'cancel',
-                                },
-                                {
-                                    text: 'Proceed to Login.',
-                                    onPress: () => navigation.navigate('Signin'),
-                                    style: 'cancel',
-                                },
-                            ],
-                            { cancelable: false },
-                        );
-                    }else {
+                    
+                    if (!usernameError && !emailError && !phoneNumberError && !referralCodeError) {
+                        // Only trigger else block if there are no errors at all
                         Alert.alert(
                             'Oops... Registration issues',
                             message,

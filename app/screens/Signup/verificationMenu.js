@@ -91,7 +91,7 @@ export default class VerificationMenu extends Component {
                     user_id: this.props.route.params.user_id,
                     email_address: this.props.route.params.email_address,
                     channel: channel,
-                    status: 'unverified'
+                    status: this.props.route.params.status ?? 'unverified'
                 });
             }else {
                 Alert.alert(
