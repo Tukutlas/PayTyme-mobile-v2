@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { RouteProvider, useRouteContext } from './app/context/RouteContext';
 
+import OptionScreen from './app/screens/Signin/OptionScreen';
 import Signin from './app/screens/Signin/index copy';
 import WithEmail from './app/screens/Signin/withEmail';
 import PinScreen from './app/screens/Signin/PinScreen';
@@ -101,7 +102,6 @@ const RootStack = () => {
     const [fontLoaded, setFontLoaded] = useState(false);
     // const [initialRoute, setInitialRoute] = useState(null);
     const { initialRoute, setRouteContextInitialRoute } = useRouteContext();
-    const [isLoading, setIsLoading] = useState(true); // Loading state
 
     useEffect(() => {
         // Preload fonts before rendering components
@@ -144,18 +144,22 @@ const RootStack = () => {
                             // Go to where it would use pin to login
                             setRouteContextInitialRoute('PinScreen');
                         } else {
+                            setRouteContextInitialRoute('OptionScreen');
                             // Go to where it would select the social login type (e.g., google_auth, facebook_auth)
                         }
                     } else {
                         if (user != null) {
                             setRouteContextInitialRoute('WithEmail');
+                            // setRouteContextInitialRoute('OptionScreen');
                             // setRouteContextInitialRoute('PinScreen');
                         } else {
-                            setRouteContextInitialRoute('Signin');
+                            setRouteContextInitialRoute('OptionScreen');
+                            // setRouteContextInitialRoute('Signin');
                         }
                     }
                 } else if (signed_up == 'true') {
-                    setRouteContextInitialRoute('Signin');
+                    // setRouteContextInitialRoute('Signin');
+                    setRouteContextInitialRoute('OptionScreen');
                 } else {
                     setRouteContextInitialRoute('Signup');
                 }
@@ -171,7 +175,7 @@ const RootStack = () => {
         checkLoginStatus();
     }, [setRouteContextInitialRoute]);
 
-    if (!fontLoaded || isLoading || initialRoute === null) {
+    if (!fontLoaded || initialRoute === null) {
         return null; // Or return a loading spinner component
     }
 
@@ -181,6 +185,7 @@ const RootStack = () => {
                 <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
                     {/* <Stack.Screen name="Pager" component={Signin} /> */}
                     
+                    <Stack.Screen name="OptionScreen" component={OptionScreen} />
                     <Stack.Screen name="Signin" component={Signin} />
                     <Stack.Screen name="WithEmail" component={WithEmail} />
                     <Stack.Screen name="PinScreen" component={PinScreen} />

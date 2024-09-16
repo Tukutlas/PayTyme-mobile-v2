@@ -407,7 +407,7 @@ const Signup = ({ navigation }) => {
                             defaultCode="NG"
                             layout="first"
                             withShadow
-                            autoFocus
+                            // autoFocus
                             containerStyle={styles.phoneContainer}
                             textContainerStyle={styles.textInput}
                             placeholderTextColor={"#A9A9A9"}
@@ -516,14 +516,15 @@ const Signup = ({ navigation }) => {
                 </TouchableOpacity>
 
                 <View style={{ flexDirection: 'row', marginTop: '3%', marginBottom: '10%', justifyContent: 'center' }}>
-                    <TouchableOpacity>
-                        <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '3%', fontSize: 14 }]}>
+                    {/* <TouchableOpacity> */}
+                        <Text style={[styles.textTermsCondition, { textAlign: 'center', fontSize: 14 }]}>
                             Already have an account?
                         </Text>
-                    </TouchableOpacity>
+                    {/* </TouchableOpacity> */}
 
-                    <TouchableOpacity onPress={() => { navigation.navigate("Signin") }}>
-                        <Text style={[styles.textTermsCondition, { textAlign: 'center', marginTop: '10%', fontSize: 14, color: '#1D59E1', fontWeight: 'bold', marginLeft: '2%' }]}>
+                    {/* <TouchableOpacity onPress={() => { navigation.navigate("Signin") }}> */}
+                    <TouchableOpacity onPress={() => { navigation.navigate("OptionScreen") }}>
+                        <Text style={[styles.textTermsCondition, { textAlign: 'center', fontSize: 14, color: '#1D59E1', fontWeight: 'bold', marginLeft: '2%' }]}>
                             Login
                         </Text>
                     </TouchableOpacity>

@@ -8,7 +8,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalVariables } from '../../../global';
 
-const PinScreen = ({ navigation }) => {
+const SetPinScreen = ({ navigation }) => {
     const [firstname, setFirstname] = useState('');
     const [email, setEmail] = useState('');
     const [pin, setPin] = useState('');
@@ -24,7 +24,6 @@ const PinScreen = ({ navigation }) => {
 
     // Generate a random key order when the component mounts
     useEffect(() => {
-        getUserDetails();
         const checkDeviceForHardware = async () => {
             const compatible = await LocalAuthentication.hasHardwareAsync();
             setCompatible(compatible);
@@ -47,6 +46,8 @@ const PinScreen = ({ navigation }) => {
 
         generateRandomKeys();
 
+        getUserDetails();
+
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
             StatusBar.setBackgroundColor("#ffff", true);
@@ -56,23 +57,13 @@ const PinScreen = ({ navigation }) => {
 
     const getUserDetails = async () => {
         const loginResponse = await AsyncStorage.getItem('login_response');
-        if (loginResponse != null) {
-            const user = JSON.parse(loginResponse).user;
-            let firstname = user.firstname ? user.firstname : user.fullname.split(" ")[0];
-            let email = await AsyncStorage.getItem('email');
-            const userPin = await AsyncStorage.getItem('user_pin');
-            setFirstname(firstname);
-            setEmail(email);
-            setSavedPin(userPin ? userPin : '');
-        }else{
-            const user = JSON.parse(await AsyncStorage.getItem("@user"));
-            let email = user.email
-            let firstname = user.given_name
-            const userPin = await AsyncStorage.getItem('user_pin');
-            setFirstname(firstname);
-            setEmail(email);
-            setPin(userPin ? userPin : '');
-        }
+        const user = JSON.parse(loginResponse).user;
+        let firstname = user.firstname ? user.firstname : user.fullname.split(" ")[0];
+        let email = await AsyncStorage.getItem('email');
+        const userPin = await AsyncStorage.getItem('user_pin');
+        setFirstname(firstname);
+        setEmail(email);
+        setPin(userPin ? userPin : '');
     }
 
     // Shuffle numbers 1-9 to randomize the keypad
@@ -83,18 +74,14 @@ const PinScreen = ({ navigation }) => {
     };
 
     const backPressed = () => {
-        if(navigation.canGoBack()){
-            navigation.goBack()
-        }else{
-            Alert.alert('Exit App', 'Are you sure you want to exit?', [
-                {
-                    text: 'Cancel',
-                    onPress: () => null,
-                    style: 'cancel',
-                },
-                { text: 'Exit', onPress: () => BackHandler.exitApp() },
-            ]);
-        }
+        Alert.alert('Exit App', 'Are you sure you want to exit?', [
+            {
+                text: 'Cancel',
+                onPress: () => null,
+                style: 'cancel',
+            },
+            { text: 'Exit', onPress: () => BackHandler.exitApp() },
+        ]);
         return true;
     };
 
@@ -138,7 +125,7 @@ const PinScreen = ({ navigation }) => {
             );
 
             if (result.success) {
-                signInUser(await AsyncStorage.getItem('user_pin'));
+                signInUser();
             }
         } catch (error) {
             Alert.alert('Error', error.toString());
@@ -149,17 +136,13 @@ const PinScreen = ({ navigation }) => {
         if (pin.length < 4) {
             setPin(pin + key);
             if (pin.length + 1 === 4) {
-                if(savedPin){
-                    if((pin + key) != savedPin){
-                        setPinError(true);
-                        Vibration.vibrate(); // Trigger vibration
-                        // Trigger shake animation (you can implement this with a state variable)
-                        shakeDots(); // Call a function to shake dots
-                    }else{
-                        signInUser(pin + key);
-                    }
+                if((pin + key) != savedPin){
+                    setPinError(true);
+                    Vibration.vibrate(); // Trigger vibration
+                    // Trigger shake animation (you can implement this with a state variable)
+                    shakeDots(); // Call a function to shake dots
                 }else{
-                    signInUser(pin + key);
+                    signInUser();
                 }
             }
         }
@@ -227,23 +210,23 @@ const PinScreen = ({ navigation }) => {
         }
     }
 
-    const signInUser = async (pin) => {
+    const signInUser = async () => {
         const deviceName = await DeviceInfo.getDeviceName();
         const deviceId = await getDeviceUniqueId();
         const deviceModel = DeviceInfo.getModel();
         const deviceBrand = DeviceInfo.getBrand();
-
-        const user = JSON.parse(await AsyncStorage.getItem("@user"));
-        const email_address = user?.email || ''; // Use optional chaining and default value
-        const trimmedPin = pin.trim(); // Combine pin assignment and trimming
-        const trimmedEmail = email_address.trim();
+        
+        let email_address = await AsyncStorage.getItem('email')
+        let trimmedEmail = email_address.trim();
+        let trimmedPin = pin.trim();
+        // let password = await AsyncStorage.getItem('password');
     
         //post details to server 
         showLoader();
         //this functions posts to the login API ; //#endregion
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
-        fetch(GlobalVariables.apiURL + "/auth/login-with-pin", {
+        fetch(GlobalVariables.apiURL + "/auth/login-v2", {
             method: 'POST',
             headers: new Headers({
                 'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
@@ -263,11 +246,8 @@ const PinScreen = ({ navigation }) => {
             // if (!response.ok) {
             //     throw new Error('Network response was not ok');
             // }
-            hideLoader();
             const responseText = await response.text();
-            // console.log(responseText)
-            // return;
-            
+            hideLoader();
             let response_status = JSON.parse(responseText).status;
 
             if (response_status == true) {
@@ -312,7 +292,6 @@ const PinScreen = ({ navigation }) => {
 
                 setItemValue('tier', tier);
 
-                setItemValue('auth_type', 'secondary');
                 if (compatible) {
                     setPersonalDetails(trimmedEmail, trimmedPin)
                 }
@@ -696,4 +675,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default PinScreen;
+export default SetPinScreen;
