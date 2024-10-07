@@ -6,8 +6,10 @@ import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import Spinner from "react-native-loading-spinner-overlay";
 import { GlobalVariables } from '../../../global';
 import * as Clipboard from 'expo-clipboard';
+import { useRouteContext } from '../../context/RouteContext';
 
 const Home = ({ navigation }) => {
+    const { initialRoute } = useRouteContext();
     const [authToken, setAuthToken] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [balance, setBalance] = useState("...");
@@ -89,14 +91,13 @@ const Home = ({ navigation }) => {
                 onPress: () => null,
                 style: 'cancel',
             },
-            { text: 'Yes, Log out', onPress: () => navigation.navigate("Signin") },
+            { text: 'Yes, Log out', onPress: () => logout() },
         ]);
         return true;
     };
 
     BackHandler.addEventListener('hardwareBackPress', backPressed);
     const loadWalletBalance = async () => {
-        console.log('loading wallet balance')
         fetch(GlobalVariables.apiURL + "/wallet/details",
         {
             method: 'GET',
@@ -338,6 +339,14 @@ const Home = ({ navigation }) => {
         // setTimeout(()=>{
         //     this.setState({copyIcon: 'copy'})
         // }, 5000);
+    }
+
+    const logout = async () => {
+        // Ensure initialRoute is defined and valid
+        navigation.reset({
+            index: 0,
+            routes: [{ name: initialRoute }]
+        });
     }
 
     return (

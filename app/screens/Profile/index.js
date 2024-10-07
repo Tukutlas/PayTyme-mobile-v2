@@ -9,7 +9,6 @@ import styles from "./styles";
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
-import { CommonActions } from '@react-navigation/native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as DocumentPicker from 'expo-document-picker';
 import Rate, { AndroidMarket } from 'react-native-rate';
@@ -233,9 +232,50 @@ const Profile = ({ navigation }) => {
         Linking.openURL(`mailto:support@paytyme.com.ng?subject=Request for Account Deletion&body=${encodeURIComponent(`Dear Paytyme Support Team,\n\nI am writing to formally request the deletion of my account associated with the email address ${email}.`)}`);
     };
 
-    const unlinkDevice = () => {
-
+    const unlinkDevice = async () => {
+        await unlinkDeviceAPI();
+        const keysToRemove = ['@user', 'email', 'password', 'pin', 'login_response', 'auth_type'];
+        keysToRemove.forEach(key => AsyncStorage.removeItem(key));
+        // Ensure initialRoute is defined and valid
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'OptionScreen' }]
+        });
     }
+
+    const unlinkDeviceAPI = async () => {
+        const loginResponse = JSON.parse(await AsyncStorage.getItem('login_response'));
+        const token = loginResponse.user.access_token;
+        const deviceId = await DeviceInfo.getUniqueId();
+
+        try {
+            const response = await fetch(`${GlobalVariables.apiURL}/unlink-device`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    device_id: deviceId,
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to unlink device');
+            }
+
+            const res = await response.json();
+            let status = res.status;
+            if(!status){
+                throw new Error('Failed to unlink device');
+            }
+            console.log(data);
+            // Handle success response
+        } catch (error) {
+            console.error('Error unlinking device:', error);
+            // Handle error response
+        }
+    };
 
     return (
         <TouchableWithoutFeedback onPress={() => setIsModalVisible(false)}>
@@ -508,12 +548,22 @@ const Profile = ({ navigation }) => {
                         }}
                     >
                         <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
-                            {/* rgba(0,0,0, 0.6) black blur, rgba(255, 255, 255, 0.6) white blur */}
-                            <View style={{ backgroundColor: 'white', width: '100%', marginBottom: 0, borderRadius: 20}}>
-                                <View style={{ marginTop: '4%', alignItems: 'center'}}>
-                                    <Text style={{fontFamily: "Lato-Bold", fontSize:22, color: "#0C0C54"}}>Are you sure?</Text>
+                            <View style={{ backgroundColor: 'white', width: '100%', height: '35%', marginBottom: 0, borderRadius: 20}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+                                    {/* Centered Text */}
+                                    <Text style={{ fontFamily: "Lato-Bold", fontSize: 22, color: "#0C0C54", marginTop: '2%' }}>
+                                        Are you sure?
+                                    </Text>
+                                    
+                                    <TouchableOpacity 
+                                        style={{ position: 'absolute', right: '4%',  marginTop: '2%'}} 
+                                        onPress={() => { setLogoutModalVisible(false) }}
+                                    >
+                                        <FontAwesome name={'times'} size={25} color={'#0C0C54'} />
+                                    </TouchableOpacity>
                                 </View>
-                                <View style={{marginLeft: '5%', marginTop: '2%', alignItems: 'left', justifyContent:"center", width: '90%'}}>
+
+                                <View style={{marginLeft: '5%', marginTop: '5%', alignItems: 'left', justifyContent:"center", width: '90%'}}>
                                     <Text style={[{fontFamily: "Lato-Bold", fontSize:16, color: "#676767" }]}>
                                         Select sign out to end your current app session.
                                     </Text>

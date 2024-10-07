@@ -35,7 +35,7 @@ export default class BankTransfer extends Component {
     };
 
     copyAccountNumber(){
-        Clipboard.setStringAsync('1024141760');
+        Clipboard.setStringAsync('1027512800');
         if(Platform.OS == 'android'){
             ToastAndroid.show('Paytyme Account Number Copied', ToastAndroid.SHORT);
         }
@@ -95,7 +95,7 @@ export default class BankTransfer extends Component {
                         </TouchableOpacity>
                         
                         <View style={{marginLeft: '3%'}}>
-                            <Text style={[styles.text2, {color: 'black', alignSelf: "center"}]} selectable={true}>1024141760</Text>
+                            <Text style={[styles.text2, {color: 'black', alignSelf: "center"}]} selectable={true}>1027512800</Text>
                             <Text style={[styles.text2, {color: 'black', alignSelf: "center"}]}>UBA</Text>
                         </View>
                     </View> 

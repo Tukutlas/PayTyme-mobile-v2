@@ -15,6 +15,7 @@ import WithEmail from './app/screens/Signin/withEmail';
 import PinScreen from './app/screens/Signin/PinScreen';
 
 import Signup from './app/screens/Signup';
+import SignUpOption from './app/screens/Signup/SignUpOption';
 import VerificationMenu from './app/screens/Signup/verificationMenu';
 import AccountVerification from './app/screens/Signup/accountVerification';
 import Home from './app/screens/Home';
@@ -51,6 +52,8 @@ import FAQ from './app/screens/Profile/faq';
 import CameraSection from './app/screens/Profile/camera';
 import SecurityQuestions from './app/screens/SecretQuestions';
 import AnswerSecurityQuestions from './app/screens/SecretQuestions/validate';
+import SetPinScreen from './app/screens/Signup/SetPinScreen';
+import ConfirmPinScreen from './app/screens/Signup/ConfirmPinScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -150,6 +153,7 @@ const RootStack = () => {
                     } else {
                         if (user != null) {
                             setRouteContextInitialRoute('WithEmail');
+                            // setRouteContextInitialRoute('Signin');
                             // setRouteContextInitialRoute('OptionScreen');
                             // setRouteContextInitialRoute('PinScreen');
                         } else {
@@ -161,13 +165,12 @@ const RootStack = () => {
                     // setRouteContextInitialRoute('Signin');
                     setRouteContextInitialRoute('OptionScreen');
                 } else {
-                    setRouteContextInitialRoute('Signup');
+                    // setRouteContextInitialRoute('Signup');
+                    setRouteContextInitialRoute('SignUpOption');
                 }
             } catch (error) {
                 // console.error('Error checking login status:', error);
-                setRouteContextInitialRoute('Signup'); // Default to Signup if there's an error
-            } finally {
-                setIsLoading(false); // Stop loading once the initial route is determined
+                setRouteContextInitialRoute('SignuUpOption'); // Default to Signup if there's an error
             }
         };
       
@@ -189,12 +192,17 @@ const RootStack = () => {
                     <Stack.Screen name="Signin" component={Signin} />
                     <Stack.Screen name="WithEmail" component={WithEmail} />
                     <Stack.Screen name="PinScreen" component={PinScreen} />
-
+                    
+                    <Stack.Screen name="SignUpOption" component={SignUpOption} />
                     <Stack.Screen name="Signup" component={Signup} />
+                    <Stack.Screen name="SetPinScreen" component={SetPinScreen} />
+                    <Stack.Screen name="ConfirmPinScreen" component={ConfirmPinScreen} />
+
                     <Stack.Screen name='VerificationMenu' component={VerificationMenu}/>
                     <Stack.Screen name='AccountVerification' component={AccountVerification}/>
                     <Stack.Screen name='SecurityQuestions' component={SecurityQuestions}/>
                     <Stack.Screen name='AnswerSecurityQuestions' component={AnswerSecurityQuestions}/>
+
                     <Stack.Screen name="ViewPicture" component={ViewPicture} />
                     <Stack.Screen name="AboutUs" component={AboutUs} />
                     <Stack.Screen name="ContactUs" component={ContactUs} />

@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import { Alert, BackHandler, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure to install react-native-vector-icons
 import Svg, { Path } from 'react-native-svg';
 import { Fonts, Metrics, Colors } from '../../Themes';
 import Spinner from 'react-native-loading-spinner-overlay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GlobalVariables } from '../../../global';
 import * as WebBrowser from "expo-web-browser";
 import * as Google from 'expo-auth-session/providers/google'
 
@@ -28,7 +29,7 @@ const SignInOption = ({navigation}) => {
 
     async function handleSignInWithGoogle() {
         // AsyncStorage.removeItem('login_response')
-        AsyncStorage.removeItem('@user')
+        // AsyncStorage.removeItem('@user')
         // console.log('work', await AsyncStorage.getItem('login_response'))
         const user = await AsyncStorage.getItem("@user");
         if(!user){
@@ -55,11 +56,68 @@ const SignInOption = ({navigation}) => {
             await AsyncStorage.setItem('@user', JSON.stringify(user));
             setUserInfo(user);
             // navigation.navigate("PinScreen", {email: user.email});
+            await checkUserEmail(user.email)
             navigation.navigate("PinScreen");
         } catch (error){
             setIsLoading(false)
         }
     }
+
+    const checkUserEmail = async (email) => {
+        try {
+            // Step 1: Check if the email exists in the database (use your specific API or database logic)
+            const response = await fetch(`${GlobalVariables.apiURL}/auth/check-email?email_address=${encodeURIComponent(email)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+        
+            const res = await response.json();
+    
+            // Check if the user email exists based on the server response
+            if (res.status) {
+                // Proceed with login if the email exists
+                const {email, auth_type:authType } = res.data;
+
+                // Step 2: If email exists, proceed to login based on the auth type
+                switch (authType) {
+                    case 'google':
+                        // Handle Google login flow
+                        setRouteContextInitialRoute('PinScreen');
+                        navigation.navigate("PinScreen");
+                        break;
+                    case 'facebook':
+                        // Handle Facebook login flow
+                        // await handleFacebookLogin(user);
+                        break;
+                    case 'apple':
+                        // Handle Apple login flow
+                        // await handleAppleLogin(user);
+                        break;
+                    case 'email':
+                        // Handle regular email login flow
+                        await AsyncStorage.setItem('email', email);
+                        setRouteContextInitialRoute('WithEmail');
+                        navigation.navigate("WithEmail");
+                        break;
+                    default:
+                        throw new Error('Invalid authentication type');
+                }
+            } else {
+                // Step 3: If the user does not exist, show an error or redirect to signup
+                
+            }
+        } catch (error) {
+            console.error('Error checking user email:', error);
+            // Handle error (e.g., show an error message to the user)
+        }
+    };    
+
 
     const backPressed = () => {
         if(navigation.canGoBack()){
@@ -104,21 +162,23 @@ const SignInOption = ({navigation}) => {
             </TouchableOpacity>
 
             {/* Sign in with Apple */}
-            <TouchableOpacity style={styles.button}>
-                <Icon name="apple" size={24} color="black" style={styles.icon} />
-                <Text style={styles.buttonText}>Sign in with Apple</Text>
-            </TouchableOpacity>
+            {/* {Platform.OS === 'ios' && (
+                <TouchableOpacity style={styles.button}>
+                    <Icon name="apple" size={24} color="black" style={styles.icon} />
+                    <Text style={styles.buttonText}>Sign in with Apple</Text>
+                </TouchableOpacity>
+            )} */}
 
             {/* Sign in with Facebook */}
-            <TouchableOpacity style={styles.button}>
+            {/* <TouchableOpacity style={styles.button}>
                 <Icon name="facebook" size={24} color="#3B65BF" style={styles.icon} />
                 <Text style={styles.buttonText}>Sign in with Facebook</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/* Sign in with Email */}
             <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate("Signin") }}>
                 <Icon name="envelope" size={24} color={'#A9A9A9'} style={styles.icon} />
-                <Text style={styles.buttonText}>Sign in with Another Email</Text>
+                <Text style={styles.buttonText}>Sign in using Email</Text>
             </TouchableOpacity>
             
             <View style={{ flexDirection: 'row', marginTop: '4%', marginBottom: '4%', justifyContent: 'center', zIndex: 1 }}>
@@ -149,7 +209,7 @@ const styles = StyleSheet.create({
     },
 
     header: {
-        marginTop: '10%',
+        marginTop: '15%',
         height: '10%',
         borderBottomWidth: 0,
         flexDirection: 'row',

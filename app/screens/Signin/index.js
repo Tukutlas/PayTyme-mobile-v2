@@ -223,9 +223,13 @@ export default class Signin extends Component {
 
     async setPersonalDetails(email, password) {
         let user_email = await AsyncStorage.getItem('email');
+        let user_password = await AsyncStorage.getItem('password');
         if (user_email === null) {
-            AsyncStorage.setItem('email',  email);
-            AsyncStorage.setItem('password',  password);
+            AsyncStorage.setItem('email', email);
+        }
+        
+        if(user_password == null){
+            AsyncStorage.setItem('password', password);
         }
     }
 

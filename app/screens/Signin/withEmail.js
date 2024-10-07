@@ -57,10 +57,20 @@ export default class WithEmail extends Component {
 
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         const loginResponse = await AsyncStorage.getItem('login_response');
-        const user = JSON.parse(loginResponse).user;
-        let firstname = user.firstname ? user.firstname : user.fullname.split(" ")[0];
+        if (loginResponse) {
+            const user = JSON.parse(loginResponse).user;
+            let firstname = user.firstname ? user.firstname : user.fullname.split(" ")[0];
+            this.setState({ firstname: firstname });
+        }else{
+            const user = JSON.parse(await AsyncStorage.getItem("@user"));
+            if(user){
+                let firstname = user.given_name
+                this.setState({ firstname: firstname });
+            }
+        }
+        
         let email = await AsyncStorage.getItem('email');
-        this.setState({ firstname: firstname, email: email });
+        this.setState({ email: email });
     }
 
     backPressed = () => {
@@ -227,9 +237,12 @@ export default class WithEmail extends Component {
 
     async setPersonalDetails(email, password) {
         let user_email = await AsyncStorage.getItem('email');
+        let user_password = await AsyncStorage.getItem('password');
         if (user_email === null) {
-            AsyncStorage.setItem('email',  email);
-            AsyncStorage.setItem('password',  password);
+            AsyncStorage.setItem('email', email);
+        }
+        if(user_password == null){
+            AsyncStorage.setItem('password', password);
         }
     }
 
@@ -322,17 +335,18 @@ export default class WithEmail extends Component {
                 const responseText = await response.text();
                 this.hideLoader();
                 let response_status = JSON.parse(responseText).status;
-
+                let data = JSON.parse(responseText).data;
+                
                 if (response_status == true) {
                     let access_token = JSON.parse(responseText).authorisation.token;
-                    let username = JSON.parse(responseText).data.username;
-                    let firstname = JSON.parse(responseText).data.first_name;
-                    let lastname = JSON.parse(responseText).data.last_name;
-                    let image = JSON.parse(responseText).data.image;
-                    let phone = JSON.parse(responseText).data.phone_number;
-                    let email = JSON.parse(responseText).data.email_address;
-                    let tier = JSON.parse(responseText).data.tier;
-                    let has_bank = JSON.parse(responseText).data.has_bank;
+                    let username = data.username;
+                    let firstname = data.first_name;
+                    let lastname = data.last_name;
+                    let image = data.image;
+                    let phone = data.phone_number;
+                    let email = data.email_address;
+                    let tier = data.tier;
+                    let has_bank = data.has_bank;
                     // console.log(tier)
                     let response = {
                         "status": "ok",
@@ -351,9 +365,9 @@ export default class WithEmail extends Component {
                     };
 
                     if(has_bank == true){
-                        let account_name = JSON.parse(responseText).data.bank_account.account_name;
-                        let account_number = JSON.parse(responseText).data.bank_account.account_number;
-                        let bank_name = JSON.parse(responseText).data.bank_account.bank_name;
+                        let account_name = data.bank_account.account_name;
+                        let account_number = data.bank_account.account_number;
+                        let bank_name = data.bank_account.bank_name;
                         let bank_details = {
                             'account_name': account_name,
                             'account_number': account_number,
@@ -395,35 +409,17 @@ export default class WithEmail extends Component {
                         this.props.navigation.navigate('VerificationMenu', {
                             routeName: 'Signin',
                             status: account_status,
-                            user_id: JSON.parse(responseText).data.user_id,
-                            phone: JSON.parse(responseText).data.phone,
-                            email: JSON.parse(responseText).data.email_address
+                            user_id: data.user_id,
+                            phone: data.phone,
+                            email: data.email_address
                         })
-                        // Alert.alert(
-                        //     'Oops',
-                        //     JSON.parse(responseText).message,
-                        //     [
-                        //         {
-                        //             text: 'Verify',
-                        //             onPress: () => this.props.navigation.navigate('VerificationMenu', {
-                        //                 routeName: 'Signin',
-                        //                 status: account_status,
-                        //                 user_id: JSON.parse(responseText).data.user_id,
-                        //                 phone: JSON.parse(responseText).data.phone,
-                        //                 email: JSON.parse(responseText).data.email_address
-                        //             }),
-                        //             style: 'cancel',
-                        //         },
-                        //     ],
-                        //     { cancelable: false },
-                        // );
                     } else if (account_status == 'unverified3') {
                         this.props.navigation.navigate('SecurityQuestions', {
                             status: account_status,
                             routeName: 'Signin',
-                            user_id: JSON.parse(responseText).data.user_id,
-                            phone: JSON.parse(responseText).data.phone,
-                            email: JSON.parse(responseText).data.email_address
+                            user_id: data.user_id,
+                            phone: data.phone,
+                            email: data.email_address
                         })
                     } else if(device_status == 'unauthenticated'){
                         Alert.alert(
@@ -439,9 +435,9 @@ export default class WithEmail extends Component {
                                     onPress: () => this.props.navigation.navigate('SecurityQuestions', {
                                         status: device_status,
                                         routeName: 'Signin',
-                                        user_id: JSON.parse(responseText).data.user_id,
-                                        phone: JSON.parse(responseText).data.phone,
-                                        email: JSON.parse(responseText).data.email_address
+                                        user_id: data.user_id,
+                                        phone: data.phone,
+                                        email: data.email_address
                                     }),
                                     style: 'cancel',
                                 },
@@ -462,9 +458,9 @@ export default class WithEmail extends Component {
                                     onPress: () => this.props.navigation.navigate('AnswerSecurityQuestions', {
                                         status: device_status,
                                         routeName: 'Signin',
-                                        user_id: JSON.parse(responseText).data.user_id,
-                                        phone: JSON.parse(responseText).data.phone,
-                                        email_address: JSON.parse(responseText).data.email_address
+                                        user_id: data.user_id,
+                                        phone: data.phone,
+                                        email_address: data.email_address
                                     }),
                                     style: 'cancel',
                                 },

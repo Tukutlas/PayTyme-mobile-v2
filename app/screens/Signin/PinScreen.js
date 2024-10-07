@@ -56,7 +56,7 @@ const PinScreen = ({ navigation }) => {
 
     const getUserDetails = async () => {
         const loginResponse = await AsyncStorage.getItem('login_response');
-        if (loginResponse != null) {
+        if (loginResponse) {
             const user = JSON.parse(loginResponse).user;
             let firstname = user.firstname ? user.firstname : user.fullname.split(" ")[0];
             let email = await AsyncStorage.getItem('email');
@@ -138,7 +138,7 @@ const PinScreen = ({ navigation }) => {
             );
 
             if (result.success) {
-                signInUser(await AsyncStorage.getItem('user_pin'));
+                signInUser(await AsyncStorage.getItem('pin'));
             }
         } catch (error) {
             Alert.alert('Error', error.toString());
@@ -147,19 +147,20 @@ const PinScreen = ({ navigation }) => {
 
     const handleKeyPress = (key) => {
         if (pin.length < 4) {
-            setPin(pin + key);
+            let newPin = pin + key;
+            setPin(newPin);
             if (pin.length + 1 === 4) {
                 if(savedPin){
-                    if((pin + key) != savedPin){
+                    if((newPin) != savedPin){
                         setPinError(true);
                         Vibration.vibrate(); // Trigger vibration
                         // Trigger shake animation (you can implement this with a state variable)
                         shakeDots(); // Call a function to shake dots
                     }else{
-                        signInUser(pin + key);
+                        signInUser(newPin);
                     }
                 }else{
-                    signInUser(pin + key);
+                    signInUser(newPin);
                 }
             }
         }
@@ -182,12 +183,6 @@ const PinScreen = ({ navigation }) => {
 
     const _storeUserData = (login_response) => {
         AsyncStorage.setItem('login_response', JSON.stringify(login_response))
-        .then(() => {
-
-        })
-        .catch((error) => {
-
-        })
     };
 
     const removeItemValue = async(key) => {
@@ -212,8 +207,12 @@ const PinScreen = ({ navigation }) => {
 
     const setPersonalDetails = async (email, pin) => {
         let user_email = await AsyncStorage.getItem('email');
-        if (user_email === null) {
+        let user_pin = await AsyncStorage.getItem('pin');
+        if (user_email == null) {
             AsyncStorage.setItem('email',  email);
+        }
+
+        if(user_pin == null){
             AsyncStorage.setItem('pin', pin);
         }
     }
@@ -234,11 +233,10 @@ const PinScreen = ({ navigation }) => {
         const deviceBrand = DeviceInfo.getBrand();
 
         const user = JSON.parse(await AsyncStorage.getItem("@user"));
-        const email_address = user?.email || ''; // Use optional chaining and default value
-        const trimmedPin = pin.trim(); // Combine pin assignment and trimming
+        const email_address = user?.email || ''; // Use optional chaining and default value // Combine pin assignment and trimming
         const trimmedEmail = email_address.trim();
     
-        //post details to server 
+        //post details to server
         showLoader();
         //this functions posts to the login API ; //#endregion
         const controller = new AbortController();
@@ -249,7 +247,7 @@ const PinScreen = ({ navigation }) => {
                 'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
             }),
             body: "email_address=" + trimmedEmail
-                + "&pin=" + trimmedPin// <-- Post parameters
+                + "&pin=" + pin// <-- Post parameters
                 // + "&password=" + password
                 + "&device_name=" + deviceName 
                 + "&device_type=" + Platform.OS 
@@ -265,21 +263,20 @@ const PinScreen = ({ navigation }) => {
             // }
             hideLoader();
             const responseText = await response.text();
-            // console.log(responseText)
-            // return;
             
             let response_status = JSON.parse(responseText).status;
-
+            let data = JSON.parse(responseText).data;
+                
             if (response_status == true) {
                 let access_token = JSON.parse(responseText).authorisation.token;
-                let username = JSON.parse(responseText).data.username;
-                let firstname = JSON.parse(responseText).data.first_name;
-                let lastname = JSON.parse(responseText).data.last_name;
-                let image = JSON.parse(responseText).data.image;
-                let phone = JSON.parse(responseText).data.phone_number;
-                let email = JSON.parse(responseText).data.email_address;
-                let tier = JSON.parse(responseText).data.tier;
-                let has_bank = JSON.parse(responseText).data.has_bank;
+                let username = data.username || data.first_name;
+                let firstname = data.first_name;
+                let lastname = data.last_name;
+                let image = data.image;
+                let phone = data.phone_number;
+                let email = data.email_address;
+                let tier = data.tier;
+                let has_bank = data.has_bank;
 
                 let response = {
                     "status": "ok",
@@ -298,9 +295,9 @@ const PinScreen = ({ navigation }) => {
                 };
 
                 if(has_bank == true){
-                    let account_name = JSON.parse(responseText).data.bank_account.account_name;
-                    let account_number = JSON.parse(responseText).data.bank_account.account_number;
-                    let bank_name = JSON.parse(responseText).data.bank_account.bank_name;
+                    let account_name = data.bank_account.account_name;
+                    let account_number = data.bank_account.account_number;
+                    let bank_name = data.bank_account.bank_name;
                     let bank_details = {
                         'account_name': account_name,
                         'account_number': account_number,
@@ -311,10 +308,10 @@ const PinScreen = ({ navigation }) => {
                 }
 
                 setItemValue('tier', tier);
-
                 setItemValue('auth_type', 'secondary');
+
                 if (compatible) {
-                    setPersonalDetails(trimmedEmail, trimmedPin)
+                    setPersonalDetails(trimmedEmail, pin)
                 }
                 
                 //remove previous records: 
@@ -340,19 +337,19 @@ const PinScreen = ({ navigation }) => {
                     );
                 } else if (['unverified1', 'unverified2'].includes(account_status)) {
                     navigation.navigate('VerificationMenu', {
-                        routeName: 'Signin',
+                        routeName: 'PinScreen',
                         status: account_status,
-                        user_id: JSON.parse(responseText).data.user_id,
-                        phone: JSON.parse(responseText).data.phone,
-                        email: JSON.parse(responseText).data.email_address
+                        user_id: data.user_id,
+                        phone: data.phone,
+                        email: data.email_address
                     })
                 } else if (account_status == 'unverified3') {
                     navigation.navigate('SecurityQuestions', {
                         status: account_status,
-                        routeName: 'Signin',
-                        user_id: JSON.parse(responseText).data.user_id,
-                        phone: JSON.parse(responseText).data.phone,
-                        email: JSON.parse(responseText).data.email_address
+                        routeName: 'PinScreen',
+                        user_id: data.user_id,
+                        phone: data.phone,
+                        email: data.email_address
                     })
                 } else if(device_status == 'unauthenticated'){
                     Alert.alert(
@@ -367,10 +364,10 @@ const PinScreen = ({ navigation }) => {
                                 text: 'Yes',
                                 onPress: () => navigation.navigate('SecurityQuestions', {
                                     status: device_status,
-                                    routeName: 'Signin',
-                                    user_id: JSON.parse(responseText).data.user_id,
-                                    phone: JSON.parse(responseText).data.phone,
-                                    email: JSON.parse(responseText).data.email_address
+                                    routeName: 'PinScreen',
+                                    user_id: data.user_id,
+                                    phone: data.phone,
+                                    email: data.email_address
                                 }),
                                 style: 'cancel',
                             },
@@ -390,10 +387,10 @@ const PinScreen = ({ navigation }) => {
                                 text: 'Yes',
                                 onPress: () => navigation.navigate('AnswerSecurityQuestions', {
                                     status: device_status,
-                                    routeName: 'Signin',
-                                    user_id: JSON.parse(responseText).data.user_id,
-                                    phone: JSON.parse(responseText).data.phone,
-                                    email_address: JSON.parse(responseText).data.email_address
+                                    routeName: 'PinScreen',
+                                    user_id: data.user_id,
+                                    phone: data.phone,
+                                    email_address: data.email_address
                                 }),
                                 style: 'cancel',
                             },
@@ -418,7 +415,6 @@ const PinScreen = ({ navigation }) => {
             }
         })
         .catch((error) => {
-            // console.log(error); 
             hideLoader();
             if (error.name === 'AbortError') {
                 Alert.alert(
@@ -487,7 +483,6 @@ const PinScreen = ({ navigation }) => {
             }),
         ]).start();
     };
-
 
     const renderDots = () => {
         const shakeInterpolate = shakeAnimation.interpolate({

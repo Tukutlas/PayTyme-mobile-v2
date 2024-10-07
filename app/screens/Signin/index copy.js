@@ -3,8 +3,8 @@ import {
     Image, View, StatusBar, Platform, TouchableOpacity, Alert, Text, 
     TextInput, Keyboard, TouchableWithoutFeedback, Linking, BackHandler
 } from "react-native";
-import Svg, { Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouteContext } from '../../context/RouteContext';
 // Screen Styles
 import styles from "./styles";
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -33,6 +33,7 @@ const Signin = ({ navigation }) => {
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
     const emailInputRef = useRef(null);
     const passwordInputRef = useRef(null);
+    const { initialRoute, setRouteContextInitialRoute } = useRouteContext();
 
     useEffect(() => {
         const checkDeviceForHardware = async () => {
@@ -131,9 +132,8 @@ const Signin = ({ navigation }) => {
             if (result.success) {
                 const email = await AsyncStorage.getItem('email');
                 const password = await AsyncStorage.getItem('password');
-                setEmail(email);
-                setPassword(password);
-                signInUser();
+                
+                signInUser(email, password);
             }
         } catch (error) {
             Alert.alert('Error', error.toString());
@@ -150,9 +150,13 @@ const Signin = ({ navigation }) => {
 
     const setPersonalDetails = async(email, password) => {
         let user_email = await AsyncStorage.getItem('email');
+        let user_password = await AsyncStorage.getItem('password');
         if (user_email === null) {
-            AsyncStorage.setItem('email',  email);
-            AsyncStorage.setItem('password',  password);
+            AsyncStorage.setItem('email', email);
+        }
+        
+        if(user_password == null){
+            AsyncStorage.setItem('password', password);
         }
     }
 
@@ -173,14 +177,9 @@ const Signin = ({ navigation }) => {
         setIsLoading(false)
     }
 
-    const _storeUserData = (login_response) => {
-        AsyncStorage.setItem('login_response', JSON.stringify(login_response))
-        .then(() => {
-
-        })
-        .catch((error) => {
-
-        })
+    const _storeUserData = async (login_response) => {
+        await AsyncStorage.setItem('login_response', JSON.stringify(login_response));
+        return true; // Indicate that the operation is complete
     };
 
     const removeItemValue = async(key) => {
@@ -203,16 +202,14 @@ const Signin = ({ navigation }) => {
         }
     }
 
-    const signInUser = async () => {
+    const signInUser = async (userEmail = '', userPassword = '') => {
         const deviceName = await DeviceInfo.getDeviceName();
         const deviceId = await getDeviceUniqueId();
         const deviceModel = DeviceInfo.getModel();
         const deviceBrand = DeviceInfo.getBrand();
         
-        // let email = this.state.email.replace(/^\s+|\s+$/g, "");
-        // let password = this.state.password.replace(/^\s+|\s+$/g, "");
-        let trimmedEmail = email.trim();
-        let trimmedPassword = password.trim();
+        let trimmedEmail = (userEmail || email).trim();
+        let trimmedPassword = (userPassword || password).trim();
 
         const checkEmail = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/.test(trimmedEmail);
         if (trimmedEmail.length < 1) {
@@ -249,18 +246,19 @@ const Signin = ({ navigation }) => {
                 const responseText = await response.text();
                 hideLoader();
                 let response_status = JSON.parse(responseText).status;
-
+                let data = JSON.parse(responseText).data;
+                
                 if (response_status == true) {
                     let access_token = JSON.parse(responseText).authorisation.token;
-                    let username = JSON.parse(responseText).data.username;
-                    let firstname = JSON.parse(responseText).data.first_name;
-                    let lastname = JSON.parse(responseText).data.last_name;
-                    let image = JSON.parse(responseText).data.image;
-                    let phone = JSON.parse(responseText).data.phone_number;
-                    let email = JSON.parse(responseText).data.email_address;
-                    let tier = JSON.parse(responseText).data.tier;
-                    let has_bank = JSON.parse(responseText).data.has_bank;
-                    // console.log(tier)
+                    let username = data.username;
+                    let firstname = data.first_name;
+                    let lastname = data.last_name;
+                    let image = data.image;
+                    let phone = data.phone_number;
+                    let email = data.email_address;
+                    let tier = data.tier;
+                    let has_bank = data.has_bank;
+                    
                     let response = {
                         "status": "ok",
                         "user": {
@@ -278,9 +276,9 @@ const Signin = ({ navigation }) => {
                     };
 
                     if(has_bank == true){
-                        let account_name = JSON.parse(responseText).data.bank_account.account_name;
-                        let account_number = JSON.parse(responseText).data.bank_account.account_number;
-                        let bank_name = JSON.parse(responseText).data.bank_account.bank_name;
+                        let account_name = data.bank_account.account_name;
+                        let account_number = data.bank_account.account_number;
+                        let bank_name = data.bank_account.bank_name;
                         let bank_details = {
                             'account_name': account_name,
                             'account_number': account_number,
@@ -300,9 +298,15 @@ const Signin = ({ navigation }) => {
                     //remove previous records: 
                     removeItemValue("login_response");
 
-                    _storeUserData(response);
+                    let storage_status = await _storeUserData(response);
+                    this.setItemValue('auth_type', 'primary');
+
+                    setRouteContextInitialRoute('WithEmail');
+
                     //Go to main dashboard
-                    navigation.navigate("Tabs");
+                    if(storage_status){
+                        navigation.navigate("Tabs");
+                    }
                 } else {
                     let account_status = JSON.parse(responseText).account_status ?? '';
                     let device_status = JSON.parse(responseText).device_status ?? '';
@@ -322,17 +326,17 @@ const Signin = ({ navigation }) => {
                         navigation.navigate('VerificationMenu', {
                             routeName: 'Signin',
                             status: account_status,
-                            user_id: JSON.parse(responseText).data.user_id,
-                            phone: JSON.parse(responseText).data.phone,
-                            email: JSON.parse(responseText).data.email_address
+                            user_id: data.user_id,
+                            phone: data.phone,
+                            email: data.email_address
                         })
                     } else if (account_status == 'unverified3') {
                         navigation.navigate('SecurityQuestions', {
                             status: account_status,
                             routeName: 'Signin',
-                            user_id: JSON.parse(responseText).data.user_id,
-                            phone: JSON.parse(responseText).data.phone,
-                            email: JSON.parse(responseText).data.email_address
+                            user_id: data.user_id,
+                            phone: data.phone,
+                            email: data.email_address
                         })
                     } else if(device_status == 'unauthenticated'){
                         Alert.alert(
@@ -348,9 +352,9 @@ const Signin = ({ navigation }) => {
                                     onPress: () => navigation.navigate('SecurityQuestions', {
                                         status: device_status,
                                         routeName: 'Signin',
-                                        user_id: JSON.parse(responseText).data.user_id,
-                                        phone: JSON.parse(responseText).data.phone,
-                                        email: JSON.parse(responseText).data.email_address
+                                        user_id: data.user_id,
+                                        phone: data.phone,
+                                        email: data.email_address
                                     }),
                                     style: 'cancel',
                                 },
@@ -371,9 +375,9 @@ const Signin = ({ navigation }) => {
                                     onPress: () => navigation.navigate('AnswerSecurityQuestions', {
                                         status: device_status,
                                         routeName: 'Signin',
-                                        user_id: JSON.parse(responseText).data.user_id,
-                                        phone: JSON.parse(responseText).data.phone,
-                                        email_address: JSON.parse(responseText).data.email_address
+                                        user_id: data.user_id,
+                                        phone: data.phone,
+                                        email_address: data.email_address
                                     }),
                                     style: 'cancel',
                                 },

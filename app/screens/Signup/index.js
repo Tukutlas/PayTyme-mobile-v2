@@ -31,7 +31,6 @@ const Signup = ({ navigation }) => {
         lastnameErrorMessage: '',
         isLoading: false,
         modalVisible: false,
-        isProgress: false,
         isProcessing: false,
         password: '',
         hidePassword: true,
@@ -102,11 +101,11 @@ const Signup = ({ navigation }) => {
     };
 
     const openProgressbar = () => {
-        setState(prevState => ({ ...prevState, isProgress: true, isLoading: true }));
+        setState(prevState => ({ ...prevState, isLoading: true }));
     };
 
     const closeProgressbar = () => {
-        setState(prevState => ({ ...prevState, isProgress: false, isLoading: false }));
+        setState(prevState => ({ ...prevState, isLoading: false }));
     };
 
     const removeItemValue = async (key) => {
@@ -228,6 +227,7 @@ const Signup = ({ navigation }) => {
                     + "&password=" + password
                     + "&password_confirmation=" + confirmPassword
                     + "&username=" + username
+                    + "&auth_type=email"
                     + "&referral_code="+ referralCode
                     + "&device_name=" + DeviceInfo.getDeviceName()
                     + "&device_type=" + Platform.OS

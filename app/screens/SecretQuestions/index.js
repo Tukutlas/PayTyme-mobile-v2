@@ -37,6 +37,7 @@ export default class SecurityQuestions extends Component {
             question1ErrorMessage: '',
             question2ErrorMessage: '',
             question3ErrorMessage: '',
+            route: ''
         }
     }
 
@@ -45,7 +46,8 @@ export default class SecurityQuestions extends Component {
             phone: this.props.route.params.phone,
             email: this.props.route.params.email_address,
             user_id: this.props.route.params.user_id,
-            status: this.props.route.params.status
+            status: this.props.route.params.status,
+            route: this.props.route.params.routeName
         });
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.fetchSecurityQuestions();
@@ -118,7 +120,7 @@ export default class SecurityQuestions extends Component {
                         {
                             text: 'Proceed to Login',
                             onPress: () => {
-                                this.props.navigation.navigate('Signin')
+                                this.props.navigation.navigate(this.state.route)
                             },
                             style: 'cancel',
                         },

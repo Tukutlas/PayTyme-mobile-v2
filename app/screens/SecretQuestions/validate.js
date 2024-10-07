@@ -23,7 +23,8 @@ export default class AnswerSecurityQuestions extends Component {
             email: '',
             phone: '',
             user_id: '',
-            status: ''
+            status: '',
+            route: ''
         }
     }
 
@@ -32,7 +33,8 @@ export default class AnswerSecurityQuestions extends Component {
             phone: this.props.route.params.phone, 
             email: this.props.route.params.email_address, 
             user_id: this.props.route.params.user_id, 
-            status: this.props.route.params.status
+            status: this.props.route.params.status,
+            route: this.props.route.params.routeName
         });
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.fetchSecurityQuestion(this.props.route.params.user_id);
@@ -105,7 +107,7 @@ export default class AnswerSecurityQuestions extends Component {
                         {
                             text: 'Proceed to Login',
                             onPress: () => {
-                                this.props.navigation.navigate('Signin');
+                                this.props.navigation.navigate(this.state.route);
                             },
                             style: 'cancel',
                         },
@@ -232,17 +234,14 @@ export default class AnswerSecurityQuestions extends Component {
             }),
         }).then((response) => response.text())
         .then((responseText) => {
-            console.log(responseText)
-            res = JSON.parse(responseText);
-            console.log(res)
+            let res = JSON.parse(responseText);
             if(res.status == true){
                 // Alert.alert('Success', 'Secret questions have been set successfully.');
                 // Navigate to the next screen or perform any other action
-                console.log(this.state.status)
                 if(this.state.status == 'unauthenticated2'){
                     this.registerDevice(user_id)
                 }else{
-                    this.props.navigation.navigate('Signin');
+                    this.props.navigation.navigate(this.state.route);
                 }
             } else {
                 Alert.alert('Error', data.message || 'Failed to set secret questions. Please try again.');
@@ -267,7 +266,6 @@ export default class AnswerSecurityQuestions extends Component {
         .then((response) => response.text())
         .then((responseText) => {
             const response = JSON.parse(responseText);
-            console.log(response)
             if(response.status == true){
                 const question = response.data;
                 this.setState({ question: question });
