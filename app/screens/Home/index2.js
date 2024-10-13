@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, StatusBar, Modal, TouchableOpacity, Image, View, Text, Platform, ToastAndroid, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from "./styles";
@@ -10,79 +10,102 @@ import { useRouteContext } from '../../context/RouteContext';
 
 const Home = ({ navigation }) => {
     const { initialRoute } = useRouteContext();
-    const [authToken, setAuthToken] = useState("");
+    const [authToken, setAuthToken] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [balance, setBalance] = useState("...");
     const [username, setUsername] = useState("...");
     const [walletId, setWalletId] = useState("");
-    const [tier, setTier] = useState("");
+    const [tier, setTier] = useState(null);
     const [view, setView] = useState(false);
     const [profilePicture, setProfilePicture] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [transactions, setTransactions] = useState([]);
     const [transactionList, setTransactionList] = useState([]);
+    const reloadIntervalRef = useRef(null); // Store interval reference
 
+    // First useEffect: Initial setup (StatusBar, navigation listeners, and token setting)
     useEffect(() => {
         StatusBar.setBarStyle("light-content", true);
-
         if (Platform.OS === "android") {
             StatusBar.setBackgroundColor("#120A47", true);
             StatusBar.setTranslucent(true);
         }
 
-        async function fetchData () {
-            const loginResponse = await AsyncStorage.getItem('login_response');
-            const user = JSON.parse(loginResponse).user;
-            setAuthToken(user.access_token);
-            setUsername(user.username);
-            setTier(user.tier);
-            if (user.image !== null) {
-                setProfilePicture(user.image);
-            }
-
-            // Load wallet balance and get transaction history only after authToken is set
-            await loadWalletBalance();
-            await getTransactionHistory();
-            try {
-                const lastShownDate = await AsyncStorage.getItem('lastShownDate');
-                
-                checkIfUserHasVirtualAccount(lastShownDate);
-
-                const walletVisibility = await AsyncStorage.getItem('walletVisibility');
-                if (walletVisibility !== null && walletVisibility === 'true') {
-                    setView(true);
-                }
-
-                navigation.addListener('focus', () => {
-                    checkIfUserHasVirtualAccount(lastShownDate);
-                    loadWalletBalance();
-                    reloadTransactionHistory();
-                });
-
-                const reloadInterval = setInterval(() => {
-                    loadWalletBalance();
-                    reloadTransactionHistory();
-                }, 120000); // 2 minutes interval
-
-                
-                return () => {
-                    clearInterval(reloadInterval);
-                    BackHandler.removeEventListener('hardwareBackPress', backPressed);
-                };
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            } finally {
-                setIsLoading(false);
+        const backPressed = () => {
+            Alert.alert('Log Out', 'Are you sure you want to log out?', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Yes, Log out', onPress: () => logout() },
+            ]);
+            return true;
+        };
+        
+        const handleFocus = async () => {
+            if (authToken) {
+                console.log('refocusing1')
+                await loadWalletBalance();
+                reloadTransactionHistory();
             }
         };
 
-        fetchData()
+        const fetchUserData = async () => {
+            try {
+                const loginResponse = await AsyncStorage.getItem('login_response');
+                const user = JSON.parse(loginResponse)?.user;
+                if (user && (!authToken || authToken !== user.access_token)) {
+                    setAuthToken(user.access_token);
+                    setUsername(user.username)
+                    setProfilePicture(user.image)
+                }
+                setTier(await AsyncStorage.getItem('tier'))
+
+                const lastShownDate = await AsyncStorage.getItem('lastShownDate');
+                checkIfUserHasVirtualAccount(lastShownDate);
+            } catch (error) {
+                // console.error('Error fetching user data:', error);
+            }
+        };
+
+        navigation.addListener('focus', handleFocus);
+        BackHandler.addEventListener('hardwareBackPress', backPressed);
+
+        const startAutoReloader = () => {
+            const intervalId = setInterval(async () => {
+            //   console.log('Running autoreloader', authToken);
+      
+                if (authToken) {
+                    console.log('reloading now')
+                    await loadWalletBalance();  // Assuming this is an async function
+                    reloadTransactionHistory();  // Assuming this can be synchronous
+                }
+            }, 30000);  // 2 minutes interval
+      
+            // Cleanup function to clear the interval when component unmounts
+            return () => clearInterval(intervalId);
+        };
+         
+        fetchUserData();
+        // Start the auto-reloader
+        const autoReloader = startAutoReloader();
 
         return () => {
             BackHandler.removeEventListener('hardwareBackPress', backPressed);
+            navigation.removeListener('focus', handleFocus);
+            autoReloader();
         };
     }, []);
 
+    // Second useEffect: Handle reload interval, balance, and transactions (depends on authToken)
+    useEffect(() => {
+        const loadDataAfterAuthToken = async () => {
+            if (authToken) {
+                // console.log('loading')
+                await loadWalletBalance();
+                await getTransactionHistory();
+            }
+        };
+
+        loadDataAfterAuthToken();
+    }, [authToken]);
 
     const backPressed = () => {
         Alert.alert('Log Out', 'Are you sure you want to log out?', [
@@ -97,6 +120,7 @@ const Home = ({ navigation }) => {
     };
 
     BackHandler.addEventListener('hardwareBackPress', backPressed);
+    
     const loadWalletBalance = async () => {
         fetch(GlobalVariables.apiURL + "/wallet/details",
         {
@@ -117,14 +141,13 @@ const Home = ({ navigation }) => {
                 setWalletId(wallet.wallet_identifier)
                 setBalance(parseInt(wallet.balance))
             } else if (response_status == 'error') {
-                return;
                     Alert.alert(
                     'Session Out',
                     'Your session has timed-out. Login and try again',
                     [
                         {
                         text: 'OK',
-                        onPress: () => navigation.navigate('Signin'),
+                        onPress: () => navigation.navigate(initialRoute),
                         style: 'cancel',
                         }, 
                     ],

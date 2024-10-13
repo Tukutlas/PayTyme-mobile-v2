@@ -8,7 +8,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalVariables } from '../../../global';
 
-const ConfirmPinScreen = ({ navigation }) => {
+const ConfirmPinScreen = ({ route, navigation }) => {
     const [pin, setPin] = useState('');
     const [pinError, setPinError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -44,19 +44,21 @@ const ConfirmPinScreen = ({ navigation }) => {
 
     const handleKeyPress = async (key) => {
         if (pin.length < 4) {
-            setPin(pin + key);
-            if (pin.length + 1 === 4) {
-                await AsyncStorage.getItem('initialPin').then((initialPin) => {
-                    if((pin + key) != initialPin){
-                        setPinError(true);
-                        Vibration.vibrate(); // Trigger vibration
-                        // Trigger shake animation (you can implement this with a state variable)
-                        shakeDots(); // Call a function to shake dots
-                    }
-                });
+            const newPin = pin + key; // Update pin with the new key pressed
+            setPin(newPin); // Update state with the new PIN
+            if (newPin.length === 4) { // Check if the PIN has reached 4 digits
+                const initialPin = await AsyncStorage.getItem('initialPin');
+                
+                if (newPin !== initialPin) {
+                    setPinError(true); // Set error state
+                    Vibration.vibrate(); // Trigger vibration
+                    // Trigger shake animation (implement shakeDots if necessary)
+                    shakeDots(); 
+                }
             }
         }
     };
+    
 
     const handleDelete = () => {
         if (pin.length > 0) {
@@ -103,11 +105,10 @@ const ConfirmPinScreen = ({ navigation }) => {
     }
 
     const signUpUser = async() => {
+        const { auth_type, status } = route.params;
         const { given_name:firstname, family_name:lastname, email } = JSON.parse(await AsyncStorage.getItem('@user'));
         const initialPin = await AsyncStorage.getItem('initialPin');
-        firstname = firstname.trim();
-        lastname = lastname.trim();
-        email = email.trim();
+
         // referralCode = referralCode.trim();
 
         let error = 0;
@@ -123,7 +124,7 @@ const ConfirmPinScreen = ({ navigation }) => {
         if (error === 0)  {
             showLoader();
 
-            fetch(GlobalVariables.apiURL + "/auth/register", {
+            fetch(GlobalVariables.apiURL + "/auth/register-with-pin", {
                 method: 'POST',
                 headers: new Headers({
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -133,7 +134,7 @@ const ConfirmPinScreen = ({ navigation }) => {
                     + "&last_name=" + lastname
                     + "&email_address=" + email
                     + "&pin=" + pin
-                    + "&auth_type="+ navigation.props.auth_type
+                    + "&auth_type="+ auth_type
                     // + "&referral_code="+ referralCode
                     + "&device_name=" + DeviceInfo.getDeviceName()
                     + "&device_type=" + Platform.OS
@@ -152,8 +153,14 @@ const ConfirmPinScreen = ({ navigation }) => {
                         'Your registration on Paytyme is successful.',
                         [
                             {
-                                text: 'Proceed to Verification',
-                                onPress: () => navigation.navigate('PinScreen'),
+                                text: 'Complete Verification',
+                                onPress: () => navigation.navigate('SecurityQuestions', {
+                                    status: status,
+                                    routeName: 'PinScreen',
+                                    user_id: res.data.user_id,
+                                    phone: res.data.phone,
+                                    email_address: res.data.email_address
+                                }),
                                 style: 'cancel',
                             },
                         ],
@@ -178,10 +185,23 @@ const ConfirmPinScreen = ({ navigation }) => {
                             ],
                             { cancelable: false },
                         );
+                    } else {
+                        Alert.alert(
+                            'Oops... Registration issues',
+                            message,
+                            [
+                                {
+                                    text: 'Try Again',
+                                    style: 'cancel',
+                                },
+                            ],
+                            { cancelable: false },
+                        );
                     }
                 }  
             })
             .catch((error) => {
+                console.log(error)
                 hideLoader();
                 Alert.alert(
                     'Error!',

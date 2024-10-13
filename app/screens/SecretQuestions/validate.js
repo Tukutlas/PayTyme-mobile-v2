@@ -247,7 +247,7 @@ export default class AnswerSecurityQuestions extends Component {
                 Alert.alert('Error', data.message || 'Failed to set secret questions. Please try again.');
             }
         }).catch ((error) => {
-            console.error('Error setting secret questions:', error);
+            // console.error('Error setting secret questions:', error);
             Alert.alert('Error', 'An unexpected error occurred. Please try again.');
         }).finally((event) => {
             this.hideLoader();
@@ -270,7 +270,7 @@ export default class AnswerSecurityQuestions extends Component {
                 const question = response.data;
                 this.setState({ question: question });
             }else{
-                alert("An error occurred")
+                alert("An error occurred while fetching the question")
             }
         }).catch((error) => {
             this.setState({ isLoading: false });

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { Alert, BackHandler, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouteContext } from '../../context/RouteContext';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure to install react-native-vector-icons
 import Svg, { Path } from 'react-native-svg';
 import { Fonts, Metrics, Colors } from '../../Themes';
@@ -20,6 +21,7 @@ const SignInOption = ({navigation}) => {
         iosClientId: "808752949617-2pdqa6lu1ovkljvth2o8v1i5e8rlsbfm.apps.googleusercontent.com",
         // webClientId: "808752949617-njdcug3govp2r561ieend3a0ihoe3oc5.apps.googleusercontent.com"
     });
+    const { setRouteContextInitialRoute } = useRouteContext();
 
     useEffect(() => {
         handleSignInWithGoogle()
@@ -31,14 +33,15 @@ const SignInOption = ({navigation}) => {
         // AsyncStorage.removeItem('login_response')
         // AsyncStorage.removeItem('@user')
         // console.log('work', await AsyncStorage.getItem('login_response'))
-        const user = await AsyncStorage.getItem("@user");
-        if(!user){
+        // const user = await AsyncStorage.getItem("@user");
+        // if(!user){
             if(response?.type === "success"){
                 await getUserInfo(response.authentication.accessToken) 
             }
-        } else {
-            setUserInfo(JSON.parse(user));
-        }
+        // } else {
+        //     setUserInfo(JSON.parse(user));
+        //     checkUserEmail(JSON.parse(user).email)
+        // }
     }
 
     const getUserInfo = async (token) => {
@@ -57,13 +60,14 @@ const SignInOption = ({navigation}) => {
             setUserInfo(user);
             // navigation.navigate("PinScreen", {email: user.email});
             await checkUserEmail(user.email)
-            navigation.navigate("PinScreen");
         } catch (error){
+            console.log(error)
             setIsLoading(false)
         }
     }
 
     const checkUserEmail = async (email) => {
+        setIsLoading(true); // Start loading
         try {
             // Step 1: Check if the email exists in the database (use your specific API or database logic)
             const response = await fetch(`${GlobalVariables.apiURL}/auth/check-email?email_address=${encodeURIComponent(email)}`, {
@@ -74,47 +78,51 @@ const SignInOption = ({navigation}) => {
             });
     
             if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
+                if (response.status === 404) {
+                    navigation.navigate("SignUpOption");
+                    return; // Stop further execution
+                }
             }
-        
-            const res = await response.json();
     
+            const res = await response.json();
+            
             // Check if the user email exists based on the server response
             if (res.status) {
                 // Proceed with login if the email exists
-                const {email, auth_type:authType } = res.data;
-
+                const { email, auth_type: authType } = res.data;
+    
                 // Step 2: If email exists, proceed to login based on the auth type
                 switch (authType) {
                     case 'google':
-                        // Handle Google login flow
+                        AsyncStorage.setItem('email', email);
                         setRouteContextInitialRoute('PinScreen');
                         navigation.navigate("PinScreen");
                         break;
                     case 'facebook':
                         // Handle Facebook login flow
-                        // await handleFacebookLogin(user);
                         break;
                     case 'apple':
                         // Handle Apple login flow
-                        // await handleAppleLogin(user);
                         break;
                     case 'email':
-                        // Handle regular email login flow
-                        await AsyncStorage.setItem('email', email);
+                        AsyncStorage.setItem('email', email);
                         setRouteContextInitialRoute('WithEmail');
                         navigation.navigate("WithEmail");
                         break;
                     default:
-                        throw new Error('Invalid authentication type');
+                        navigation.navigate("SignUpOption");
                 }
             } else {
                 // Step 3: If the user does not exist, show an error or redirect to signup
-                
+                navigation.navigate("SignUpOption");
             }
         } catch (error) {
             console.error('Error checking user email:', error);
+            navigation.navigate("SignUpOption");
             // Handle error (e.g., show an error message to the user)
+        } finally {
+            // Ensure isLoading is set to false whether success or failure
+            setIsLoading(false);
         }
     };    
 
@@ -186,7 +194,7 @@ const SignInOption = ({navigation}) => {
                     New To PayTyme?
                 </Text>
 
-                <TouchableOpacity onPress={() => { navigation.navigate("Signup") }}>
+                <TouchableOpacity onPress={() => { navigation.navigate("SignUpOption") }}>
                     <Text style={styles.signUpText}>
                         Create Account
                     </Text>

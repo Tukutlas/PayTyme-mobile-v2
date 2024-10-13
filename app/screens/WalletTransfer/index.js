@@ -61,13 +61,16 @@ export default class WalletTransfer extends Component {
             'keyboardDidHide',
             this.handleKeyboardDidHide
         );
+
+        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
     }
 
-    // componentWillUnmount() {
-    //     BackHandler.removeEventListener("hardwareBackPress", this.backPressed);
-    // }
+    componentWillUnmount() {
+        BackHandler.removeEventListener("hardwareBackPress", this.backPressed);
+    }
 
     backPressed = () => {
+        // console.log('returning')
         if(this.state.transaction){
             this.props.navigation.dispatch(
                 CommonActions.reset({

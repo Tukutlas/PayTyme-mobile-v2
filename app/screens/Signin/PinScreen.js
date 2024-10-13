@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalVariables } from '../../../global';
+import { useRouteContext } from '../../context/RouteContext';
 
 const PinScreen = ({ navigation }) => {
     const [firstname, setFirstname] = useState('');
@@ -21,6 +22,7 @@ const PinScreen = ({ navigation }) => {
     const [biometricEnabled, setBiometricEnabled] = useState(false);
     const [randomKeys, setRandomKeys] = useState([]);
     const shakeAnimation = useRef(new Animated.Value(0)).current; // Create a ref for the shake animation
+    const { setRouteContextInitialRoute } = useRouteContext();
 
     // Generate a random key order when the component mounts
     useEffect(() => {
@@ -263,6 +265,7 @@ const PinScreen = ({ navigation }) => {
             // }
             hideLoader();
             const responseText = await response.text();
+            // console.log(responseText)
             
             let response_status = JSON.parse(responseText).status;
             let data = JSON.parse(responseText).data;
@@ -316,8 +319,10 @@ const PinScreen = ({ navigation }) => {
                 
                 //remove previous records: 
                 removeItemValue("login_response");
+                setRouteContextInitialRoute('PinScreen');
 
                 _storeUserData(response);
+                
                 //Go to main dashboard
                 navigation.navigate("Tabs");
             } else {

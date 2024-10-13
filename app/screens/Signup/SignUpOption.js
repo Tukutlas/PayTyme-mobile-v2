@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { Alert, BackHandler, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { RouteProvider, useRouteContext } from '../../context/RouteContext';
+import { useRouteContext } from '../../context/RouteContext';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure to install react-native-vector-icons
 import Svg, { Path } from 'react-native-svg';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -20,7 +20,7 @@ const SignUpOption = ({navigation}) => {
         iosClientId: "808752949617-2pdqa6lu1ovkljvth2o8v1i5e8rlsbfm.apps.googleusercontent.com",
         // webClientId: "808752949617-njdcug3govp2r561ieend3a0ihoe3oc5.apps.googleusercontent.com"
     });
-    const { initialRoute, setRouteContextInitialRoute } = useRouteContext();
+    const { setRouteContextInitialRoute } = useRouteContext();
 
     useEffect(() => {
         handleSignInWithGoogle()
@@ -51,15 +51,15 @@ const SignUpOption = ({navigation}) => {
         // AsyncStorage.removeItem('login_response')
         // AsyncStorage.removeItem('@user')
         
-        const user = await AsyncStorage.getItem("@user");
-        if(!user){
+        // const user = await AsyncStorage.getItem("@user");
+        // if(!user){
             if(response?.type === "success"){
                 await getUserInfo(response.authentication.accessToken) 
             }
-        } else {
-            setUserInfo(JSON.parse(user));
-            await checkUserEmail(JSON.parse(user).email);
-        }
+        // } else {
+        //     setUserInfo(JSON.parse(user));
+        //     await checkUserEmail(JSON.parse(user).email);
+        // }
     }
 
     const getUserInfo = async (token) => {
@@ -74,10 +74,11 @@ const SignUpOption = ({navigation}) => {
             );
 
             const user = await response.json();
-            await checkUserEmail(user.email);
             await AsyncStorage.setItem('@user', JSON.stringify(user));
             setUserInfo(user);
-            navigation.navigate("SetPinScreen", {auth_type: 'google'});
+            // console.log(user)
+            await checkUserEmail(user.email);
+            // navigation.navigate("SetPinScreen", {auth_type: 'google'});
         } catch (error){
             setIsLoading(false)
             // console.log(error)
@@ -110,21 +111,25 @@ const SignUpOption = ({navigation}) => {
                 }
             });
     
+            // Handle non-OK responses (404, 500, etc.)
             if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
+                if (response.status === 404) {
+                    navigation.navigate("SetPinScreen", { auth_type: 'google' });
+                    return; // Stop further execution
+                }
+                // throw new Error(`Error: ${response.status}`);
             }
-        
+    
             const res = await response.json();
     
             // Check if the user email exists based on the server response
             if (res.status) {
-                // Proceed with login if the email exists
-                const {email, auth_type:authType } = res.data;
-
+                const { email, auth_type: authType } = res.data;
+    
                 // Step 2: If email exists, proceed to login based on the auth type
                 switch (authType) {
                     case 'google':
-                        // Handle Google login flow
+                        AsyncStorage.setItem('email', email);
                         setRouteContextInitialRoute('PinScreen');
                         navigation.navigate("PinScreen");
                         break;
@@ -137,23 +142,25 @@ const SignUpOption = ({navigation}) => {
                         // await handleAppleLogin(user);
                         break;
                     case 'email':
-                        // Handle regular email login flow
-                        await AsyncStorage.setItem('email', email);
+                        AsyncStorage.setItem('email', email);
                         setRouteContextInitialRoute('WithEmail');
                         navigation.navigate("WithEmail");
                         break;
                     default:
-                        throw new Error('Invalid authentication type');
+                        console.log('Invalid auth type. Navigating to SetPinScreen with Google.');
+                        navigation.navigate("SetPinScreen", { auth_type: 'google' });
                 }
             } else {
                 // Step 3: If the user does not exist, show an error or redirect to signup
-                console.log('User does not exist. Redirecting to signup...');
+                // console.log('User does not exist. Redirecting to signup...');
+                navigation.navigate("SetPinScreen", { auth_type: 'google' });
             }
         } catch (error) {
-            console.error('Error checking user email:', error);
-            // Handle error (e.g., show an error message to the user)
+            // console.error('Error checking user email:', error);
+            // You can show an error message or notify the user
         }
-    };    
+    };
+     
 
     return (
         <View style={styles.container}>

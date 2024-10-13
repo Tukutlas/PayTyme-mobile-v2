@@ -528,11 +528,15 @@ export default class Electricity extends Component {
     }
 
     setDiscoValue = async (callback) => {
-        this.setState(state => ({
-            discoValue: callback(state.discoValue)
-        }));
-
-        this.getDiscoService();
+        this.setState(
+            state => ({
+                discoValue: callback(state.discoValue)
+            }),
+            () => {
+                // This will be called after state is updated
+                this.getDiscoService();
+            }
+        );
     }
 
     getDiscoService = () => {

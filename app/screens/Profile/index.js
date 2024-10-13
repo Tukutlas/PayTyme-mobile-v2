@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Switch, StatusBar, Linking, PermissionsAndroid, 
+    BackHandler, Switch, StatusBar, Linking, PermissionsAndroid, 
     TouchableOpacity, TouchableWithoutFeedback, Image, 
     Alert, View, Text, Modal, Platform, Share 
 } from 'react-native';
@@ -61,7 +61,14 @@ const Profile = ({ navigation }) => {
             StatusBar.setBackgroundColor("#120A47", true);
             StatusBar.setTranslucent(true);
         }
+
+        BackHandler.addEventListener("hardwareBackPress", backPressed);
     }, [navigation]);
+
+    const backPressed = () => {
+        navigation.goBack();
+        return true;
+    }
 
     const checkDeviceForHardware = async () => {
         const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -261,18 +268,18 @@ const Profile = ({ navigation }) => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to unlink device');
+                // throw new Error('Failed to unlink device');
             }
 
             const res = await response.json();
             let status = res.status;
             if(!status){
-                throw new Error('Failed to unlink device');
+                // throw new Error('Failed to unlink device');
             }
             console.log(data);
             // Handle success response
         } catch (error) {
-            console.error('Error unlinking device:', error);
+            // console.error('Error unlinking device:', error);
             // Handle error response
         }
     };

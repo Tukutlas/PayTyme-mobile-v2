@@ -5,7 +5,7 @@ import { Fonts, Metrics, Colors } from '../../Themes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GlobalVariables } from '../../../global';
 
-const SetPinScreen = ({ navigation }) => {
+const SetPinScreen = ({ navigation, route }) => {
     const [pin, setPin] = useState('');
     const [randomKeys, setRandomKeys] = useState([]);
     // const shakeAnimation = useRef(new Animated.Value(0)).current; // Create a ref for the shake animation
@@ -34,15 +34,18 @@ const SetPinScreen = ({ navigation }) => {
 
     const handleKeyPress = (key) => {
         if (pin.length < 4) {
-            setPin(pin + key);
-            if ((pin + key).length + 1 === 4) {    
-                AsyncStorage.setItem('initialPin', pin);
+            const newPin = pin + key; // Calculate new pin first
+            setPin(newPin); // Update pin state
+            
+            if (newPin.length === 4) {  // Check if pin has reached 4 digits
+                AsyncStorage.setItem('initialPin', newPin); // Store the new pin
             }
         }
-    };
+    };    
 
     const ProceedToConfirmPinScreen = () => {
-        navigation.navigate("ConfirmPinScreen", {auth_type: navigation.props.auth_type});
+        const { auth_type } = route.params;
+        navigation.navigate("ConfirmPinScreen", {auth_type: auth_type});
     }
 
     const handleDelete = () => {
@@ -101,7 +104,7 @@ const SetPinScreen = ({ navigation }) => {
                 </TouchableOpacity>
 
                 {/* Confirm Button */}
-                <TouchableOpacity style={styles.key} onPress={ProceedToConfirmPinScreen()}>
+                <TouchableOpacity style={styles.key} onPress={ProceedToConfirmPinScreen}>
                     <MaterialIcons name="check" size={24} color="#000" />
                 </TouchableOpacity>
             </View>
