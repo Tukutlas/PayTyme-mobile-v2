@@ -48,7 +48,8 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.6.4",
-    "react-native-pager-view": "6.2.3"
+    "react-native-pager-view": "6.2.3",
+    "expo-apple-authentication": "~6.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

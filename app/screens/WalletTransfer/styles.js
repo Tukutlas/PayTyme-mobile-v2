@@ -7,16 +7,16 @@ const styles = StyleSheet.create({
     height: Metrics.HEIGHT
   },
 
-  header: {
-    backgroundColor: Colors.transparent,
-    height: Metrics.HEIGHT * 0.12,
-    borderBottomWidth: 0,
-    // paddingTop: Metrics.HEIGHT * 0.0354,
-    marginTop: Metrics.HEIGHT * 0.0314,
-    elevation: 0,
-    flexDirection: 'row',
-    flexWrap: 'wrap'
-  },
+  // header: {
+  //   backgroundColor: Colors.transparent,
+  //   height: Metrics.HEIGHT * 0.12,
+  //   borderBottomWidth: 0,
+  //   // paddingTop: Metrics.HEIGHT * 0.0354,
+  //   marginTop: Metrics.HEIGHT * 0.0314,
+  //   elevation: 0,
+  //   flexDirection: 'row',
+  //   flexWrap: 'wrap'
+  // },
 
   header: {
     backgroundColor: Colors.transparent,

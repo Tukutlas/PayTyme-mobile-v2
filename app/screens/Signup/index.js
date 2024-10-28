@@ -447,9 +447,9 @@ const Signup = ({ navigation }) => {
                 </View>
             </View>
 
-            <View style={[styles.formLine, { paddingTop: 5 }]}>
+            {/* <View style={[styles.formLine, { paddingTop: 5 }]}>
                 <View style={styles.formCenter}>
-                    <Text style={styles.labeltext}>Referral Code</Text>
+                    <Text style={styles.labeltext}>Referral Code (Optional)</Text>
                     <View roundedc style={styles.inputitem}>
                         <FontAwesome5 name={'user-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                         <TextInput 
@@ -466,7 +466,7 @@ const Signup = ({ navigation }) => {
                     </View>
                     {state.referralCodeError && <Text style={{ color: 'red' }}>{state.referralCodeErrorMessage}</Text>}
                 </View>
-            </View>
+            </View> */}
 
             <View style={[styles.formLine, { paddingTop: 5 }]}>
                 <View style={styles.formCenter}>

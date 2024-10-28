@@ -5,3 +5,8 @@ npx expo start --dev-client --tunnel
 eas build --platform android
 eas build --platform ios
 eas build --platform all
+
+eas submit --platform ios
+
+eas build --profile preview --platform android
+eas build --profile preview --platform all

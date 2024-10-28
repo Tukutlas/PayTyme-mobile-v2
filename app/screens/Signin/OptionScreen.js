@@ -8,7 +8,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GlobalVariables } from '../../../global';
 import * as WebBrowser from "expo-web-browser";
-import * as Google from 'expo-auth-session/providers/google'
+import * as Google from 'expo-auth-session/providers/google';
+import * as Facebook from 'expo-auth-session/providers/facebook';
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -21,6 +22,12 @@ const SignInOption = ({navigation}) => {
         iosClientId: "808752949617-2pdqa6lu1ovkljvth2o8v1i5e8rlsbfm.apps.googleusercontent.com",
         // webClientId: "808752949617-njdcug3govp2r561ieend3a0ihoe3oc5.apps.googleusercontent.com"
     });
+
+    const [facebookRequest, facebookResponse, facebookPromptAsync] = Facebook.useAuthRequest({
+        clientId: "478452041884575",
+        // clientSecret: "de116684b25542522c7cc22c07a193ca"
+    });
+
     const { setRouteContextInitialRoute } = useRouteContext();
 
     useEffect(() => {
@@ -28,6 +35,12 @@ const SignInOption = ({navigation}) => {
 
         BackHandler.addEventListener("hardwareBackPress", backPressed);
     }, [response]);
+
+    useEffect(() => {
+        handleSignInWithFacebook()
+
+        BackHandler.addEventListener("hardwareBackPress", backPressed);
+    }, [facebookResponse]);
 
     async function handleSignInWithGoogle() {
         // AsyncStorage.removeItem('login_response')
@@ -42,6 +55,40 @@ const SignInOption = ({navigation}) => {
         //     setUserInfo(JSON.parse(user));
         //     checkUserEmail(JSON.parse(user).email)
         // }
+    }
+
+    async function handleSignInWithFacebook() {
+        if(facebookResponse?.type === "success"){
+            await getUserFacebookInfo(facebookResponse.authentication.accessToken) 
+        }
+    }
+
+    const getUserFacebookInfo = async (token) => {
+        if(!token) return;
+        setIsLoading(true)
+        try {
+            const response = await fetch(
+                `https://graph.facebook.com/me?access_token=${token}&fields=id,name,picture.type(large),email`,
+                {
+                    headers: {Authorization: `Bearer ${token}`},
+                }
+            );
+
+            const user = await response.json();
+            const nameArray = user.name.split(' ');
+            const given_name = nameArray[0];
+            const family_name = nameArray.slice(1).join(' ');
+            user.given_name = given_name;
+            user.family_name = family_name;
+
+            await AsyncStorage.setItem('@user', JSON.stringify(user));
+            setUserInfo(user);
+            // navigation.navigate("PinScreen", {email: user.email});
+            await checkUserEmail(user.email, 'facebook')
+        } catch (error){
+            // console.log(error)
+            setIsLoading(false)
+        }
     }
 
     const getUserInfo = async (token) => {
@@ -59,14 +106,14 @@ const SignInOption = ({navigation}) => {
             await AsyncStorage.setItem('@user', JSON.stringify(user));
             setUserInfo(user);
             // navigation.navigate("PinScreen", {email: user.email});
-            await checkUserEmail(user.email)
+            await checkUserEmail(user.email, 'google')
         } catch (error){
-            console.log(error)
+            // console.log(error)
             setIsLoading(false)
         }
     }
 
-    const checkUserEmail = async (email) => {
+    const checkUserEmail = async (email, authType) => {
         setIsLoading(true); // Start loading
         try {
             // Step 1: Check if the email exists in the database (use your specific API or database logic)
@@ -99,6 +146,9 @@ const SignInOption = ({navigation}) => {
                         navigation.navigate("PinScreen");
                         break;
                     case 'facebook':
+                        AsyncStorage.setItem('email', email);
+                        setRouteContextInitialRoute('PinScreen');
+                        navigation.navigate("PinScreen");
                         // Handle Facebook login flow
                         break;
                     case 'apple':
@@ -125,7 +175,6 @@ const SignInOption = ({navigation}) => {
             setIsLoading(false);
         }
     };    
-
 
     const backPressed = () => {
         if(navigation.canGoBack()){
@@ -178,10 +227,10 @@ const SignInOption = ({navigation}) => {
             )} */}
 
             {/* Sign in with Facebook */}
-            {/* <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => facebookPromptAsync()}>
                 <Icon name="facebook" size={24} color="#3B65BF" style={styles.icon} />
                 <Text style={styles.buttonText}>Sign in with Facebook</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             {/* Sign in with Email */}
             <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate("Signin") }}>

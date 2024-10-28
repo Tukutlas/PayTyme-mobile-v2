@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GlobalVariables } from '../../../global';
 import * as WebBrowser from "expo-web-browser";
 import * as Google from 'expo-auth-session/providers/google';
+import * as Facebook from 'expo-auth-session/providers/facebook';
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -20,6 +21,12 @@ const SignUpOption = ({navigation}) => {
         iosClientId: "808752949617-2pdqa6lu1ovkljvth2o8v1i5e8rlsbfm.apps.googleusercontent.com",
         // webClientId: "808752949617-njdcug3govp2r561ieend3a0ihoe3oc5.apps.googleusercontent.com"
     });
+
+    const [facebookRequest, facebookResponse, facebookPromptAsync] = Facebook.useAuthRequest({
+        clientId: "478452041884575",
+        // clientSecret: "de116684b25542522c7cc22c07a193ca"
+    });
+
     const { setRouteContextInitialRoute } = useRouteContext();
 
     useEffect(() => {
@@ -27,6 +34,12 @@ const SignUpOption = ({navigation}) => {
 
         BackHandler.addEventListener("hardwareBackPress", backPressed);
     }, [response]);
+
+    useEffect(() => {
+        handleSignInWithFacebook()
+
+        BackHandler.addEventListener("hardwareBackPress", backPressed);
+    }, [facebookResponse]);
 
     const gotoAuth = async(authType) => {
         switch (authType) {
@@ -36,7 +49,7 @@ const SignUpOption = ({navigation}) => {
                 break;
             case 'facebook':
                 // Handle Facebook login flow
-                // await handleFacebookLogin(user);
+                await facebookPromptAsync();
                 break;
             case 'apple':
                 // Handle Apple login flow
@@ -62,6 +75,41 @@ const SignUpOption = ({navigation}) => {
         // }
     }
 
+    async function handleSignInWithFacebook() {
+        if(facebookResponse?.type === "success"){
+            await getUserFacebookInfo(facebookResponse.authentication.accessToken) 
+        }
+    }
+
+    const getUserFacebookInfo = async (token) => {
+        if(!token) return;
+        setIsLoading(true)
+        try {
+            const response = await fetch(
+                `https://graph.facebook.com/me?access_token=${token}&fields=id,name,picture.type(large),email`,
+                {
+                    headers: {Authorization: `Bearer ${token}`},
+                }
+            );
+
+            // console.log(await response.json())
+            const user = await response.json();
+            const nameArray = user.name.split(' ');
+            const given_name = nameArray[0];
+            const family_name = nameArray.slice(1).join(' ');
+            user.given_name = given_name;
+            user.family_name = family_name;
+
+            await AsyncStorage.setItem('@user', JSON.stringify(user));
+            setUserInfo(user);
+            // navigation.navigate("PinScreen", {email: user.email});
+            await checkUserEmail(user.email, 'facebook');
+        } catch (error){
+            // console.log(error)
+            setIsLoading(false)
+        }
+    }
+
     const getUserInfo = async (token) => {
         if(!token) return;
         setIsLoading(true)
@@ -76,8 +124,7 @@ const SignUpOption = ({navigation}) => {
             const user = await response.json();
             await AsyncStorage.setItem('@user', JSON.stringify(user));
             setUserInfo(user);
-            // console.log(user)
-            await checkUserEmail(user.email);
+            await checkUserEmail(user.email, 'google');
             // navigation.navigate("SetPinScreen", {auth_type: 'google'});
         } catch (error){
             setIsLoading(false)
@@ -101,7 +148,7 @@ const SignUpOption = ({navigation}) => {
         return true;
     };
 
-    const checkUserEmail = async (email) => {
+    const checkUserEmail = async (email, authType) => {
         try {
             // Step 1: Check if the email exists in the database (use your specific API or database logic)
             const response = await fetch(`${GlobalVariables.apiURL}/auth/check-email?email_address=${encodeURIComponent(email)}`, {
@@ -114,7 +161,7 @@ const SignUpOption = ({navigation}) => {
             // Handle non-OK responses (404, 500, etc.)
             if (!response.ok) {
                 if (response.status === 404) {
-                    navigation.navigate("SetPinScreen", { auth_type: 'google' });
+                    navigation.navigate("SetPinScreen", { auth_type: authType });
                     return; // Stop further execution
                 }
                 // throw new Error(`Error: ${response.status}`);
@@ -134,8 +181,10 @@ const SignUpOption = ({navigation}) => {
                         navigation.navigate("PinScreen");
                         break;
                     case 'facebook':
+                        AsyncStorage.setItem('email', email);
+                        setRouteContextInitialRoute('PinScreen');
+                        navigation.navigate("PinScreen");
                         // Handle Facebook login flow
-                        // await handleFacebookLogin(user);
                         break;
                     case 'apple':
                         // Handle Apple login flow
@@ -160,7 +209,6 @@ const SignUpOption = ({navigation}) => {
             // You can show an error message or notify the user
         }
     };
-     
 
     return (
         <View style={styles.container}>
@@ -186,10 +234,10 @@ const SignUpOption = ({navigation}) => {
             </TouchableOpacity> */}
 
             {/* Sign in with Facebook */}
-            {/* <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => gotoAuth('facebook')}>
                 <Icon name="facebook" size={24} color="#3B65BF" style={styles.icon} />
                 <Text style={styles.buttonText}>Sign in with Facebook</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             {/* Sign in with Email */}
             <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate("Signup") }}>

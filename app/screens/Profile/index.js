@@ -241,6 +241,7 @@ const Profile = ({ navigation }) => {
 
     const unlinkDevice = async () => {
         await unlinkDeviceAPI();
+        await setBiometricEnability(false);
         const keysToRemove = ['@user', 'email', 'password', 'pin', 'login_response', 'auth_type'];
         keysToRemove.forEach(key => AsyncStorage.removeItem(key));
         // Ensure initialRoute is defined and valid
@@ -575,13 +576,13 @@ const Profile = ({ navigation }) => {
                                         Select sign out to end your current app session.
                                     </Text>
                                     <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#676767"}}>
-                                        Select deactivate if you want to unlink your device or sign with a different device. If you deactivate, account verification will be required to re-access the app.
+                                        Select unlink device if you want to unlink your device or sign with a different device. If you deactivate, account verification will be required to re-access the app.
                                     </Text>
                                 </View>
                                 <View style={{alignSelf: "center", marginTop: '4%', flexDirection:'row', height: '15%',}}>
                                     <TouchableOpacity info style={{width: '40%', height: '100%', borderRadius: 15, borderWidth: 2, borderColor: "#0C0C54",  alignSelf: "center", justifyContent: "center", marginRight: '5%'}} onPress={() => { unlinkDevice() }}>
                                         <Text autoCapitalize="words" style={styles.cancelButton}>
-                                            Deactivate
+                                            Unlink Device
                                         </Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity info style={{width: '40%', height: '100%', backgroundColor: "#0C0C54", borderWidth: 2, borderRadius: 15, borderColor: "#0C0C54", alignSelf: "center", justifyContent: "center",}} onPress={() => { logout() }}>

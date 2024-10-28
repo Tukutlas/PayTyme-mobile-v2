@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RouteProvider, useRouteContext } from './app/context/RouteContext';
 
 import OptionScreen from './app/screens/Signin/OptionScreen';
-import Signin from './app/screens/Signin/index copy';
+import Signin from './app/screens/Signin/index';
 import WithEmail from './app/screens/Signin/withEmail';
 import PinScreen from './app/screens/Signin/PinScreen';
 

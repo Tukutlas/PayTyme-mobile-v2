@@ -41,7 +41,7 @@ const Home = ({ navigation }) => {
         
         const handleFocus = async () => {
             if (authToken) {
-                console.log('refocusing1')
+                // console.log('refocusing1')
                 await loadWalletBalance();
                 reloadTransactionHistory();
             }
@@ -70,10 +70,8 @@ const Home = ({ navigation }) => {
 
         const startAutoReloader = () => {
             const intervalId = setInterval(async () => {
-            //   console.log('Running autoreloader', authToken);
-      
                 if (authToken) {
-                    console.log('reloading now')
+                    // console.log('reloading now')
                     await loadWalletBalance();  // Assuming this is an async function
                     reloadTransactionHistory();  // Assuming this can be synchronous
                 }
@@ -388,7 +386,7 @@ const Home = ({ navigation }) => {
                             <Image style={styles.profileImage} source={require('../../../assets/user.png')} />
                     }
                     <View>
-                        <TouchableOpacity style={styles.right2} onPress={() => copyWalletID }>
+                        <TouchableOpacity style={styles.right2} onPress={() => copyWalletID() }>
                             <Text style={styles.text2}>{walletId}</Text>
                         </TouchableOpacity>
                     </View>
@@ -448,10 +446,10 @@ const Home = ({ navigation }) => {
             </View>
             
             <View style={styles.gridb}>
-                <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }} >
+                {/* <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { alert("Coming Soon"); }} >
                     <FontAwesome5 name={'plane-departure'} color={'#FF7D00'} size={30}/>
                     <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Flight Booking</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { navigation.navigate("Betting") }} >
                     <FontAwesome5 name={'volleyball-ball'} color={'#AA4088'} size={30} />
                     <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Sports Betting</Text>
@@ -464,6 +462,10 @@ const Home = ({ navigation }) => {
                     <FontAwesome5 name={'car'} color={'#F03434'} size={30} />
                     <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Insurance</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={[styles.flexy, { backgroundColor: '#E0EBEC' }]} onPress={() => { navigation.navigate("WalletTopUp") }} >
+                    <FontAwesome5 name={'wallet'} color={'#FF7D00'} size={30}/>
+                    <Text style={[styles.menutext, { paddingTop: 5, fontSize: 10 }]}>Fund Wallet</Text>
+                </TouchableOpacity> 
             </View>
 
             {/* <View style={styles.grid}>

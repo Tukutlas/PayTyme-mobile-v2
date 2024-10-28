@@ -1,18 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActionSheetIOS, Alert, Animated, BackHandler, Image, Linking, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { Alert, Animated, BackHandler, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Import fingerprint icon
-import { Fonts, Metrics, Colors } from '../../Themes';
+import { Colors } from '../../Themes';
 import Spinner from 'react-native-loading-spinner-overlay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as LocalAuthentication from 'expo-local-authentication';
 import DeviceInfo from 'react-native-device-info';
 import { GlobalVariables } from '../../../global';
+import { TextInput } from 'react-native-web';
 
 const ConfirmPinScreen = ({ route, navigation }) => {
     const [pin, setPin] = useState('');
     const [pinError, setPinError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [randomKeys, setRandomKeys] = useState([]);
+    const [referralVisible, setReferralVisible] = useState(false);
+    const [referralCode, setReferralCode] = useState(null);
     const shakeAnimation = useRef(new Animated.Value(0)).current; // Create a ref for the shake animation
 
     // Generate a random key order when the component mounts
@@ -20,8 +22,6 @@ const ConfirmPinScreen = ({ route, navigation }) => {
         BackHandler.addEventListener("hardwareBackPress", backPressed);
 
         generateRandomKeys();
-
-        // getUserDetails();
 
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
@@ -201,7 +201,7 @@ const ConfirmPinScreen = ({ route, navigation }) => {
                 }  
             })
             .catch((error) => {
-                console.log(error)
+                // console.log(error)
                 hideLoader();
                 Alert.alert(
                     'Error!',
@@ -246,7 +246,6 @@ const ConfirmPinScreen = ({ route, navigation }) => {
             }),
         ]).start();
     };
-
 
     const renderDots = () => {
         const shakeInterpolate = shakeAnimation.interpolate({
@@ -326,6 +325,59 @@ const ConfirmPinScreen = ({ route, navigation }) => {
             <View style={styles.imageContainer}>
                 <Image style={styles.logoImage} source={require('../../Images/paytyme-logo-color-less.jpeg')} />
             </View> 
+            {/* <View style={{ flex: 1}}>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={referralVisible}
+                    onRequestClose={() => {
+                        setReferralVisible(false);
+                    }}
+                >
+                    <View style={{ flex: 1, alignItems: 'center' , justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
+                        <View style={{ backgroundColor: 'white', width: '100%', height: '35%', marginBottom: 0, borderRadius: 20}}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+                                <Text style={{ fontFamily: "Lato-Bold", fontSize: 22, color: "#0C0C54", marginTop: '2%' }}>
+                                    Kindly input your 
+                                </Text>
+                                <TextInput placeholder="Enter referral code" style={styles.textBox} placeholderTextColor={"#A9A9A9"} onChangeText={(referralCode) => setReferralCode}/>
+
+                                <Text style={{ fontFamily: "Lato-Bold", fontSize: 22, color: "#0C0C54", marginTop: '2%' }}>
+                                    Are you sure?
+                                </Text>
+                                
+                                <TouchableOpacity 
+                                    style={{ position: 'absolute', right: '4%',  marginTop: '2%'}} 
+                                    onPress={() => { setLogoutModalVisible(false) }}
+                                >
+                                    <FontAwesome name={'times'} size={25} color={'#0C0C54'} />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={{marginLeft: '5%', marginTop: '5%', alignItems: 'left', justifyContent:"center", width: '90%'}}>
+                                <Text style={[{fontFamily: "Lato-Bold", fontSize:16, color: "#676767" }]}>
+                                    Select sign out to end your current app session.
+                                </Text>
+                                <Text style={{fontFamily: "Lato-Regular", fontSize:16, color: "#676767"}}>
+                                    Select deactivate if you want to unlink your device or sign with a different device. If you deactivate, account verification will be required to re-access the app.
+                                </Text>
+                            </View>
+                            <View style={{alignSelf: "center", marginTop: '4%', flexDirection:'row', height: '15%',}}>
+                                <TouchableOpacity info style={{width: '40%', height: '100%', borderRadius: 15, borderWidth: 2, borderColor: "#0C0C54",  alignSelf: "center", justifyContent: "center", marginRight: '5%'}} onPress={() => { unlinkDevice() }}>
+                                    <Text autoCapitalize="words" style={styles.cancelButton}>
+                                        Deactivate
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity info style={{width: '40%', height: '100%', backgroundColor: "#0C0C54", borderWidth: 2, borderRadius: 15, borderColor: "#0C0C54", alignSelf: "center", justifyContent: "center",}} onPress={() => { logout() }}>
+                                    <Text autoCapitalize="words" style={styles.loginButton}>
+                                        Sign out
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </View> */}
         </View>
     );
 };

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "PayTyme",
-    "slug": "PayTyme",
+    "name": "PayTymeDev",
+    "slug": "PayTymeDev",
     "version": "1.7.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,13 +16,13 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.victorel.paytymemobileapp",
+      "bundleIdentifier": "com.paytyme.dev",
       "infoPlist": {
         "NSCameraUsageDescription": "PayTyme requires camera access to add images to your profile.",
         "NSDocumentPickerUsageDescription": "This app requires access to documents for file selection.",
         "NSTouchIDUsageDescription": "We use Touch ID to secure your data."
       },
-      "buildNumber": "1",
+      "buildNumber": "2",
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {
@@ -50,7 +50,8 @@
             ]
           }
         ]
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -73,7 +74,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.app.paytyme",
+      "package": "com.paytyme.dev",
       "versionCode": 9
     },
     "web": {
@@ -81,7 +82,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "024cfd22-e17c-45ce-b7dc-f648f7bc098d"
+        "projectId": "56892edf-9246-4ae7-a440-6f447d62ee33"
       }
     },
     "plugins": [
@@ -91,8 +92,8 @@
           "cameraPermission": "Allow PayTyme to access your camera to add images to your profile."
         }
       ],
-      "./plugins/screen.js"
-    ],
-    "owner": "victorel"
+      "./plugins/screen.js",
+      "expo-apple-authentication"
+    ]
   }
 }
