@@ -113,7 +113,7 @@ verifyButton: {
   backgroundColor: '#0C0C54',
   padding: 5,
   borderRadius: 25,
-  marginLeft: 10
+  marginLeft: 'auto'
 },
 
 verifyButtonText: {

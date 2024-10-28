@@ -9,19 +9,17 @@ const styles = StyleSheet.create({
 
     header: {
         backgroundColor: Colors.transparent,
-        height: '15%',
+        height: '7%',
         borderBottomWidth: 0,
-        paddingTop: Metrics.HEIGHT * 0.0604,
-        marginTop: '10%',
+        marginTop: '15%',
         flexDirection: 'row',
         flexWrap: 'wrap'
     },
 
     left: {
-        // flex: 0.5,
-        paddingLeft: Metrics.WIDTH * 0.0421,
-        paddingRight: Metrics.WIDTH * 0.01,
-        width: '50%',
+        // paddingLeft: Metrics.WIDTH * 0.0421,
+        marginLeft: '5%',
+        width: '70%',
     },
 
     login: {
@@ -68,12 +66,12 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         backgroundColor: '#fff',
         width: '100%',
-        paddingTop: 0,
+        // paddingTop: 0,
     },
     
     formCenter: {
-        marginLeft: '4%', // Adjust the padding according to your requirement
-        width: '92%',
+        marginLeft: '2.5%', // Adjust the padding according to your requirement
+        width: '95%',
     },
     
     inputitem: {
@@ -81,7 +79,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 25,
         height: 40,
         marginTop: '1%',
         backgroundColor: '#F6F6F6',
@@ -100,7 +98,7 @@ const styles = StyleSheet.create({
         height: 35,
         paddingVertical: 0,
         paddingHorizontal: 10, // Adjust the padding according to your requirement
-        borderRadius: 2,
+        borderRadius: 25,
         backgroundColor: '#F6F6F6',
     },
     
@@ -154,6 +152,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: Metrics.HEIGHT * 0.11,
     },
+
     headertext: {
         fontFamily: Fonts.PlayfairDisplayBold,
         backgroundColor: "transparent",
@@ -175,11 +174,13 @@ const styles = StyleSheet.create({
         color: "white",
         marginTop: Metrics.HEIGHT * 0.04
     },
+
     form: {
         alignSelf: "center",
         margin: 20,
         marginTop: Metrics.HEIGHT * 0.05
     },
+
     buttonlogin: {
         borderWidth: 1,
         borderColor: "#8493d5",
@@ -213,18 +214,6 @@ const styles = StyleSheet.create({
         alignSelf: "center"
     },
 
-    buttondialogsignup: {
-        backgroundColor: "#445cc4",
-        alignSelf: "center",
-        elevation: 1,
-        borderRadius: 10,
-        height: Metrics.HEIGHT * 0.06,
-        width: Metrics.WIDTH * 0.8,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: Metrics.HEIGHT * 0.03
-    },
-
     tcview: {
         justifyContent: 'center',
         alignSelf: 'flex-end',
@@ -233,142 +222,19 @@ const styles = StyleSheet.create({
         //color: '#1D59E1'
     },
 
-    textTermsCondition: {
-        fontFamily: "Roboto-Medium",
-        color: "#000"
-    },
-
-    textPolicyDescription: {
-        fontFamily: "Roboto-Medium",
-        color: "white"
-    },
-
     btnText: {
         fontFamily: "Roboto-Medium",
         color: "white"
-    },
-
-    modelCenter: {
-        borderRadius: 5,
-        height: Metrics.HEIGHT * 0.78,
-        width: "100%",//Metrics.WIDTH * 0.95,
-        marginTop: 34,
-        backgroundColor: "transparent",
-        padding: 20
-    },
-
-    close: {
-        alignItems: "flex-end"
-    },
-    txtsingIn: {
-        fontSize: 25,
-        fontFamily: "Roboto-Regular",
-        justifyContent: "center",
-        color: "#fff",
-        alignSelf: "center",
-        marginBottom: 5
-    },
-    item: {
-        justifyContent: "center",
-        alignSelf: "center",
-        borderRightColor: 'transparent',
-        borderWidth: 0,
-        //marginTop: 28,
-        elevation: 1,
-        borderRadius: 1,
-        width: '100%', //Metrics.WIDTH * 0.8,
-        backgroundColor: 'rgb(238,242,245)',
-        marginTop: '1%',
-        height: 50
-    },
-    input: {
-        fontFamily: "Roboto-Regular",
-        color: "#000",
-        borderRadius: 0,
-        elevation: 0,
-    },
-    rememView: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 20,
-        width: Metrics.WIDTH * 0.8,
-        alignSelf: "center"
-    },
-    remem: {
-        marginLeft: 5,
-        fontSize: 15,
-        fontFamily: "Roboto-Regular"
-    },
-    forgot: {
-        alignSelf: "flex-end",
-        fontSize: 15,
-        justifyContent: "flex-end",
-        fontFamily: "Roboto-Regular"
-    },
-    modelSignUp: {
-        alignSelf: "center",
-        fontWeight: 'bold',
-        fontFamily: "Roboto-Regular",
-        color: "white"
-    },
-
-    orSignInContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: '20%',
-        marginLeft: '20%',
-        width: '60%',
-        // alignItems: 'center',
-        justifyContent: 'center'
-    },
-    line: {
-        flex: 1,
-        height: 1,
-        backgroundColor: '#52525B'
-    },
-    orSignInText: {
-        marginHorizontal: 10,
-        fontSize: 14,
-        color: '#52525B',
-        fontFamily: "SFProText-Regular",
-    },
-    socialSignInGrid: {
-        marginTop: '5%',
-        marginBottom: 20,
-        flexDirection: 'row',
-        justifyContent: 'center'
-    },
-    socialButton: {
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        // borderRadius: 5,
-        padding: 10,
-        // marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
-        borderRadius: 25,
-        height: 44,
-        width: 44,
-        margin: 10
-    },
-
-    socialButtonText: {
-        marginLeft: 10,
-        fontSize: 16,
-        color: '#333333',
-    },
-
-    otpItem: {
-        // backgroundColor: '#F6F6F6',
-        // height: 10,
-        // width: 43,
-        borderColor: '#0C0C54',
-        minHeight: 50, 
-        minWidth:39
-    },
+    },   
     
-      otpContainer: {
-        marginTop: '3%'
-      }
+    dropdown:{
+        minHeight: 40, 
+        backgroundColor:'#F6F6F6',
+        borderRadius: 25
+    },
+
+    dropdownPlaceholder:{
+        color:"#A9A9A9"
+    }
 });
 export default styles;

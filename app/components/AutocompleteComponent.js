@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import Autocomplete from 'react-native-autocomplete-input';
 // import styles from '../screens/Signup/styles';
 
-const AutocompleteComponent = ({ data, placeholder, onSelect  }) => {
+const AutocompleteComponent = ({ data, placeholder, onSelect, width, keyboardType }) => {
     const [query, setQuery] = useState('');
     const [showResults, setShowResults] = useState(false);
     const inputRef = useRef(null);
@@ -50,7 +50,7 @@ const AutocompleteComponent = ({ data, placeholder, onSelect  }) => {
     }
 
     return (
-        <View style={styles.autocompleteContainer}>
+        <View style={[styles.autocompleteContainer, {width: width}]}>
             <Autocomplete
                 data={filteredData}
                 defaultValue={query}
@@ -70,8 +70,8 @@ const AutocompleteComponent = ({ data, placeholder, onSelect  }) => {
                     <TextInput
                         {...props}
                         onFocus={handleInputFocus}
-                        keyboardType={'numeric'}
-                        returnKeyType="done"
+                        keyboardType={keyboardType}
+                        returnKeyType={keyboardType === 'numeric' ? 'done' : undefined}
                         // onBlur={handleInputBlur} // Optionally hide results when input loses focus
                         style={{backgroundColor: '#F6F6F6', height:35, borderRadius: 0, borderWidth: 0}}
                         ref={inputRef} // Ref to manage focus
@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
     autocompleteItem: {
         padding: 10,
     },
+    
     autocompleteText: {
         color: '#000',
     },

@@ -42,8 +42,7 @@ export default class AccountVerification extends Component {
     };
 
     async UNSAFE_componentWillMount() {
-        // this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});//, phone:await AsyncStorage.getItem('phone')});  
-        this.setState({phone: this.props.route.params.phonenumber})      
+        this.setState({phone: this.props.route.params.phone})      
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.startTimer();
     }
@@ -70,7 +69,10 @@ export default class AccountVerification extends Component {
         let otp = this.state.otp;
 
         if (otp == '') {
-            this.setState({otpError: true, otpErrorMessage: 'Please Kindly insert the verification code'})
+            this.setState({
+                otpError: true, 
+                otpErrorMessage: 'Please Kindly insert the verification code'
+            });
         }else if(otp != ''){ 
             fetch(GlobalVariables.apiURL+"/auth/verify-sent-code",
             { 
@@ -86,22 +88,30 @@ export default class AccountVerification extends Component {
             .then((response) => response.text())
             .then((responseText) => { 
                 this.setState({isLoading:false});
-                //  console.log(JSON.parse(responseText).data.payment_info.data.access_code)
                 let response_status = JSON.parse(responseText).status;
-                
                 if(response_status == true){
-                    Alert.alert(
-                        'Account Verification Successful!',
-                        'Your account on Paytyme has been verified successfully.',
-                        [
-                            {
-                                text: 'Proceed to Sign in',
-                                onPress: () => this.props.navigation.navigate(this.props.route.params.routeName),
-                                style: 'cancel',
-                            },
-                        ],
-                        {cancelable: false},
-                    );
+                    if(this.props.route.params.status == 'unverified2'){
+                        Alert.alert(
+                            'Account Verification Successful!',
+                            'Your account on Paytyme has been verified successfully.',
+                            [
+                                {
+                                    text: 'Proceed to Sign in',
+                                    onPress: () => this.props.navigation.navigate('Signin'),
+                                    style: 'cancel',
+                                },
+                            ],
+                            {cancelable: false},
+                        );
+                    }else{
+                        this.props.navigation.navigate('SecurityQuestions', {
+                            status: this.props.route.params.status,
+                            routeName: 'Signin',
+                            user_id: this.props.route.params.user_id,
+                            phone: this.props.route.params.phone,
+                            email_address: this.props.route.params.email_address
+                        })
+                    }
                 }else if(response_status == false){
                     let message = JSON.parse(responseText).message;
                     Alert.alert(

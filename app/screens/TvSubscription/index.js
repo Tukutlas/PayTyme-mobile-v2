@@ -9,6 +9,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { CommonActions } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
+import AutocompleteComponent from "../../components/AutocompleteComponent";
    
 export default class TvSubscription extends Component {
     constructor(props) {
@@ -67,7 +68,9 @@ export default class TvSubscription extends Component {
             cardErrorMessage: '',
             bouquetEnable: false,
             bouquetError: false,
-            bouquetErrorMessage: ''
+            bouquetErrorMessage: '',
+            tvSmartCards: [],
+            smartCardNumbers: []
         };
     }
 
@@ -82,7 +85,7 @@ export default class TvSubscription extends Component {
         // this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.loadWalletBalance();
-        // this.getUserCards();
+        this.getTvSmartCardDetails();
     }
 
     numberFormat = x => {
@@ -164,6 +167,57 @@ export default class TvSubscription extends Component {
         });       
     }
 
+    getTvSmartCardDetails(){
+        fetch(GlobalVariables.apiURL + "/tv/smart-cards",
+        {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body: ""
+            // <-- Post parameters
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            // this.setState({ isLoading: false });
+            let res = JSON.parse(responseText);
+            if (res.status == true) {
+                let smartCards = res.data;
+                let smartCardNumbers = [];
+                smartCards.forEach(smartCard => {
+                    smartCardNumbers.push(smartCard.smart_card_no);
+                });
+                this.setState({ smartCardNumbers: smartCardNumbers, tvSmartCards: smartCards });
+            }
+        })
+        .catch((error) => {
+            // this.setState({ isLoading: false });
+            // alert("Network error. Please check your connection settings");
+        });
+    };
+
+    handleSelect = (smartCardNumber) => {
+        this.setState({cardnumber:smartCardNumber, cardError: false});
+        const selectedCard = this.state.tvSmartCards.find(
+            item => item.smart_card_no === smartCardNumber
+        );
+        if(selectedCard){
+            this.setState({
+                // 'smart_card_no', 'type', 'customer_name', 'customer_number', 'provider'
+                smartCardNumber: selectedCard.smart_card_no, 
+                providerValue: selectedCard.type,
+                // phoneNo: selectedCard.customer_number, 
+                // phoneError:false,
+                customerName: selectedCard.customer_name, 
+                service_provider: selectedCard.provider, 
+                verifyNumber:true
+            });
+
+            this.getCableBouquetOptions(selectedCard.type, false);
+        }
+    }
+
     handleVerify(){
         cardnumber = this.state.cardnumber;
         type = this.state.providerValue;
@@ -172,7 +226,7 @@ export default class TvSubscription extends Component {
     }
 
     getCustomerdetails(cabletype, cardnumber, provider){
-        console.log(cabletype, cardnumber, provider)
+        // console.log(cabletype, cardnumber, provider)
         if (cabletype == '' && cardnumber == '') {
             
         }else if(cardnumber == ''){
@@ -190,7 +244,7 @@ export default class TvSubscription extends Component {
             fetch(GlobalVariables.apiURL+"/tv/validate-card?smart_card_no="+cardnumber+"&type="+cabletype+"&provider="+provider, requestOptions)
             .then(response => response.text())
             .then(result => {
-                console.log(result)
+                // console.log(result)
                 let status = JSON.parse(result).status;
                 if (status == true) {
                     let data = JSON.parse(result).data;
@@ -562,8 +616,8 @@ export default class TvSubscription extends Component {
             }
     }
 
-    getCableBouquetOptions(tv_type){
-        this.setState({isLoading:true, bouquetEnable: false});
+    getCableBouquetOptions(tv_type, loadStatus = true){
+        this.setState({isLoading:loadStatus, bouquetEnable: false});
         let requestOptions = {
             method: 'GET',
             headers: new Headers({
@@ -645,7 +699,7 @@ export default class TvSubscription extends Component {
         })
         .catch((error) => {
             this.setState({isLoading:false});
-            console.log(error)
+            // console.log(error)
             alert("Network error. Please check your connection settings");
         });   
     }
@@ -953,13 +1007,14 @@ export default class TvSubscription extends Component {
                         : <View></View>
                     }
 
-                    <View style={[styles.formLine, {marginTop:'1%'}]}>
+                    <View style={[styles.formLine, {marginTop:'1%', zIndex: 1}]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Enter {this.state.providerValue == 'showmax' ? 'Phone Number' : 'Card Number'}</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'credit-card'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
                                 {/* <TextInput placeholder="Type your smart card number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} ref="cardnumber" onChangeText={cardnumber => this.getValueFunction(cardnumber)} value={this.state.cardnumber}/> */}
-                                <TextInput placeholder={this.state.providerValue == 'showmax' ?"Type your phone number": "Type your smart card number"} style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="cardnumber" onChangeText={(cardnumber) => this.setCardNo(cardnumber)}/>
+                                {/* <TextInput placeholder={this.state.providerValue == 'showmax' ?"Type your phone number": "Type your smart card number"} style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="cardnumber" onChangeText={(cardnumber) => this.setCardNo(cardnumber)}/> */}
+                                <AutocompleteComponent placeholder={this.state.providerValue == 'showmax' ?"Type your phone number": "Type your smart card number"} data={this.state.smartCardNumbers} onSelect={this.handleSelect} width={'74%'} keyboardType={'numeric'} />
                                 {
                                     this.state.providerValue == 'showmax' 
                                     ? <></> 

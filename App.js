@@ -5,12 +5,21 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import Signin from './app/screens/Signin';
+import { RouteProvider, useRouteContext } from './app/context/RouteContext';
+
+import OptionScreen from './app/screens/Signin/OptionScreen';
+import Signin from './app/screens/Signin/index';
+import WithEmail from './app/screens/Signin/withEmail';
+import PinScreen from './app/screens/Signin/PinScreen';
+
 import Signup from './app/screens/Signup';
+import SignUpOption from './app/screens/Signup/SignUpOption';
+import VerificationMenu from './app/screens/Signup/verificationMenu';
 import AccountVerification from './app/screens/Signup/accountVerification';
-import Home from './app/screens/Home';
-// import Home from './app/screens/Home/index2';
+// import Home from './app/screens/Home';
+import Home from './app/screens/Home/index2';
 import Profile from './app/screens/Profile';
 import ViewPicture from './app/screens/Profile/viewPicture';
 import AboutUs from './app/screens/Profile/aboutUs';
@@ -41,6 +50,10 @@ import Otp from './app/screens/ForgotPassword/Otp';
 import BankTransfer from './app/screens/BankTransfer';
 import FAQ from './app/screens/Profile/faq';
 import CameraSection from './app/screens/Profile/camera';
+import SecurityQuestions from './app/screens/SecretQuestions';
+import AnswerSecurityQuestions from './app/screens/SecretQuestions/validate';
+import SetPinScreen from './app/screens/Signup/SetPinScreen';
+import ConfirmPinScreen from './app/screens/Signup/ConfirmPinScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -90,6 +103,8 @@ const Tabs = () => (
 
 const RootStack = () => {
     const [fontLoaded, setFontLoaded] = useState(false);
+    // const [initialRoute, setInitialRoute] = useState(null);
+    const { initialRoute, setRouteContextInitialRoute } = useRouteContext();
 
     useEffect(() => {
         // Preload fonts before rendering components
@@ -100,7 +115,7 @@ const RootStack = () => {
                 'Roboto-Bold': require('./app/Fonts/Roboto-Bold.ttf'),
                 'SFUIDisplay-Medium': require('./app/Fonts/ProximaNova-Regular.ttf'),
                 // 'SFUIDisplay-Light': require('./app/Fonts/ProximaNovaThin.ttf'),
-                // 'SFUIDisplay-Regular': require('./app/Fonts/SF-UI-Text-Regular.ttf'),
+                'SFProText-Regular': require('./app/Fonts/SFProText-Regular.ttf'),
                 // 'SFUIDisplay-Semibold': require('./app/Fonts/ProximaNovaAltBold.ttf'),
                 // 'HelveticaNeue-Bold': require('./app/Fonts/HelveticaNeue-Bold.ttf'),
                 // 'HelveticaNeue-Light': require('./app/Fonts/HelveticaNeue-Light.ttf'),
@@ -118,16 +133,76 @@ const RootStack = () => {
                 await SplashScreen.hideAsync();
             }, 3000);
         }        
+        
+        const checkLoginStatus = async () => {
+            try {
+                const email = await AsyncStorage.getItem('email');
+                const signed_up = await AsyncStorage.getItem('signed_up');
+                const user = await AsyncStorage.getItem('login_response');
+                const auth_type = await AsyncStorage.getItem('auth_type');
+                
+                if (email != null) {
+                    if (auth_type == 'secondary') {
+                        if (user != null) {
+                            // Go to where it would use pin to login
+                            setRouteContextInitialRoute('PinScreen');
+                        } else {
+                            setRouteContextInitialRoute('OptionScreen');
+                            // Go to where it would select the social login type (e.g., google_auth, facebook_auth)
+                        }
+                    } else {
+                        if (user != null) {
+                            setRouteContextInitialRoute('WithEmail');
+                            // setRouteContextInitialRoute('Signin');
+                            // setRouteContextInitialRoute('OptionScreen');
+                            // setRouteContextInitialRoute('PinScreen');
+                        } else {
+                            setRouteContextInitialRoute('OptionScreen');
+                            // setRouteContextInitialRoute('Signin');
+                        }
+                    }
+                } else if (signed_up == 'true') {
+                    // setRouteContextInitialRoute('Signin');
+                    setRouteContextInitialRoute('OptionScreen');
+                } else {
+                    // setRouteContextInitialRoute('Signup');
+                    setRouteContextInitialRoute('SignUpOption');
+                }
+            } catch (error) {
+                // console.error('Error checking login status:', error);
+                setRouteContextInitialRoute('SignuUpOption'); // Default to Signup if there's an error
+            }
+        };
+      
         prepare();
-    }, []);
+        checkLoginStatus();
+    }, [setRouteContextInitialRoute]);
+
+    if (!fontLoaded || initialRoute === null) {
+        return null; // Or return a loading spinner component
+    }
 
     return (
         fontLoaded ? (
             <NavigationContainer>
-                <Stack.Navigator initialRouteName="Signin" screenOptions={{ headerShown: false }}>
+                <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+                    {/* <Stack.Screen name="Pager" component={Signin} /> */}
+                    
+                    <Stack.Screen name="OptionScreen" component={OptionScreen} />
                     <Stack.Screen name="Signin" component={Signin} />
+                    <Stack.Screen name="WithEmail" component={WithEmail} />
+                    <Stack.Screen name="PinScreen" component={PinScreen} />
+                    
+                    <Stack.Screen name="SignUpOption" component={SignUpOption} />
                     <Stack.Screen name="Signup" component={Signup} />
+                    <Stack.Screen name="SetPinScreen" component={SetPinScreen} />
+                    <Stack.Screen name="ConfirmPinScreen" component={ConfirmPinScreen} />
+
+                    <Stack.Screen name='VerificationMenu' component={VerificationMenu}/>
                     <Stack.Screen name='AccountVerification' component={AccountVerification}/>
+                    <Stack.Screen name='SecurityQuestions' component={SecurityQuestions}/>
+                    <Stack.Screen name='AnswerSecurityQuestions' component={AnswerSecurityQuestions}/>
+
                     <Stack.Screen name="ViewPicture" component={ViewPicture} />
                     <Stack.Screen name="AboutUs" component={AboutUs} />
                     <Stack.Screen name="ContactUs" component={ContactUs} />
@@ -154,6 +229,7 @@ const RootStack = () => {
                     <Stack.Screen name="Otp" component={Otp}/>
                     <Stack.Screen name="Faq" component={FAQ}/>
                     <Stack.Screen name="CameraSection" component={CameraSection}/>
+                    {/* <Stack.Screen name="Profile" component={Profile}/> */}
                     <Stack.Screen name="Tabs" component={Tabs} />
                 </Stack.Navigator>
             </NavigationContainer>
@@ -161,4 +237,10 @@ const RootStack = () => {
     );
 }
 
-export default RootStack;
+const App = () => (
+    <RouteProvider>
+        <RootStack />
+    </RouteProvider>
+);
+
+export default App;

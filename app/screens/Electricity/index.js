@@ -15,7 +15,6 @@ export default class Electricity extends Component {
         super(props);
   
         this.state = {
-            rating: 0,
             customerName: "",
             phoneNo: "",
             selectedValue:"",
@@ -25,6 +24,10 @@ export default class Electricity extends Component {
             balance:0,
             company: "",
             amount:0,
+            minimumAmount: 0,
+            outstandingBalance: 0,
+            outstandingBalanceStatus: false,
+            outstandingBalanceMessage: '',
             isLoading:false,
             biller_code:"",
             auth_token:"",
@@ -32,13 +35,21 @@ export default class Electricity extends Component {
             payOnDelieveryChecked:false,
             discoOpen: false,
             discoValue: null,
-            discos: [{label:'AEDC - Abuja Electricity Distribution Company',value:'AEDC', icon: () => <Image source={require('../../Images/Electricity/aedc.png')} style={styles.iconStyle} />},{label:'BEDC - Benin Electricity Distribution Company',value:'BEDC', icon: () => <Image source={require('../../Images/Electricity/bedc.png')} style={styles.iconStyle3} />}, {label:'EEDC - Enugu Electricity Distribution Company',value:'EEDC', icon: () => <Image source={require('../../Images/Electricity/eedc.png')} style={styles.iconStyle} />}, {label:'EKEDC - Eko Electricity Distribution Company',value:'EKEDC', icon: () => <Image source={require('../../Images/Electricity/ekedc.png')} style={styles.iconStyle2} />},
-                {label:'IBEDC - Ibadan Electricity Distribution Company',value:'IBEDC', icon: () => <Image source={require('../../Images/Electricity/ibedc.png')} style={styles.iconStyle} />}, {label:'IKEDC - Ikeja Electricity Distribution Company',value:'IKEDC', icon: () => <Image source={require('../../Images/Electricity/ikedc.png')} style={styles.iconStyle2} />}, {label:'JEDC- Jos Electricity Distribution Company',value:'JEDC', icon: () => <Image source={require('../../Images/Electricity/jedc.png')} style={styles.iconStyle} />},
-                {label:'KAEDC - Kaduna Electricity Distribution Company',value:'KAEDC', icon: () => <Image source={require('../../Images/Electricity/kaedc.png')} style={styles.iconStyle2} />}, {label:'KEDC - Kano Electricity Distribution Company',value:'KEDC', icon: () => <Image source={require('../../Images/Electricity/kedc.png')} style={styles.iconStyle} />}, {label:'PHEDC - Port Harcourt Electricity Distribution Company',value:'PHEDC', icon: () => <Image source={require('../../Images/Electricity/phedc.png')} style={styles.iconStyle} />}
+            discos: [
+                {label:'AEDC - Abuja Electricity Distribution Company',value:'AEDC', icon: () => <Image source={require('../../Images/Electricity/aedc.png')} style={styles.iconStyle} />},{label:'BEDC - Benin Electricity Distribution Company',value:'BEDC', icon: () => <Image source={require('../../Images/Electricity/bedc.png')} style={styles.iconStyle3} />}, 
+                {label:'EEDC - Enugu Electricity Distribution Company',value:'EEDC', icon: () => <Image source={require('../../Images/Electricity/eedc.png')} style={styles.iconStyle} />}, {label:'EKEDC - Eko Electricity Distribution Company',value:'EKEDC', icon: () => <Image source={require('../../Images/Electricity/ekedc.png')} style={styles.iconStyle2} />},
+                {label:'IBEDC - Ibadan Electricity Distribution Company',value:'IBEDC', icon: () => <Image source={require('../../Images/Electricity/ibedc.png')} style={styles.iconStyle} />}, {label:'IKEDC - Ikeja Electricity Distribution Company',value:'IKEDC', icon: () => <Image source={require('../../Images/Electricity/ikedc.png')} style={styles.iconStyle2} />}, 
+                {label:'JEDC- Jos Electricity Distribution Company',value:'JEDC', icon: () => <Image source={require('../../Images/Electricity/jedc.png')} style={styles.iconStyle} />},{label:'KAEDC - Kaduna Electricity Distribution Company',value:'KAEDC', icon: () => <Image source={require('../../Images/Electricity/kaedc.png')} style={styles.iconStyle2} />},
+                {label:'KEDC - Kano Electricity Distribution Company',value:'KEDC', icon: () => <Image source={require('../../Images/Electricity/kedc.png')} style={styles.iconStyle} />}, {label:'PHEDC - Port Harcourt Electricity Distribution Company',value:'PHEDC', icon: () => <Image source={require('../../Images/Electricity/phedc.png')} style={styles.iconStyle} />}
             ],
+            discoMinimumAmount: 0,
+            discoMaximumAmount: 0,
             typeOpen: false,
             typeValue: null,
-            meterTypes: [{label:'Prepaid',value:'prepaid'}, {label:'Postpaid',value:'postpaid'}],
+            meterTypes: [
+                {label:'Prepaid',value:'prepaid'}, 
+                {label:'Postpaid',value:'postpaid'}
+            ],
             transaction: false,
             there_cards: false,
             serviceProvider: '',
@@ -50,7 +61,9 @@ export default class Electricity extends Component {
             amountError: false,
             amountErrorMessage: '',
             phoneError: false,
-            phoneNoErrorMessage: ''
+            phoneNoErrorMessage: '',
+            meters: [],
+            electricityMeters: []
         };
     }
 
@@ -124,8 +137,54 @@ export default class Electricity extends Component {
     }
 
     getElectrictyMeterNumbers(){
-        
+        fetch(GlobalVariables.apiURL + "/electricity/meters",
+        {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+            }),
+            body: ""
+            // <-- Post parameters
+        })
+        .then((response) => response.text())
+        .then((responseText) => {
+            // this.setState({ isLoading: false });
+            let res = JSON.parse(responseText);
+            if (res.status == true) {
+                let electricityMeters = res.data;
+                let meters = [];
+                electricityMeters.forEach(meter => {
+                    meters.push(meter.meter_no);
+                });
+                this.setState({ meters: meters, electricityMeters: electricityMeters});
+            }
+        })
+        .catch((error) => {
+            // this.setState({ isLoading: false });
+            // alert("Network error. Please check your connection settings");
+        });
     };
+
+    handleSelect = async (meterNumber) => {
+        this.setState({meterno:meterNumber, meterError: false});
+        const selectedMeter = this.state.electricityMeters.find(
+            item => item.meter_no === meterNumber
+        );
+        if(selectedMeter){
+            this.setState({
+                typeValue: selectedMeter.meter_type, 
+                discoValue: selectedMeter.company,
+                phoneNo: selectedMeter.phone_number, 
+                phoneError:false,
+                customerName: selectedMeter.customer_name, 
+                // serviceProvider: selectedMeter.provider, 
+                // isValidated:true
+            });
+
+            this.validateMeter(meterNumber, selectedMeter.meter_type, selectedMeter.company)
+        }
+    }
 
     backPressed = () => {
         if(this.state.transaction){
@@ -164,16 +223,26 @@ export default class Electricity extends Component {
     }
 
     validateMeter(meterno, type, company){
-        var value = meterno.length.toString();
+        // var value = meterno.length.toString();
+        let error = 0;
         if(company == null){
             this.setState({discoError: true})
-        }else if(type == null){
+            error++;
+        }
+        
+        if(type == null){
             this.setState({meterTypeError: true})
-        }else if (meterno == '') {
+            error++;
+        }
+        if (meterno == '') {
+            error++;
             this.setState({meterError: true, meterErrorMessage: "Please kindly input the Meter Number"})
-        }else if(value < 10){
-            this.setState({meterError: true, meterErrorMessage: "Kindly check the Meter Number"})
-        }else if(meterno != '' && type != null && company != null){ 
+        }
+        
+        // else if(value < 10){
+        //     this.setState({meterError: true, meterErrorMessage: "Kindly check the Meter Number"})
+        // }
+        if(error == 0){ 
             let myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer "+this.state.auth_token);
 
@@ -190,7 +259,21 @@ export default class Electricity extends Component {
             {
                 let result = JSON.parse(responseText);
                 if(result.status == true){
-                    this.setState({customerName:result.data.customer_name, serviceProvider:result.provider, isValidated:true});
+                    this.setState({
+                        customerName:result.data.customer_name,
+                        serviceProvider:result.provider, 
+                        isValidated:true,
+                        minimumAmount: result.data.minimum_amount
+                    });
+
+                    if(result.outstandingBalance){
+                        //display outstanding balance
+                        this.setState({
+                            outstandingBalance: result.outstanding_balance,
+                            outstandingBalanceStatus: true,
+                            outstandingBalanceMessage: `You have an outstanding balance of ₦${this.numberFormat(result.outstandingBalance)}`
+                        })
+                    }
                     this.setState({isLoading:false});
                 }else if(result.status != true){
                     Alert.alert(
@@ -351,26 +434,52 @@ export default class Electricity extends Component {
         let meter_type = this.state.typeValue;
         let phoneNo = this.state.phoneNo;
         let isValidated = this.state.isValidated
+        let error = 0;
 
         if(company == null){
             this.setState({discoError: true})
-        }else if(meter_type == null){
+            error++;
+        }
+        
+        if(meter_type == null){
             this.setState({meterTypeError: true})
-        }else if (meter_no == '') {
+            error++;
+        }
+        
+        if (meter_no == '') {
+            error++;
             this.setState({meterError: true, meterErrorMessage: "Please kindly input the Meter Number"});
-        }else if(meter_no.length.toString() < 10){
-            this.setState({meterError: true, meterErrorMessage: "Kindly check the Meter Number"});
-        }else if(isValidated == false){
+        }
+        // else if(meter_no.length.toString() < 10){
+        //     error++;
+        //     this.setState({meterError: true, meterErrorMessage: "Kindly check the Meter Number"});
+        // }
+        
+        if(isValidated == false){
+            error++;
             this.setState({meterError: true, meterErrorMessage: "Meter number must be verified before purchasing electricity token"});
-        }else if(phoneNo == ""){
+        }
+        
+        if(phoneNo == ""){
+            error++;
             this.setState({phoneError: true, phoneNoErrorMessage: "Recipient Phone Number must be inserted"});
         }else if(phoneNo.length < 11){
+            error++;
             this.setState({phoneError: true, phoneNoErrorMessage: "Kindly check the Phone Number"});
-        }else if(amount == ""){
+        }
+        
+        if(amount == ""){
+            error++;
             this.setState({amountError: true, amountErrorMessage: "Please kindly input the amount"});
         }else if(amount < 0){
+            error++;
             this.setState({amountError: true, amountErrorMessage: "Please kindly input a correct amount"});
-        }else{
+        }else if(amount < this.state.outstandingBalance){
+            error++;
+            this.setState({amountError: true, amountErrorMessage: "The amount is less than the outstanding balance"});
+        }
+        
+        if(error == 0){
             if(thetype=="wallet"){
                 Alert.alert(
                     'Confirm Purchase',
@@ -418,10 +527,49 @@ export default class Electricity extends Component {
         });
     }
 
-    setDiscoValue = (callback) => {
-        this.setState(state => ({
-            discoValue: callback(state.discoValue)
-        }));
+    setDiscoValue = async (callback) => {
+        this.setState(
+            state => ({
+                discoValue: callback(state.discoValue)
+            }),
+            () => {
+                // This will be called after state is updated
+                this.getDiscoService();
+            }
+        );
+    }
+
+    getDiscoService = () => {
+        let disco = this.state.discoValue;
+        fetch(`${GlobalVariables.apiURL}/electricity/service?company=${disco}`,
+            {
+                method: 'GET',
+                headers: new Headers({
+                    'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+                    'Authorization': 'Bearer ' + this.state.auth_token, // <-- Specifying the Authorization
+                }),
+                body: ""
+                // <-- Post parameters
+            })
+            .then((response) => response.text())
+            .then((responseText) => {
+                let res = JSON.parse(responseText);
+                if (res.status == true) {
+                    if (res.data) {
+                        const {minimum_mount, maximum_amount}  = res.data;
+                        this.setState({
+                            discoMinimumAmount: minimum_mount,
+                            discoMaximumAmount: maximum_amount
+                        })
+                    } 
+                    // else {
+                    //     console.error("Data is empty");
+                    // }
+                }
+            })
+            .catch((error) => {
+                // alert("Network error. Please check your connection settings");
+            });
     }
 
     setDiscoItems = (callback) => {
@@ -468,9 +616,26 @@ export default class Electricity extends Component {
         this.setState({phoneNo: phoneno, phoneError:false});
     }
 
-    setAmount= (amount) => {
+    setAmount = (amount) => {
         this.setState({amount: amount, amountError:false});
+        const validationResult = this.validateAmount(amount);
+        if (validationResult.error) {
+            this.setState({ amountError: true, amountErrorMessage: validationResult.message });
+        }
     }
+
+    validateAmount = (amount) => {
+        if (amount <= 0) {
+            return { error: true, message: "Please kindly input a correct amount" };
+        } else if (amount < this.state.outstandingBalance) {
+            return { error: true, message: `The amount is less than the outstanding balance of ₦${this.numberFormat(this.state.outstandingBalance)}` };
+        } else if (this.state.discoMinimumAmount !== 0 && amount < this.state.discoMinimumAmount) {
+            return { error: true, message: `The amount is less than the minimum amount of ₦${this.numberFormat(this.state.discoMinimumAmount)}` };
+        } else if (this.state.discoMaximumAmount !== 0 && amount > this.state.discoMaximumAmount) {
+            return { error: true, message: `The amount is greater than the maximum amount of ₦${this.numberFormat(this.state.discoMaximumAmount)}` };
+        }
+        return { error: false };
+    };
     
     numberFormat = x => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -490,7 +655,6 @@ export default class Electricity extends Component {
     };
 
     render() {
-        const { navigation } = this.props;
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
           StatusBar.setBackgroundColor("#ffff", true);
@@ -588,12 +752,13 @@ export default class Electricity extends Component {
                         </View>
                     }
                     {this.state.meterTypeError && <Text style={{ marginTop: '1.2%', marginLeft: '5%', color: 'red' }}>Please select the meter type</Text>}
-                    <View style={[styles.formLine, {marginTop:'1.2%'}]}>
+                    <View style={[styles.formLine, {marginTop:'1.2%', zIndex: 1}]}>
                         <View style={styles.formCenter}>
                             <Text style={styles.labeltext}>Enter Meter Number</Text>
                             <View roundedc style={[styles.inputitem]}>
                                 <FontAwesome5 name={'tachometer-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/>
+                                {/* <TextInput placeholder="Type your Meter number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="meterno" onChangeText={(meterno) => this.setMeterNo(meterno)}/> */}
+                                <AutocompleteComponent placeholder="Type your Meter number" data={this.state.meters} onSelect={this.handleSelect} width={'74%'} keyboardType={'numeric'} />
                                 <TouchableOpacity style={styles.verifyButton} onPress={() => {this.handleVerify()}}>
                                     <Text style={styles.verifyButtonText}>Verify</Text>
                                 </TouchableOpacity>
@@ -617,7 +782,7 @@ export default class Electricity extends Component {
                             <Text style={styles.labeltext}>Customer Phone Number</Text>
                             <View roundedc style={[styles.inputitem]}>
                                 <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)}/>
+                                <TextInput placeholder="Type in your phone number" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="phoneNo" onChangeText={(phoneNo) => this.setPhoneNo(phoneNo)} value={this.state.phoneNo}/>
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
@@ -635,7 +800,7 @@ export default class Electricity extends Component {
                             <Text style={styles.labeltext}>Amount</Text>
                             <View roundedc style={styles.inputitem}>
                                 <FontAwesome5 name={'money-bill-wave-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput placeholder="Type in the token amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="amount" onChangeText={(amount) => this.setState({amount})} />
+                                <TextInput placeholder="Type in the token amount" style={styles.textBox} placeholderTextColor={"#A9A9A9"} keyboardType={'numeric'} returnKeyType="done" ref="amount" onChangeText={(amount) => this.setAmount(amount)} />
                                 { 
                                     this.state.isKeyboardOpen == true && Platform.OS === "ios" ?
                                     <TouchableOpacity activeOpacity={0.8} style={styles.touchableButton} onPress={this.dismissKeyboard}>
@@ -645,8 +810,10 @@ export default class Electricity extends Component {
                                 }
                             </View>
                             {this.state.amountError && <Text style={{fontSize:13, color:'red', backgroundColor:'#F6F6F6', height:20}}>{this.state.amountErrorMessage}</Text>}
+                            {this.state.outstandingBalanceStatus && <Text style={{fontSize:13, color:'red', backgroundColor:'#F6F6F6', height:20}}>{this.state.outstandingBalanceMessage}</Text>}
                         </View>
                     </View>
+                    
                     {/* Card Option*/}
                     <View
                         style={{

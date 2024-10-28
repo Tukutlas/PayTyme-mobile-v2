@@ -95,7 +95,6 @@
       "./plugins/screen.js",
       "expo-apple-authentication"
     ],
-    "scheme": ["PayTyme", "fb478452041884575"],
     "owner": "victorel"
   }
 }

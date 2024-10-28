@@ -40,7 +40,6 @@ export default class Home extends Component {
             this.setState({ profilePicture: JSON.parse(await AsyncStorage.getItem('login_response')).user.image })
         }
 
-        // await AsyncStorage.removeItem('lastShownDate');
         const lastShownDate = await AsyncStorage.getItem('lastShownDate');
         this.loadWalletBalance();
         this.getTransactionHistory();
@@ -55,7 +54,10 @@ export default class Home extends Component {
             this.setWalletVisibility(true)
         }
 
-        this.props.navigation.addListener('focus', () => {
+        this.props.navigation.addListener('focus', async () => {
+            this.setState({
+                auth_token: JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token,
+            });
             this.loadWalletBalance();
             this.reloadTransactionHistory();
         });

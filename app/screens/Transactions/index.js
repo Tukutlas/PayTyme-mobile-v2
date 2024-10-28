@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StatusBar, TouchableOpacity, Image, Alert, View, ScrollView, Text, Platform} from 'react-native';
+import {BackHandler, StatusBar, TouchableOpacity, Image, Alert, View, ScrollView, Text, Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import styles from "./styles";
@@ -47,8 +47,14 @@ export default class Transactions extends Component {
             this.loadWalletBalance();
             this.getTransactionHistory();
         });
+        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
     }
-      
+
+    backPressed = () => {
+        this.props.navigation.goBack();
+        return true;  
+    };
+
     loadWalletBalance(){
         fetch(GlobalVariables.apiURL+"/wallet/details",
         { 
@@ -140,8 +146,7 @@ export default class Transactions extends Component {
         .catch((error) => {
             // console.log(error)
             alert("Network error. Please check your connection settings");
-        });
-        
+        });   
     }
     
     setModalVisible = (visible) => {

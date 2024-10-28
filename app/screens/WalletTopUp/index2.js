@@ -8,7 +8,6 @@ import { CommonActions } from "@react-navigation/native";
 import { GlobalVariables } from "../../../global";
 import * as Font from "expo-font";
 import styles from "./styles";
-// import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const WalletTopUp = ({ navigation }) => {
     const [amount, setAmount] = useState(0);
