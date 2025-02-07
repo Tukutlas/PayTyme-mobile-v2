@@ -22,7 +22,7 @@ const WalletTopUp = ({ navigation }) => {
         // { label: "", value: "paystack", icon: () => <Image source={require('../../Images/Payment-Gateway/paystack.png')} style={styles.iconStyle} />},
         // { label: "", value: "flutterwave", icon: () => <Image source={require('../../Images/Payment-Gateway/flutterwave.png')} style={styles.iconStyle} />},
         { label: "Card", value: "card", icon: () =>  <FontAwesome5 name={'credit-card'} color={'#000'} size={20}/>},
-        { label: "Virtual Account", value: "virtual_account" , icon: () => <Image source={require('../../Images/Bank/default-image.png')} style={styles.iconStyle2} />},
+        // { label: "Virtual Account", value: "virtual_account" , icon: () => <Image source={require('../../Images/Bank/default-image.png')} style={styles.iconStyle2} />},
         { label: "Bank Transfer", value: "bank_transfer" , icon: () => <Image source={require('../../Images/Bank/default-image.png')} style={styles.iconStyle2} />},
         
     ]);
@@ -121,16 +121,13 @@ const WalletTopUp = ({ navigation }) => {
             }); 
         }
        
-        else if (paymentChannelValue === "virtual_account") {
+        else if (paymentChannelValue === "bank_transfer") {
             if(tier == '0'){
                 setModalVisible(true);
                 // navigation.navigate('CreateVirtualAccount');
             }else{
                 navigation.navigate('VirtualAccount');
             }
-        } else if (paymentChannelValue === "bank_transfer") {
-            // Navigate to BankTransfer screen
-            navigation.navigate('BankTransfer');
         }
     };
 
@@ -222,14 +219,14 @@ const WalletTopUp = ({ navigation }) => {
                 <></>
             }
             
-            <View style={{ marginTop:'5%', alignItems: 'center' }}>
+            {/* <View style={{ marginTop:'5%', alignItems: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate("PaymentConfirmation")}>
                     <Text style={{ color: '#1D59E1' }}>
                         Upload Proof of Payment
                     </Text>
                 </TouchableOpacity>
-            </View>
-            <View style={{ marginTop: '5%' }}>
+            </View> */}
+            <View style={{ marginTop: '10%' }}>
                 <TouchableOpacity style={styles.buttonPurchase} onPress={checkPaymentChannel}>
                     <Text style={{ color: 'white', alignSelf: 'center' }}>Next</Text>
                 </TouchableOpacity>

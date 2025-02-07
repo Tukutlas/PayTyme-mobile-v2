@@ -18,25 +18,15 @@ export default class SecurityQuestions extends Component {
         this.state = {
             isLoading: false,
             securityQuestions: [],
-            question1: { open: false, value: null, items: [] },
-            question2: { open: false, value: null, items: [] },
-            question3: { open: false, value: null, items: [] },
-            answers: {
-                answer1: { value: '', error: false, errorMessage: '' },
-                answer2: { value: '', error: false, errorMessage: '' },
-                answer3: { value: '', error: false, errorMessage: '' }
-            },
+            question: { open: false, value: null, items: [] },
+            answer: { value: '', error: false, errorMessage: '' },
             questions: null,
             email: '',
             phone: '',
             user_id: '',
             status: '',
-            question1Error: false,
-            question2Error: false,
-            question3Error: false,
-            question1ErrorMessage: '',
-            question2ErrorMessage: '',
-            question3ErrorMessage: '',
+            questionError: false,
+            questionErrorMessage: '',
             route: ''
         }
     }
@@ -111,22 +101,32 @@ export default class SecurityQuestions extends Component {
             const responseText = await response.text();
             this.hideLoader();
             let res = JSON.parse(responseText);
+            // console.log(res)
 
             if (res.status == true) {
-                Alert.alert(
-                    'Successful',
-                    'Device registered successfully',
-                    [
-                        {
-                            text: 'Proceed to Login',
-                            onPress: () => {
-                                this.props.navigation.navigate(this.state.route)
+                if(this.state.phone == ''){
+                    this.props.navigation.navigate('AddPhoneNumber', {
+                        phone: this.state.phone,
+                        user_id: user_id,
+                        routeName: this.props.route.params.routeName
+                    });
+                }else{
+                    Alert.alert(
+                        'Successful',
+                        'Device registered successfully',
+                        [
+                            {
+                                text: 'Proceed to Login',
+                                onPress: () => {
+                                    this.props.navigation.navigate(this.state.route)
+                                },
+                                style: 'cancel',
                             },
-                            style: 'cancel',
-                        },
-                    ],
-                    { cancelable: false },
-                );
+                        ],
+                        { cancelable: false },
+                    );
+                }
+                
             } else {
                 Alert.alert(
                     'Oops',
@@ -142,7 +142,6 @@ export default class SecurityQuestions extends Component {
             }
         })
         .catch((error) => {
-            // console.log(error); 
             this.hideLoader();
             if (error.name === 'AbortError') {
                 Alert.alert(
@@ -197,64 +196,41 @@ export default class SecurityQuestions extends Component {
     handleSubmit = async () => {
         // Implement submit logic here
         // Validate inputs
-        let user_id = this.state.user_id
-        const { question1, question2, question3 } = this.state;
-        
-        if (!question1.value || !question2.value || !question3.value) {
-            Alert.alert('Error', 'Please select all three secret questions.');
-            return;
-        }
-
-        // Check if any two questions are the same
-        if (question1.value === question2.value || question2.value === question3.value || question1.value === question3.value) {
-            Alert.alert('Error', 'Secret questions must be different from each other. Please choose unique questions for each.');
+        const { user_id, question, answer } = this.state;
+        if (!question.value) {
+            Alert.alert('Error', 'Please select a question.');
             return;
         }
         
         let hasError = false;
-        ['answer1', 'answer2', 'answer3'].forEach(key => {
-            if (!this.state.answers[key].value.trim()) {
-                this.setState(prevState => ({
-                    answers: {
-                        ...prevState.answers,
-                        [key]: {
-                            ...prevState.answers[key],
-                            error: true,
-                            errorMessage: 'This answer is required'
-                        }
+        if(!answer.value){
+            this.setState({
+                answer: {
+                        value: answer.value,
+                        error: true,
+                        errorMessage: 'This answer is required'
                     }
-                }));
-                hasError = true;
-            }
-        });
+            });
+            hasError = true;
+        }
 
+        console.log(question.value, answer.value)
+        
         if (hasError) {
-            // Alert.alert('Error', 'Please provide answers for all questions.');
             return;
         }
 
-        const { answer1, answer2, answer3 } = Object.fromEntries(
-            Object.entries(this.state.answers)
-                .map(([key, { value }]) => [key, value.trim()])
-        );
-
-        // console.log(answer1, answer2, answer3)
-
         this.showLoader();
 
-        fetch(`${GlobalVariables.apiURL}/auth/secret-questions/set/${user_id}`, {
+        fetch(`${GlobalVariables.apiURL}/auth/secret-questions/set-one/${user_id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 // 'Authorization': `Bearer ${this.state.auth_token}`,
             },
-            body: JSON.stringify({
-                question_1: question1.value,
-                answer_1: answer1,
-                question_2: question2.value,
-                answer_2: answer2,
-                question_3: question3.value,
-                answer_3: answer3,
+            body:  JSON.stringify({   // ✅ Convert body to a JSON string
+                question: question.value,
+                answer: answer.value
             }),
         }).then((response) => response.text())
         .then((responseText) => {
@@ -262,16 +238,12 @@ export default class SecurityQuestions extends Component {
             if(res.status == true){
                 // Alert.alert('Success', 'Secret questions have been set successfully.');
                 // Navigate to the next screen or perform any other action
-                if(this.state.status == 'unauthenticated' || 'unverified'){
-                    this.registerDevice(user_id)
-                }else{
-                    this.props.navigation.navigate('Signin');
-                }
-                 
+                this.registerDevice(user_id)
             } else {
-                Alert.alert('Error', data.message || 'Failed to set secret questions. Please try again.');
+                Alert.alert('Error', res.message || 'Failed to set secret questions. Please try again.');
             }
         }).catch ((error) => {
+            console.log(error )
             // console.error('Error setting secret questions:', error);
             Alert.alert('Error', 'An unexpected error occurred. Please try again.');
         }).finally((event) => {
@@ -304,30 +276,9 @@ export default class SecurityQuestions extends Component {
 
     }
 
-    compareSelectedQuestion = async (questionKey, value) => {
-        const currentValue = value;
-        if (currentValue === null) return; // Skip comparison if current value is null
-
-        const otherQuestions = ['question1', 'question2', 'question3'].filter(q => q !== questionKey);
-        
-        for (let otherQuestion of otherQuestions) {
-            const otherValue = this.state[otherQuestion].value;
-            if (otherValue !== null && otherValue === currentValue) {
-                // Alert.alert('Duplicate Question', 'Please select a different question for each field.');\
-                let message ='Duplicate Question, Please select a different question for each field.';
-                this.setState({
-                    [`${questionKey}Error`]: true,
-                    [`${questionKey}ErrorMessage`]: message
-                });
-            }else{
-                this.removeError(otherQuestion)
-            }
-        }
-    }
-
-    removeError = (questionKey) => {
+    removeError = () => {
         this.setState({
-            [`${questionKey}Error`]: false,
+            questionError: false,
         });
     }
 
@@ -345,47 +296,39 @@ export default class SecurityQuestions extends Component {
                     <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>
                     <View style={styles.header}>
                         <View style={styles.left}>
-                            <Text style={styles.login}>Set Secret Questions</Text>
-                            <Text style={styles.text}>Answer the security questions below</Text>
+                            <Text style={styles.login}>Set Secret Question</Text>
+                            <Text style={styles.text}>Answer the security question below</Text>
                         </View>
                         <View style={styles.right}>
                             <Image style={styles.profileImage} source={require('../../../assets/logo.png')} />
                         </View>
                     </View>
-                    <View style={[styles.formLine, {marginTop:'0%'}]}>
+                    <View style={[styles.formLine, {marginTop:'8%'}]}>
                         <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Question 1</Text>
+                            <Text style={styles.labeltext}>Question</Text>
                         </View>
                     </View>
-                    <View style={{minHeight:'40',width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%', zIndex:1000}}>
+                    <View style={{minHeight:40,width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%', zIndex:1000}}>
                         <DropDownPicker
                             placeholder="Select a Secret Question"
                             placeholderStyle={styles.dropdownPlaceholder}
-                            open={this.state.question1.open}
-                            value={this.state.question1.value}
+                            open={this.state.question.open}
+                            value={this.state.question.value}
                             items={this.state.securityQuestions}
                             style={styles.dropdown}
                             setOpen={(open) => {
                                 this.setState(prevState => ({
-                                    question1: {
-                                        ...prevState.question1,
+                                    question: {
+                                        ...prevState.question,
                                         open: open
                                     },
-                                    question2: {
-                                        ...prevState.question2,
-                                        open: false
-                                    },
-                                    question3: {
-                                        ...prevState.question3,
-                                        open: false
-                                    }
                                 }));
                             }}
                             setValue={(callback) => {
-                                const newValue = callback(this.state.question1.value);
+                                const newValue = callback(this.state.question.value);
                                 this.setState(prevState => ({
-                                    question1: {
-                                        ...prevState.question1,
+                                    question: {
+                                        ...prevState.question,
                                         value: newValue
                                     }
                                 }));
@@ -394,26 +337,7 @@ export default class SecurityQuestions extends Component {
                                 const newItems = callback(this.state.securityQuestions);
                                 this.setState({ securityQuestions: newItems });
                             }}
-                            onSelectItem={(item) => {
-                                this.removeError('question1');
-                                this.compareSelectedQuestion('question1', item.value);
-                            }}
-                            // onChangeValue={(value) => {
-                            //     // this.setState(prevState => ({
-                            //     //     question1: {
-                            //     //         ...prevState.question1,
-                            //     //         value: value
-                            //     //     }
-                            //     // }));
-                            // }}
-                            // onSelectItem={(item) => {
-                            //     this.setState(prevState => ({
-                            //         question1: {
-                            //             ...prevState.question1,
-                            //             value: item.value
-                            //         }
-                            //     }));
-                            // }}
+                            onSelectItem={() => this.removeError() }
                             listMode="SCROLLVIEW"
                             scrollViewProps={{
                                 nestedScrollEnabled: true,
@@ -426,7 +350,7 @@ export default class SecurityQuestions extends Component {
                                 top: 0,
                             }}
                         />
-                        {this.state.question1Error && <Text style={{ color: 'red' }}>{this.state.question1ErrorMessage}</Text>}
+                        {this.state.questionError && <Text style={{ color: 'red' }}>{this.state.questionErrorMessage}</Text>}
                     </View>
                     <View style={[styles.formLine, { marginTop:'2%' }]}>
                         <View style={styles.formCenter}>
@@ -437,196 +361,19 @@ export default class SecurityQuestions extends Component {
                                     placeholder="Enter your answer" 
                                     style={styles.textBox} 
                                     placeholderTextColor={"#A9A9A9"} 
-                                    ref="answer1"
+                                    ref="answer"
                                     returnKeyType="done" 
-                                    onChangeText={(answer1) => this.setState(prevState => ({
-                                        answers: {
-                                            ...prevState.answers,
-                                            answer1: {
-                                                ...prevState.answers.answer1,
-                                                value: answer1,
+                                    onChangeText={(answer) => this.setState({
+                                        answer: {
+                                                value: answer,
                                                 error: false,
                                                 errorMessage: ''
                                             }
                                         }
-                                    }))}
+                                    )}
                                 />
                             </View>
-                            {this.state.answers.answer1.error && <Text style={{ color: 'red' }}>{this.state.answers.answer1.errorMessage}</Text>}
-                        </View>
-                    </View>
-                    <View style={[styles.formLine, {marginTop:'3%'}]}>
-                        <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Question 2</Text>
-                        </View>
-                    </View>
-                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
-                        <DropDownPicker
-                            placeholder="Select a Secret Question"
-                            placeholderStyle={styles.dropdownPlaceholder}
-                            open={this.state.question2.open}
-                            value={this.state.question2.value}
-                            items={this.state.securityQuestions}
-                            style={styles.dropdown}
-                            setOpen={(open) => {
-                                this.setState(prevState => ({
-                                    question1: {
-                                        ...prevState.question1,
-                                        open: false
-                                    },
-                                    question2: {
-                                        ...prevState.question2,
-                                        open: open
-                                    },
-                                    question3: {
-                                        ...prevState.question3,
-                                        open: false
-                                    }
-                                }));
-                            }}
-                            setValue={(callback) => {
-                                const newValue = callback(this.state.question2.value);
-                                this.setState(prevState => ({
-                                    question2: {
-                                        ...prevState.question2,
-                                        value: newValue
-                                    }
-                                }));
-                            }}
-                            setItems={(callback) => {
-                                const newItems = callback(this.state.securityQuestions);
-                                this.setState({ securityQuestions: newItems });
-                            }}
-                            onSelectItem={(item) => {
-                                this.removeError('question2');
-                                this.compareSelectedQuestion('question2', item.value);
-                            }}
-                            listMode="SCROLLVIEW"
-                            scrollViewProps={{
-                                nestedScrollEnabled: true,
-                                persistentScrollbar: true,
-                            }}
-                            dropDownContainerStyle={{
-                                width: '97%',
-                                marginLeft: '1.5%',
-                                position: 'relative',
-                                top: 0,
-                            }}
-                        />
-                        {this.state.question2Error && <Text style={{ color: 'red' }}>{this.state.question2ErrorMessage}</Text>}
-                    </View>
-                    <View style={[styles.formLine, { marginTop:'2%' }]}>
-                        <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Answer</Text>
-                            <View roundedc style={styles.inputitem}>
-                                <FontAwesome5 name={'comment'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput 
-                                    placeholder="Enter your answer" 
-                                    style={styles.textBox} 
-                                    placeholderTextColor={"#A9A9A9"} 
-                                    ref="answer2" 
-                                    returnKeyType="done"
-                                    onChangeText={(answer2) => this.setState(prevState => ({
-                                        answers: {
-                                            ...prevState.answers,
-                                            answer2: {
-                                                ...prevState.answers.answer2,
-                                                value: answer2,
-                                                error: false,
-                                                errorMessage: ''
-                                            }
-                                        }
-                                    }))}
-                                />
-                            </View>
-                            {this.state.answers.answer2.error && <Text style={{ color: 'red' }}>{this.state.answers.answer2.errorMessage}</Text>}
-                        </View>
-                    </View>
-                    <View style={[styles.formLine, {marginTop:'3%'}]}>
-                        <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Question 3</Text>
-                        </View>
-                    </View>
-                    <View style={{width:'95%', marginLeft:'2.5%', backgroundColor:'#fff', borderColor:'#445cc4', marginTop: '1%'}}>
-                        <DropDownPicker
-                            placeholder="Select a Secret Question"
-                            placeholderStyle={styles.dropdownPlaceholder}
-                            open={this.state.question3.open}
-                            value={this.state.question3.value}
-                            items={this.state.securityQuestions}
-                            style={styles.dropdown}
-                            setOpen={(open) => {
-                                this.setState(prevState => ({
-                                    question1: {
-                                        ...prevState.question1,
-                                        open: false
-                                    },
-                                    question2: {
-                                        ...prevState.question2,
-                                        open: false
-                                    },
-                                    question3: {
-                                        ...prevState.question3,
-                                        open: open
-                                    }
-                                }));
-                            }}
-                            setValue={(callback) => {
-                                const newValue = callback(this.state.question3.value);
-                                this.setState(prevState => ({
-                                    question3: {
-                                        ...prevState.question3,
-                                        value: newValue
-                                    }
-                                }));
-                            }}
-                            setItems={(callback) => {
-                                const newItems = callback(this.state.securityQuestions);
-                                this.setState({ securityQuestions: newItems });
-                            }}
-                            onSelectItem={(item) => {
-                                this.removeError('question3');
-                                this.compareSelectedQuestion('question3', item.value);
-                            }}
-                            listMode="SCROLLVIEW"
-                            scrollViewProps={{
-                                nestedScrollEnabled: true,
-                                persistentScrollbar: true,
-                            }}
-                            dropDownContainerStyle={{
-                                width: '97%',
-                                marginLeft: '1.5%',
-                                position: 'relative',
-                                top: 0,
-                            }}
-                        />
-                        {this.state.question3Error && <Text style={{ color: 'red' }}>{this.state.question3ErrorMessage}</Text>}
-                    </View>
-                    <View style={[styles.formLine, { marginTop:'2%' }]}>
-                        <View style={styles.formCenter}>
-                            <Text style={styles.labeltext}>Answer</Text>
-                            <View roundedc style={styles.inputitem}>
-                                <FontAwesome5 name={'comment'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/>
-                                <TextInput 
-                                    placeholder="Enter your answer" 
-                                    style={styles.textBox} 
-                                    placeholderTextColor={"#A9A9A9"} 
-                                    ref="answer3" 
-                                    returnKeyType="done"
-                                    onChangeText={(answer3) => this.setState(prevState => ({
-                                        answers: {
-                                            ...prevState.answers,
-                                            answer3: {
-                                                ...prevState.answers.answer3,
-                                                value: answer3,
-                                                error: false,
-                                                errorMessage: ''
-                                            }
-                                        }
-                                    }))}
-                                />
-                            </View>
-                            {this.state.answers.answer3.error && <Text style={{ color: 'red' }}>{this.state.answers.answer3.errorMessage}</Text>}
+                            {this.state.answer.error && <Text style={{ color: 'red' }}>{this.state.answer.errorMessage}</Text>}
                         </View>
                     </View>
                     <View>
