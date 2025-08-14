@@ -13,5 +13,5 @@ eas build --profile preview --platform ios
 eas build --profile preview --platform all
 
 development profile //development build
-eas build --profile development --platform ios
+eas build --profile development --platform android
 eas build --profile development --platform ios

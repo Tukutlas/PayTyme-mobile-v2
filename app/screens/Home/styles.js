@@ -32,9 +32,9 @@ module.exports = StyleSheet.create({
     },
 
     left: {
-        alignSelf: "flex-start",
+        alignSelf: "flex-center",
         marginLeft: '4%',
-        marginTop:'18%',
+        marginTop: '15%',
         width: '50%'
     },
 

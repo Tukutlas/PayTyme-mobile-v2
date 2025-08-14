@@ -70,7 +70,7 @@ const Signin = ({ navigation }) => {
         return () => {
             keyboardDidShowListener.remove();
             keyboardDidHideListener.remove();
-            BackHandler.removeEventListener("hardwareBackPress", backPressed);
+            // BackHandler.removeEventListener("hardwareBackPress", backPressed);
         };
     }, []);
 
@@ -244,7 +244,7 @@ const Signin = ({ navigation }) => {
                 //     throw new Error('Network response was not ok');
                 // }
                 const responseText = await response.text();
-                // console.log(responseText)
+                console.log(responseText)
                 hideLoader();
                 let response_status = JSON.parse(responseText).status;
                 let data = JSON.parse(responseText).data;

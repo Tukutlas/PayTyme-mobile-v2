@@ -131,6 +131,7 @@ export default class AccountVerification extends Component {
                 }
             })
             .catch((error) => {
+                this.setState({isLoading:false});
                 alert("Network error. Please an error occured.");
             });
         }

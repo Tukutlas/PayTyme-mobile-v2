@@ -93,9 +93,13 @@
         }
       ],
       "./plugins/screen.js",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "expo-web-browser"
     ],
-    "scheme": ["paytyme","fb478452041884575"],
+    "scheme": [
+      "paytyme",
+      "fb478452041884575"
+    ],
     "owner": "victorel"
   }
 }

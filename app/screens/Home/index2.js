@@ -23,27 +23,18 @@ const Home = ({ navigation }) => {
     const [transactionList, setTransactionList] = useState([]);
     const reloadIntervalRef = useRef(null); // Store interval reference
 
-    // First useEffect: Initial setup (StatusBar, navigation listeners, and token setting)
     useEffect(() => {
         StatusBar.setBarStyle("light-content", true);
         if (Platform.OS === "android") {
             StatusBar.setBackgroundColor("#120A47", true);
             StatusBar.setTranslucent(true);
         }
-
-        const backPressed = () => {
-            Alert.alert('Log Out', 'Are you sure you want to log out?', [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Yes, Log out', onPress: () => logout() },
-            ]);
-            return true;
-        };
         
         const handleFocus = async () => {
             if (authToken) {
-                // console.log('refocusing1')
+                console.log('refocusing1')
                 await loadWalletBalance();
-                reloadTransactionHistory();
+                await reloadTransactionHistory();
             }
         };
 
@@ -71,11 +62,10 @@ const Home = ({ navigation }) => {
         const startAutoReloader = () => {
             const intervalId = setInterval(async () => {
                 if (authToken) {
-                    // console.log('reloading now')
                     await loadWalletBalance();  // Assuming this is an async function
-                    reloadTransactionHistory();  // Assuming this can be synchronous
+                    await reloadTransactionHistory();  // Assuming this can be synchronous
                 }
-            }, 30000);  // 2 minutes interval
+            }, 20000);  // 2 minutes interval
       
             // Cleanup function to clear the interval when component unmounts
             return () => clearInterval(intervalId);
@@ -86,17 +76,15 @@ const Home = ({ navigation }) => {
         const autoReloader = startAutoReloader();
 
         return () => {
-            BackHandler.removeEventListener('hardwareBackPress', backPressed);
+            // BackHandler.removeEventListener('hardwareBackPress', backPressed);
             navigation.removeListener('focus', handleFocus);
             autoReloader();
         };
     }, []);
 
-    // Second useEffect: Handle reload interval, balance, and transactions (depends on authToken)
     useEffect(() => {
         const loadDataAfterAuthToken = async () => {
             if (authToken) {
-                // console.log('loading')
                 await loadWalletBalance();
                 await getTransactionHistory();
             }
@@ -116,8 +104,6 @@ const Home = ({ navigation }) => {
         ]);
         return true;
     };
-
-    BackHandler.addEventListener('hardwareBackPress', backPressed);
     
     const loadWalletBalance = async () => {
         fetch(GlobalVariables.apiURL + "/wallet/details",
@@ -175,6 +161,7 @@ const Home = ({ navigation }) => {
         .then((response) => response.text())
         .then((responseText) => { 
             setIsLoading(false) 
+            console.log(responseText)
             let response_status = JSON.parse(responseText).status;
             if(response_status == true){
                 let data = JSON.parse(responseText).data.data;  
@@ -203,7 +190,7 @@ const Home = ({ navigation }) => {
         });
     }
 
-    const reloadTransactionHistory = () => {
+    const reloadTransactionHistory = async () => {
         // setIsLoading(true)  
         fetch(GlobalVariables.apiURL+"/transactions?perpage=3",
         { 
@@ -216,8 +203,7 @@ const Home = ({ navigation }) => {
             // <-- Post parameters
         }) 
         .then((response) => response.text())
-        .then((responseText) => { 
-            // setIsLoading(false) 
+        .then((responseText) => {
             let response_status = JSON.parse(responseText).status;
             if(response_status == true){
                 let data = JSON.parse(responseText).data.data;  

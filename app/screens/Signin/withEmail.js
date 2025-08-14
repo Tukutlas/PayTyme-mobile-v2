@@ -333,6 +333,7 @@ export default class WithEmail extends Component {
                 //     throw new Error('Network response was not ok');
                 // }
                 const responseText = await response.text();
+                console.log(responseText)
                 this.hideLoader();
                 let response_status = JSON.parse(responseText).status;
                 let data = JSON.parse(responseText).data;
