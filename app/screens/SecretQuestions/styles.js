@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     left: {
         // paddingLeft: Metrics.WIDTH * 0.0421,
         marginLeft: '5%',
-        width: '70%',
+        width: '75%',
     },
 
     login: {

@@ -1,0 +1,137 @@
+import React, { Component } from "react";
+import { Image, View, StatusBar, Platform, TouchableOpacity, BackHandler, Alert, Text } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// Screen Styles
+import styles from "./styles";  
+import { FontAwesome5 } from "@expo/vector-icons";
+import Spinner from 'react-native-loading-spinner-overlay';
+import { GlobalVariables } from '../../../global';
+import PhoneInput from "react-native-phone-number-input";
+
+
+export default class AddPhoneNumber extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            isChecked: false,
+            
+            amount:0,
+            isLoading: false,
+            modalVisible: false,
+
+            result: '',
+            auth_token: '', 
+            phone: '',
+            phoneInput: null,
+            phoneError: false,
+            phoneErrorMessage: ''
+        }
+    }
+
+    _storePhoneNumber(phone){ 
+        AsyncStorage.setItem('phone', phone )
+        .then( ()=>{
+      
+        })
+        .catch( (error)=>{
+      
+        }) 
+    };
+
+    showLoader () {
+        this.setState({ isLoading: true });
+    };
+
+    async UNSAFE_componentWillMount() {
+        // this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});        
+        BackHandler.addEventListener("hardwareBackPress", this.backPressed);
+    }
+
+    async removeItemValue(key) 
+    {
+        try {
+            await AsyncStorage.removeItem(key);
+            return true;
+        }
+        catch(exception) {
+            return false;
+        }
+    }
+    
+    backPressed = () => {
+        this.props.navigation.goBack();
+        return true;  
+    };
+
+    addPhoneNumber(){
+        this.setState({isLoading:true});
+        if(this.state.phone.length > 5){
+            this.props.navigation.navigate('PhoneVerificationMenu', {
+                phone: this.state.phone,
+                user_id: this.props.route.params.user_id,
+                routeName: this.props.route.params.routeName
+            });
+        }else{
+            this.setState({phoneError:true, phoneErrorMessage:"Phone number must be inserted"})
+        }
+    }
+
+    render(){
+        StatusBar.setBarStyle("dark-content", true);
+        if (Platform.OS === "android") {
+          StatusBar.setBackgroundColor("#ffff", true);
+          StatusBar.setTranslucent(true);
+        }
+        return (
+            <View style={styles.container}>
+                <Spinner visible={this.state.isLoading} textContent={''} color={'blue'}/>  
+                <View style={styles.header}>
+                    <View style={styles.left}>
+                        <TouchableOpacity onPress={() =>this.backPressed()}>
+                            <FontAwesome5 name={'arrow-left'} size={20} color={'#0C0C54'} />
+                        </TouchableOpacity>
+                    </View> 
+                    <View style={styles.headerBody}>
+                        <Text style={styles.body}>Add Phone Number</Text>
+                        <Text style={styles.text}></Text>
+                    </View>
+                    <View style={styles.right}>
+                        <Image style={styles.logo} source={require('../../../assets/logo.png')}/> 
+                    </View> 
+                </View>
+                <View style={[styles.formLine, {marginTop: '2%'}]}>
+                    <View style={styles.formCenter}>
+                        <Text style={styles.labeltext}>Enter your Phone Number</Text>
+                        <View roundedc style={[styles.inputitem, { justifyContent: 'center' }]}>
+                            {/* <FontAwesome5 name={'phone-alt'} color={'#A9A9A9'} size={15} style={styles.inputIcon}/> */}
+                            {/* <TextInput  placeholder="Type in phone Number" style={styles.input} keyboardType={'numeric'} returnKeyType="done" placeholderTextColor={"#A9A9A9"} ref="phone" onChangeText={(phone) => this.setState({phone})} value={this.state.phone} /> */}
+                            <PhoneInput
+                                ref={this.state.phoneInput}
+                                defaultValue={this.state.phone}
+                                defaultCode="NG"
+                                layout="first"
+                                withShadow
+                                autoFocus
+                                containerStyle={styles.phoneContainer}
+                                textContainerStyle={styles.textInput}
+                                placeholderTextColor={"#A9A9A9"}
+                                textStyle={{ fontSize: 13, fontFamily: "Roboto-Regular" }}
+                                returnKeyType="done" 
+                                onChangeFormattedText={(phone) => this.setState({phone, phoneError:false})}
+                            />
+                        </View>
+                        {this.state.phoneError && <Text style={{ color: 'red' }}>{this.state.phoneErrorMessage}</Text>}
+                    </View>
+                </View>
+                
+                <View style={{marginTop:'35%'}}>
+                    <TouchableOpacity info style={styles.buttonPurchase} onPress={() => {this.addPhoneNumber();}}>
+                        <Text autoCapitalize="words" style={{color:'white'}}>
+                            Next
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+  }
+}

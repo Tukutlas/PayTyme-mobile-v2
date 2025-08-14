@@ -2,7 +2,7 @@
   "expo": {
     "name": "PayTyme",
     "slug": "PayTyme",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,7 @@
         "NSDocumentPickerUsageDescription": "This app requires access to documents for file selection.",
         "NSTouchIDUsageDescription": "We use Touch ID to secure your data."
       },
-      "buildNumber": "2",
+      "buildNumber": "1",
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {
@@ -75,7 +75,7 @@
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.app.paytyme",
-      "versionCode": 9
+      "versionCode": 10
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -93,9 +93,13 @@
         }
       ],
       "./plugins/screen.js",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "expo-web-browser"
     ],
-    "scheme": ["PayTyme", "fb478452041884575"],
+    "scheme": [
+      "paytyme",
+      "fb478452041884575"
+    ],
     "owner": "victorel"
   }
 }

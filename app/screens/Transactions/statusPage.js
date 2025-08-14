@@ -25,8 +25,18 @@ export default class StatusPage extends Component {
     async componentDidMount() {
         this.setState({auth_token:JSON.parse(await AsyncStorage.getItem('login_response')).user.access_token});
         
-        // BackHandler.addEventListener("hardwareBackPress", this.backPressed);
+        // Only add BackHandler on Android
+        // if (Platform.OS === 'android') {
+        //     this.backHandler = BackHandler.addEventListener("hardwareBackPress", this.backPressed);
+        // }
     }
+
+    // componentWillUnmount() {
+    //     // Clean up BackHandler listener
+    //     if (this.backHandler && Platform.OS === 'android') {
+    //         this.backHandler.remove();
+    //     }
+    // }
 
     backPressed = () => {
         this.props.navigation.dispatch(

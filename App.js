@@ -55,6 +55,10 @@ import AnswerSecurityQuestions from './app/screens/SecretQuestions/validate';
 import SetPinScreen from './app/screens/Signup/SetPinScreen';
 import ConfirmPinScreen from './app/screens/Signup/ConfirmPinScreen';
 
+import AddPhoneNumber from './app/screens/PhoneNumber/addPhoneNumber';
+import PhoneVerificationMenu from './app/screens/PhoneNumber/verificationMenu';
+import PhoneVerification from './app/screens/PhoneNumber/phoneVerification';
+
 SplashScreen.preventAutoHideAsync();
 
 const Tab = createBottomTabNavigator();
@@ -202,6 +206,10 @@ const RootStack = () => {
                     <Stack.Screen name='AccountVerification' component={AccountVerification}/>
                     <Stack.Screen name='SecurityQuestions' component={SecurityQuestions}/>
                     <Stack.Screen name='AnswerSecurityQuestions' component={AnswerSecurityQuestions}/>
+
+                    <Stack.Screen name='AddPhoneNumber' component={AddPhoneNumber}/>
+                    <Stack.Screen name='PhoneVerificationMenu' component={PhoneVerificationMenu}/>
+                    <Stack.Screen name='PhoneVerification' component={PhoneVerification}/>
 
                     <Stack.Screen name="ViewPicture" component={ViewPicture} />
                     <Stack.Screen name="AboutUs" component={AboutUs} />

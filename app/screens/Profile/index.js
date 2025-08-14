@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CommonActions } from '@react-navigation/native';
 import { 
     BackHandler, Switch, StatusBar, Linking, PermissionsAndroid, 
     TouchableOpacity, TouchableWithoutFeedback, Image, 
@@ -106,7 +107,15 @@ const Profile = ({ navigation }) => {
         Alert.alert(
             'Session Out',
             'Your session has timed-out. Login and try again',
-            [{ text: 'OK', onPress: () => navigation.navigate('Signin') }],
+            [
+                { 
+                    text: 'OK', 
+                    onPress: () => navigation.reset({
+                        index: 0,
+                        routes: [{ name: initialRoute }]
+                    }) 
+                }
+            ],
             { cancelable: false }
         );
     };
@@ -147,11 +156,13 @@ const Profile = ({ navigation }) => {
     };
 
     const logout = async () => {
-        // Ensure initialRoute is defined and valid
-        navigation.reset({
-            index: 0,
-            routes: [{ name: initialRoute }]
-        });
+        setLogoutModalVisible(false);
+        setTimeout(() => {
+            navigation.reset({
+                    index: 0,
+                    routes: [{ name: initialRoute }]
+                });
+        }, 500); // Delay to prevent overlapping calls
     }
 
     setBiometricEnability = async (status) => {
@@ -244,6 +255,7 @@ const Profile = ({ navigation }) => {
         await setBiometricEnability(false);
         const keysToRemove = ['@user', 'email', 'password', 'pin', 'login_response', 'auth_type'];
         keysToRemove.forEach(key => AsyncStorage.removeItem(key));
+        setLogoutModalVisible(false);
         // Ensure initialRoute is defined and valid
         navigation.reset({
             index: 0,

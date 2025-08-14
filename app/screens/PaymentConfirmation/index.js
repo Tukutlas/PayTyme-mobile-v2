@@ -63,9 +63,9 @@ export default class PaymentConfirmation extends Component {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener("hardwareBackPress", this.backPressed);
-    }
+    // componentWillUnmount() {
+    //     BackHandler.removeEventListener("hardwareBackPress", this.backPressed);
+    // }
 
     backPressed = () => {
         this.props.navigation.goBack();

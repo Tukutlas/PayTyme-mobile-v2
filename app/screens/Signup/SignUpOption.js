@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Alert, BackHandler, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, Image, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { useRouteContext } from '../../context/RouteContext';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure to install react-native-vector-icons
 import Svg, { Path } from 'react-native-svg';
@@ -9,6 +9,8 @@ import { GlobalVariables } from '../../../global';
 import * as WebBrowser from "expo-web-browser";
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { Buffer } from "buffer";
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -41,7 +43,7 @@ const SignUpOption = ({navigation}) => {
         BackHandler.addEventListener("hardwareBackPress", backPressed);
     }, [facebookResponse]);
 
-    const gotoAuth = async(authType) => {
+    const goToAuth = async(authType) => {
         switch (authType) {
             case 'google':
                 // Handle Google login flow
@@ -132,6 +134,28 @@ const SignUpOption = ({navigation}) => {
         }
     }
 
+    const getUserAppleInfo = async () => {
+        const credential = await AppleAuthentication.signInAsync({
+            requestedScopes: [
+                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                AppleAuthentication.AppleAuthenticationScope.EMAIL
+            ],
+        })
+
+        const given_name = credential.fullName?.givenName || '';
+        const family_name = credential.fullName?.familyName || '';
+        const email = credential.email || decodeJWT(credential.identityToken)?.email || '';
+        const user = {
+            given_name: given_name,
+            family_name: family_name,
+            email: email
+        }
+
+        await AsyncStorage.setItem('@user', JSON.stringify(user));
+        setUserInfo(user);
+        await checkUserEmail(email, 'apple');
+    }
+
     const backPressed = () => {
         if(navigation.canGoBack()){
             navigation.goBack()
@@ -146,6 +170,21 @@ const SignUpOption = ({navigation}) => {
             ]);
         }
         return true;
+    };
+
+    const decodeJWT = (token) => {
+        try {
+            // Split the token and extract the payload part
+            const base64Url = token.split('.')[1];
+            
+            // Decode using Buffer and parse the JSON
+            const decodedPayload = JSON.parse(Buffer.from(base64Url, "base64").toString("utf-8"));
+            
+            return decodedPayload;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
     };
 
     const checkUserEmail = async (email, authType) => {
@@ -172,7 +211,6 @@ const SignUpOption = ({navigation}) => {
             // Check if the user email exists based on the server response
             if (res.status) {
                 const { email, auth_type: authType } = res.data;
-    
                 // Step 2: If email exists, proceed to login based on the auth type
                 switch (authType) {
                     case 'google':
@@ -188,7 +226,9 @@ const SignUpOption = ({navigation}) => {
                         break;
                     case 'apple':
                         // Handle Apple login flow
-                        // await handleAppleLogin(user);
+                        AsyncStorage.setItem('email', email);
+                        setRouteContextInitialRoute('PinScreen');
+                        navigation.navigate("PinScreen");
                         break;
                     case 'email':
                         AsyncStorage.setItem('email', email);
@@ -205,8 +245,11 @@ const SignUpOption = ({navigation}) => {
                 navigation.navigate("SetPinScreen", { auth_type: 'google' });
             }
         } catch (error) {
-            // console.error('Error checking user email:', error);
+            console.error('Error checking user email:', error);
             // You can show an error message or notify the user
+        } finally {
+            // Ensure isLoading is set to false whether success or failure
+            setIsLoading(false);
         }
     };
 
@@ -216,7 +259,7 @@ const SignUpOption = ({navigation}) => {
             <Text style={styles.title}>Sign Up</Text>
 
             {/* Sign in with Google */}
-            <TouchableOpacity style={styles.button} onPress={() => gotoAuth('google')}>
+            <TouchableOpacity style={styles.button} onPress={() => goToAuth('google')}>
                 {/* <Icon name="google" size={24} color="white" style={styles.icon} /> */}
                 <Svg width="20" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={styles.icon}>
                     <Path d="M4.93242 12.0855L4.23625 14.6845L1.69176 14.7383C0.931328 13.3279 0.5 11.7141 0.5 9.9993C0.5 8.34105 0.903281 6.7773 1.61813 5.40039H1.61867L3.88398 5.8157L4.87633 8.06742C4.66863 8.67293 4.55543 9.32293 4.55543 9.9993C4.55551 10.7334 4.68848 11.4367 4.93242 12.0855Z" fill="#FBBB00" />
@@ -228,15 +271,59 @@ const SignUpOption = ({navigation}) => {
             </TouchableOpacity>
 
             {/* Sign in with Apple */}
-            {/* <TouchableOpacity style={styles.button}>
-                <Icon name="apple" size={24} color="black" style={styles.icon} />
-                <Text style={styles.buttonText}>Sign in with Apple</Text>
-            </TouchableOpacity> */}
+            {/* Sign in with Apple */}
+            {Platform.OS === 'ios' ? (
+            <>
+                {/* <AppleAuthentication.AppleAuthenticationButton
+                    buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE}
+                    cornerRadius={25}
+                    style={{ 
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: '#ffff', // Customize button color as needed
+                        padding: 12,
+                        marginVertical: 10,
+                        borderRadius: 25,
+                        width: '80%',
+                        height: 64,
+                        justifyContent: 'center',
+                        // borderWidth: 1,
+                        borderColor: '#222B40'
+                    }}
+                    onPress={async () => {
+                        try {
+                            const credential = await AppleAuthentication.signInAsync({
+                                requestedScopes: [
+                                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                                    AppleAuthentication.AppleAuthenticationScope.EMAIL
+                                ],
+                            })
+
+                            console.log(credential)
+
+                            // // Sign in via Supabase Auth.
+                            // if (credential.identityToken) {
+                                
+                            // } else {
+                            //     throw new Error('No identityToken.')
+                            // }
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }}
+                /> */}
+                <TouchableOpacity style={styles.button} onPress={() => getUserAppleInfo()}>
+                    <Icon name="apple" size={24} color="black" style={styles.icon} />
+                    <Text style={styles.buttonText}>Sign up with Apple</Text>
+                </TouchableOpacity>
+                </>
+            ): <></>}
 
             {/* Sign in with Facebook */}
-            <TouchableOpacity style={styles.button} onPress={() => gotoAuth('facebook')}>
+            <TouchableOpacity style={styles.button} onPress={() => goToAuth('facebook')}>
                 <Icon name="facebook" size={24} color="#3B65BF" style={styles.icon} />
-                <Text style={styles.buttonText}>Sign in with Facebook</Text>
+                <Text style={styles.buttonText}>Sign up with Facebook</Text>
             </TouchableOpacity>
 
             {/* Sign in with Email */}
@@ -244,7 +331,7 @@ const SignUpOption = ({navigation}) => {
                 <Icon name="envelope" size={24} color={'#A9A9A9'} style={styles.icon} />
                 <Text style={styles.buttonText}>Sign up with Another Email</Text>
             </TouchableOpacity>
-            <View style={{ flexDirection: 'row', marginTop: '3%', marginBottom: '10%', justifyContent: 'center' }}>
+            <View style={{ flexDirection: 'row', marginTop: '3%', marginBottom: '10%', justifyContent: 'center', zIndex: 2 }}>
                 <Text style={styles.signUpTextBlack}>
                     Already have an account?
                 </Text>

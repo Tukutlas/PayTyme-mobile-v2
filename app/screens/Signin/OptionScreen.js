@@ -10,6 +10,8 @@ import { GlobalVariables } from '../../../global';
 import * as WebBrowser from "expo-web-browser";
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { Buffer } from "buffer";
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -65,7 +67,7 @@ const SignInOption = ({navigation}) => {
 
     const getUserFacebookInfo = async (token) => {
         if(!token) return;
-        setIsLoading(true)
+        setIsLoading(true);
         try {
             const response = await fetch(
                 `https://graph.facebook.com/me?access_token=${token}&fields=id,name,picture.type(large),email`,
@@ -113,6 +115,42 @@ const SignInOption = ({navigation}) => {
         }
     }
 
+    const decodeJWT = (token) => {
+        try {
+            // Split the token and extract the payload part
+            const base64Url = token.split('.')[1];
+            
+            // Decode using Buffer and parse the JSON
+            const decodedPayload = JSON.parse(Buffer.from(base64Url, "base64").toString("utf-8"));
+            
+            return decodedPayload;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
+    };
+
+    const getUserAppleInfo = async () => {
+        const credential = await AppleAuthentication.signInAsync({
+            requestedScopes: [
+                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                AppleAuthentication.AppleAuthenticationScope.EMAIL
+            ],
+        })
+
+        const given_name = credential.fullName?.givenName || '';
+        const family_name = credential.fullName?.familyName || '';
+        const email = credential.email || decodeJWT(credential.identityToken)?.email || '';
+        const user = {
+            given_name: given_name,
+            family_name: family_name,
+            email: email
+        }
+
+        await AsyncStorage.setItem('@user', JSON.stringify(user));
+        await checkUserEmail(email, 'apple');
+    }
+
     const checkUserEmail = async (email, authType) => {
         setIsLoading(true); // Start loading
         try {
@@ -126,7 +164,7 @@ const SignInOption = ({navigation}) => {
     
             if (!response.ok) {
                 if (response.status === 404) {
-                    navigation.navigate("SignUpOption");
+                    navigation.navigate("SetPinScreen", { auth_type: authType });
                     return; // Stop further execution
                 }
             }
@@ -153,6 +191,9 @@ const SignInOption = ({navigation}) => {
                         break;
                     case 'apple':
                         // Handle Apple login flow
+                        AsyncStorage.setItem('email', email);
+                        setRouteContextInitialRoute('PinScreen');
+                        navigation.navigate("PinScreen");
                         break;
                     case 'email':
                         AsyncStorage.setItem('email', email);
@@ -160,11 +201,13 @@ const SignInOption = ({navigation}) => {
                         navigation.navigate("WithEmail");
                         break;
                     default:
-                        navigation.navigate("SignUpOption");
+                        // navigation.navigate("SignUpOption");
+                        navigation.navigate("SetPinScreen", { auth_type: 'google' });
                 }
             } else {
                 // Step 3: If the user does not exist, show an error or redirect to signup
-                navigation.navigate("SignUpOption");
+                // navigation.navigate("SignUpOption");
+                navigation.navigate("SetPinScreen", { auth_type: 'google' });
             }
         } catch (error) {
             console.error('Error checking user email:', error);
@@ -219,12 +262,53 @@ const SignInOption = ({navigation}) => {
             </TouchableOpacity>
 
             {/* Sign in with Apple */}
-            {/* {Platform.OS === 'ios' && (
-                <TouchableOpacity style={styles.button}>
+            {Platform.OS === 'ios' ? (
+            <>
+                {/* <AppleAuthentication.AppleAuthenticationButton
+                    buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE}
+                    cornerRadius={25}
+                    style={{ 
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: '#ffff', // Customize button color as needed
+                        padding: 12,
+                        marginVertical: 10,
+                        borderRadius: 25,
+                        width: '80%',
+                        height: 64,
+                        justifyContent: 'center',
+                        // borderWidth: 1,
+                        borderColor: '#222B40'
+                    }}
+                    onPress={async () => {
+                        try {
+                            const credential = await AppleAuthentication.signInAsync({
+                                requestedScopes: [
+                                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                                    AppleAuthentication.AppleAuthenticationScope.EMAIL
+                                ],
+                            })
+
+                            console.log(credential)
+
+                            // // Sign in via Supabase Auth.
+                            // if (credential.identityToken) {
+                                
+                            // } else {
+                            //     throw new Error('No identityToken.')
+                            // }
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }}
+                /> */}
+                <TouchableOpacity style={styles.button} onPress={() => getUserAppleInfo()}>
                     <Icon name="apple" size={24} color="black" style={styles.icon} />
                     <Text style={styles.buttonText}>Sign in with Apple</Text>
                 </TouchableOpacity>
-            )} */}
+                </>
+            ): <></>}
 
             {/* Sign in with Facebook */}
             <TouchableOpacity style={styles.button} onPress={() => facebookPromptAsync()}>

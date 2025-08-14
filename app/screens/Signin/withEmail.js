@@ -313,7 +313,7 @@ export default class WithEmail extends Component {
             //this functions posts to the login API ; //#endregion
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 20000); // Adjust the timeout duration as needed (e.g., 20 seconds)
-            fetch(GlobalVariables.apiURL + "/auth/login-v2", {
+            fetch(GlobalVariables.apiURL + "/auth/login-v3", {
                 method: 'POST',
                 headers: new Headers({
                     'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
@@ -333,11 +333,13 @@ export default class WithEmail extends Component {
                 //     throw new Error('Network response was not ok');
                 // }
                 const responseText = await response.text();
+                console.log(responseText)
                 this.hideLoader();
                 let response_status = JSON.parse(responseText).status;
                 let data = JSON.parse(responseText).data;
                 
                 if (response_status == true) {
+                    
                     let access_token = JSON.parse(responseText).authorisation.token;
                     let username = data.username;
                     let firstname = data.first_name;
@@ -410,7 +412,7 @@ export default class WithEmail extends Component {
                             routeName: 'Signin',
                             status: account_status,
                             user_id: data.user_id,
-                            phone: data.phone,
+                            phone: data.phone_number,
                             email: data.email_address
                         })
                     } else if (account_status == 'unverified3') {
@@ -418,8 +420,13 @@ export default class WithEmail extends Component {
                             status: account_status,
                             routeName: 'Signin',
                             user_id: data.user_id,
-                            phone: data.phone,
+                            phone: data.phone_number,
                             email: data.email_address
+                        })
+                    } else if (account_status == 'unverified4') {
+                        this.props.navigation.navigate('AddPhoneNumber', {
+                            routeName: 'PinScreen',
+                            user_id: data.user_id,
                         })
                     } else if(device_status == 'unauthenticated'){
                         Alert.alert(
@@ -436,7 +443,7 @@ export default class WithEmail extends Component {
                                         status: device_status,
                                         routeName: 'Signin',
                                         user_id: data.user_id,
-                                        phone: data.phone,
+                                        phone: data.phone_number,
                                         email: data.email_address
                                     }),
                                     style: 'cancel',
@@ -459,7 +466,7 @@ export default class WithEmail extends Component {
                                         status: device_status,
                                         routeName: 'Signin',
                                         user_id: data.user_id,
-                                        phone: data.phone,
+                                        phone: data.phone_number,
                                         email_address: data.email_address
                                     }),
                                     style: 'cancel',
@@ -485,7 +492,7 @@ export default class WithEmail extends Component {
                 }
             })
             .catch((error) => {
-                // console.log(error); 
+                console.log(error); 
                 this.hideLoader();
                 if (error.name === 'AbortError') {
                     Alert.alert(

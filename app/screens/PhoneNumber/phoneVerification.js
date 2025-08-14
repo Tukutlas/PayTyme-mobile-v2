@@ -18,7 +18,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { GlobalVariables } from '../../../global';
 import { OtpInput } from "react-native-otp-entry";
 
-export default class AccountVerification extends Component {
+export default class PhoneVerification extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -30,6 +30,7 @@ export default class AccountVerification extends Component {
             otpError: false,
             otpErrorMessage: '',
             timer: 60,
+            user_id: ''
         }
     }
 
@@ -42,7 +43,7 @@ export default class AccountVerification extends Component {
     };
 
     async UNSAFE_componentWillMount() {
-        this.setState({phone: this.props.route.params.phone})      
+        this.setState({phone: this.props.route.params.phone, user_id: this.props.route.params.user_id})      
         BackHandler.addEventListener("hardwareBackPress", this.backPressed);
         this.startTimer();
     }
@@ -90,28 +91,7 @@ export default class AccountVerification extends Component {
                 this.setState({isLoading:false});
                 let response_status = JSON.parse(responseText).status;
                 if(response_status == true){
-                    if(this.props.route.params.status == 'unverified2'){
-                        Alert.alert(
-                            'Account Verification Successful!',
-                            'Your account on Paytyme has been verified successfully.',
-                            [
-                                {
-                                    text: 'Proceed to Sign in',
-                                    onPress: () => this.props.navigation.navigate('Signin'),
-                                    style: 'cancel',
-                                },
-                            ],
-                            {cancelable: false},
-                        );
-                    }else{
-                        this.props.navigation.navigate('SecurityQuestions', {
-                            status: this.props.route.params.status,
-                            routeName: 'Signin',
-                            user_id: this.props.route.params.user_id,
-                            phone: this.props.route.params.phone,
-                            email_address: this.props.route.params.email_address
-                        })
-                    }
+                    this.addPhoneNumber();
                 }else if(response_status == false){
                     let message = JSON.parse(responseText).message;
                     Alert.alert(
@@ -131,7 +111,6 @@ export default class AccountVerification extends Component {
                 }
             })
             .catch((error) => {
-                this.setState({isLoading:false});
                 alert("Network error. Please an error occured.");
             });
         }
@@ -224,6 +203,62 @@ export default class AccountVerification extends Component {
         });   
     }
 
+    addPhoneNumber(){
+        this.setState({isLoading:true});
+        let phone = this.state.phone;
+        let user_id = this.state.user_id;
+        
+        fetch(`${GlobalVariables.apiURL}/auth/add-phone-number/${user_id}`,
+        { 
+            method: 'POST',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+            }),
+            body:  "phone_number="+phone
+            // <-- Post parameters
+        }) 
+        .then((response) => response.text())
+        .then((responseText) => { 
+            // console.log(responseText)
+            this.setState({isLoading:false});
+            let res = JSON.parse(responseText);
+            // console.log(JSON.parse(responseText).message);
+            if(res.status == true){
+                Alert.alert(
+                    'Phone Number Verification',
+                    res.message,
+                    [
+                        {
+                            text: 'Proceed to Sign in',
+                            onPress: () => this.props.navigation.navigate(this.props.route.params.routeName),
+                            style: 'cancel',
+                        },
+                    ],
+                    {cancelable: false},
+                );
+            }else {
+                let message = res.message;
+                Alert.alert(
+                    'Error',
+                    message,
+                    [
+                        {  
+                            text: 'Cancel',
+                            onPress: () => {
+                                
+                            },
+                            style: 'cancel',
+                        }
+                    ],
+                    {cancelable: false},
+                );
+            }
+        })
+        .catch((error) => {
+            alert("Network error. Please an error occured.");
+        });
+    }
+
     render(){
         StatusBar.setBarStyle("dark-content", true);
         if (Platform.OS === "android") {
@@ -240,7 +275,7 @@ export default class AccountVerification extends Component {
                         </TouchableOpacity>
                     </View> 
                     <View style={styles.headerBody}>
-                        <Text style={styles.body}>Account Authentication</Text>
+                        <Text style={styles.body}>Number Authentication</Text>
                         <Text style={styles.text}>Check your SMS for the authentication code sent to you</Text>
                     </View>
                     <View style={styles.right}>

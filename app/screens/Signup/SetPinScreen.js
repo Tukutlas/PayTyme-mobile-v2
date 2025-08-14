@@ -55,11 +55,6 @@ const SetPinScreen = ({ navigation, route }) => {
     };
 
     const renderDots = () => {
-        // const shakeInterpolate = shakeAnimation.interpolate({
-        //     inputRange: [-1, 0, 1],
-        //     outputRange: [-5, 0, 5], // Adjust the shake distance
-        // });
-
         return (
             <View style={styles.dotsContainer}>
                 {[...Array(4)].map((_, index) => (
